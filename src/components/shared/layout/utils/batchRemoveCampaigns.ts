@@ -1,0 +1,1 @@
+// \nproject\fe_pdsw\src\components\shared\layout\utils\batchRemoveCampaigns.ts

@@ -1,0 +1,36 @@
+# 🎭 Playwright 필수 가이드
+
+## 🎯 테스트 작성 규칙
+**선택자 우선순위**: `data-testid` > `role` > `text` > CSS클래스
+- 동적 CSS 클래스 피하기 (Tailwind 등)
+- 브라우저 개발자도구로 HTML 구조 확인
+
+## ⭐ 자주 사용하는 명령어 TOP 5
+```bash
+npx playwright test             # 1. 전체 실행
+npx playwright test campaign    # 2. 특정 테스트만
+npx playwright test --debug     # 3. 디버깅
+npx playwright show-report      # 4. 보고서 보기
+npx playwright test --ui        # 5. UI 모드
+```
+
+## 📌 기본 명령어
+```bash
+# 실행
+npx playwright test                    # 전체
+npx playwright test -g "캠페인"         # 이름으로 특정 테스트
+
+# 모드
+npx playwright test --headed           # 브라우저 보면서 실행
+npx playwright test --headed=false     # 백그라운드 실행
+```
+
+## 🚨 문제 해결
+```bash
+# 재설치
+npm install @playwright/test
+npx playwright install
+
+# 캐시 클리어  
+rm -rf playwright-report/ test-results/
+```

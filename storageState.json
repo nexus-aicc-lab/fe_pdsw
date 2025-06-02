@@ -1,0 +1,83 @@
+{
+  "cookies": [
+    {
+      "name": "userHost",
+      "value": "222.108.155.17",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1747812178,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "id",
+      "value": "NEX21004",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1747812178,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "session_key",
+      "value": "1a4140af4417cf20-28d3c8e5-484a-afc8-66456674764d76b1419317c",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1747812178,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "tenant_id",
+      "value": "0",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1747812178,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "role_id",
+      "value": "0",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1747812178,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "menu_role_id",
+      "value": "1",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1747812178,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "environment-storage",
+          "value": "{\"state\":{\"environmentData\":{\"code\":\"SU\",\"message\":\"Success\",\"campaignListAlram\":0,\"statisticsUpdateCycle\":10,\"serverConnectionTime\":100,\"showChannelCampaignDayScop\":5,\"personalCampaignAlertOnly\":0,\"useAlramPopup\":1,\"unusedWorkHoursCalc\":1,\"sendingWorkStartHours\":\"0000\",\"sendingWorkEndHours\":\"2359\",\"dayOfWeekSetting\":\"f,f,t,t,t,t,t\"},\"campaignListAlram\":0,\"statisticsUpdateCycle\":10,\"serverConnectionTime\":100,\"showChannelCampaignDayScop\":5,\"personalCampaignAlertOnly\":0,\"useAlramPopup\":1,\"unusedWorkHoursCalc\":1,\"sendingWorkStartHours\":\"0000\",\"sendingWorkEndHours\":\"2359\",\"dayOfWeekSetting\":\"f,f,t,t,t,t,t\"},\"version\":0}"
+        },
+        {
+          "name": "auth-storage",
+          "value": "{\"state\":{\"id\":\"NEX21004\",\"tenant_id\":0,\"session_key\":\"1a4140af4417cf20-28d3c8e5-484a-afc8-66456674764d76b1419317c\",\"role_id\":0,\"menu_role_id\":1,\"expires_in\":3495451642954,\"expires_check\":false},\"version\":0}"
+        },
+        {
+          "name": "available-menu-storage",
+          "value": "{\"state\":{\"availableMenus\":[],\"availableHeaderMenus\":[],\"availableHeaderMenuIds\":[],\"availableCampaignTenantContextMenus\":[],\"availableCampaignTenantContextMenuIds\":[],\"availableCampaignTabCampaignContextMenus\":[],\"availableCampaignTabCampaignContextMenuIds\":[],\"availableMenuIdsForSkilAssignment\":[],\"availableMenuIdsForCampaignGroupTabTenant\":[],\"availableMenuIdsForCampaignGroupTabCampaignGroup\":[],\"availableMenuIdsForCampaignGroupTabCampaign\":[],\"isLoading\":true,\"isError\":false},\"version\":0}"
+        }
+      ]
+    }
+  ]
+}

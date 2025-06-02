@@ -1,0 +1,29 @@
+<!-- C:\nproject\fe_pdsw\public\header-menu\재발신설정.svg -->
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- 원형 화살표 -->
+    <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3" 
+          stroke="#666666" 
+          stroke-width="2" 
+          stroke-linecap="round"/>
+    
+    <!-- 화살표 머리 -->
+    <path d="M12 3L16 6L12 9" 
+          stroke="#666666" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
+    
+    <!-- 중앙의 시계 표시 -->
+    <circle cx="12" cy="12" r="3" 
+            stroke="#666666" 
+            stroke-width="2" 
+            fill="none"/>
+    
+    <!-- 시계 침 -->
+    <path d="M12 10V12L13.5 13.5" 
+          stroke="#666666" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
+</svg>
