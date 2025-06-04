@@ -42,7 +42,7 @@ const defaultSkillListRequest: SkillListRequestForSystemAdmin = {
   //     end: 9999999,
   //   },
     // tenant_id: [],
-  },
+  // },
   sort: {
     skill_id: 0,
     tenant_id: 0,
