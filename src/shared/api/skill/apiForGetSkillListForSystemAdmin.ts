@@ -17,8 +17,8 @@ export interface SkillListResponseForSystemAdmin {
 }
 
 export interface SkillListRequestForSystemAdmin {
-  filter: {
-    skill_id: {
+  filter?: {
+    skill_id?: {
       start: number;
       end: number;
     };
@@ -36,12 +36,12 @@ export interface SkillListRequestForSystemAdmin {
 
 // 기본 요청 구조
 const defaultSkillListRequest: SkillListRequestForSystemAdmin = {
-  filter: {
-    skill_id: {
-      start: 1,
-      end: 9999999,
-    },
-    tenant_id: [],
+  // filter: {
+  //   skill_id: {
+  //     start: 1,
+  //     end: 9999999,
+  //   },
+    // tenant_id: [],
   },
   sort: {
     skill_id: 0,

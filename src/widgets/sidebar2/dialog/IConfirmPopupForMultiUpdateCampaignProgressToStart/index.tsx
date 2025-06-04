@@ -79,12 +79,12 @@ const CampaignStartModal = ({
   // 캠페인 스케줄 정보 가져오기
   const { data: scheduleData, isLoading: isLoadingSchedule } = useApiForCampaignScheduleInfosForSystemAdmin({
     request: {
-      filter: {
-        campaign_id: {
-          start: Math.min(...campaignIds, 1),
-          end: Math.max(...campaignIds, 9999999)
-        }
-      }
+      // filter: {
+      //   campaign_id: {
+      //     start: Math.min(...campaignIds, 1),
+      //     end: Math.max(...campaignIds, 9999999)
+      //   }
+      // }
     },
     enabled: campaignIds.length > 0 && internalOpen
   });
@@ -92,12 +92,12 @@ const CampaignStartModal = ({
   // 캠페인 발신번호 정보 가져오기
   const { data: callingNumberData, isLoading: isLoadingCallingNumbers } = useApiForCampaignCallingNumberListForSystemAdmin({
     request: {
-      filter: {
-        campaign_id: {
-          start: Math.min(...campaignIds, 1),
-          end: Math.max(...campaignIds, 9999999)
-        }
-      }
+      // filter: {
+      //   campaign_id: {
+      //     start: Math.min(...campaignIds, 1),
+      //     end: Math.max(...campaignIds, 9999999)
+      //   }
+      // }
     },
     enabled: campaignIds.length > 0 && internalOpen
   });
@@ -115,12 +115,12 @@ const CampaignStartModal = ({
   // 캠페인 스킬 정보 가져오기
   const { data: skillData, isLoading: isLoadingSkills } = useApiForCampaignSkillListForSystemAdmin({
     request: {
-      filter: {
-        skill_id: {
-          start: 1,
-          end: 9999999
-        }
-      }
+      // filter: {
+      //   skill_id: {
+      //     start: 1,
+      //     end: 9999999
+      //   }
+      // }
     },
     enabled: campaignIds.length > 0 && internalOpen
   });

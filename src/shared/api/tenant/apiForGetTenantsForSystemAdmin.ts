@@ -4,7 +4,7 @@ import { axiosInstance } from "@/lib/axios";
 
 // 요청에 사용할 타입
 export interface TenantFilterRequestForSystemAdmin {
-  filter: {
+  filter?: {
     tenant_id: {
       start: number;
       end: number;
@@ -36,12 +36,12 @@ export interface TenantListResponseForSystemAdmin {
 
 // 기본 요청 구조
 const defaultTenantListRequest: TenantFilterRequestForSystemAdmin = {
-  filter: {
-    tenant_id: {
-      start: 0,
-      end: 9999999,
-    },
-  },
+  // filter: {
+  //   tenant_id: {
+  //     start: 0,
+  //     end: 9999999,
+  //   },
+  // },
   sort: {
     tenant_id: 0,
   },

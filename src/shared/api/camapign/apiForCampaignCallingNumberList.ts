@@ -8,7 +8,7 @@ export interface CampaignCallingNumberItemForSystemAdmin {
 
 // 📌 요청 타입
 export interface IRequestForCampaignCallingNumberListForSystemAdmin {
-  filter: {
+  filter?: {
     campaign_id?: {
       start: number;
       end: number;
@@ -34,12 +34,12 @@ export interface IResponseForCampaignCallingNumberListForSystemAdmin {
 
 // 📌 기본 요청 값
 const defaultRequest: IRequestForCampaignCallingNumberListForSystemAdmin = {
-  filter: {
-    campaign_id: {
-      start: 1,
-      end: 9999999
-    }
-  },
+  // filter: {
+  //   campaign_id: {
+  //     start: 1,
+  //     end: 9999999
+  //   }
+  // },
   sort: {
     campaign_id: 0
   },

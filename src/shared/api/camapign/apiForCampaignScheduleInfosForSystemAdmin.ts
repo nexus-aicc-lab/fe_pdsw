@@ -13,7 +13,7 @@ export interface CampaignScheduleInfoForSystemAdmin {
 
 // 📌 요청 타입
 export interface CampaignScheduleInfosRequestForSystemAdmin {
-  filter: {
+  filter?: {
     campaign_id?: {
       start: number;
       end: number;
@@ -41,12 +41,12 @@ export interface CampaignScheduleInfosResponseForSystemAdmin {
 
 // 📌 기본 요청 값
 const defaultRequest: CampaignScheduleInfosRequestForSystemAdmin = {
-  filter: {
-    campaign_id: {
-      start: 1,
-      end: 9999999
-    }
-  },
+  // filter: {
+  //   campaign_id: {
+  //     start: 1,
+  //     end: 9999999
+  //   }
+  // },
   sort: {
     tenant_id: 0,
     campaign_id: 0

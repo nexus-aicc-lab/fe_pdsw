@@ -11,7 +11,7 @@ export interface CampaignSkillItemForSystemAdmin {
 
 // 📌 요청 타입
 export interface IRequestTypeForCampaignSkillListForSystemAdmin {
-  filter: {
+  filter?: {
     skill_id?: {
       start: number;
       end: number;
@@ -39,12 +39,12 @@ export interface IResponseTypeForCampaignSkillListForSystemAdmin {
 
 // 📌 기본 요청 값
 const defaultRequest: IRequestTypeForCampaignSkillListForSystemAdmin = {
-  filter: {
-    skill_id: {
-      start: 1,
-      end: 9999999
-    }
-  },
+  // filter: {
+  //   skill_id: {
+  //     start: 1,
+  //     end: 9999999
+  //   }
+  // },
   sort: {
     skill_id: 0
   },

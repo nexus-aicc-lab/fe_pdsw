@@ -18,7 +18,10 @@ const ITenantSkillsForSystemAdmin = () => {
 
   const { data: skillData } = useApiForGetSkillListForSystemAdmin({
     request: {
-      filter: { tenant_id: tenantIds, skill_id: { start: 0, end: 99999 } },
+      // filter: { 
+      //   tenant_id: tenantIds, 
+      //   // skill_id: { start: 0, end: 99999 } 
+      // },
       page: { index: 1, items: 9999 },
     },
     enabled: tenantIds.length > 0,
