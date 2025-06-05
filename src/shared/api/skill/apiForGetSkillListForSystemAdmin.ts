@@ -105,7 +105,7 @@ export interface SkillListRequestForSystemAdmin {
       start: number;
       end: number;
     };
-    tenant_id: number[]; // 필수
+    tenant_id: number[];
   };
   sort?: {
     skill_id: number;
