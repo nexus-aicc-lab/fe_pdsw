@@ -11,7 +11,6 @@ import { toast, initToasts } from "./CustomToast";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignManager/hooks/useApiForGetTreeDataForCampaignGroupTab";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion"; // 꼭 상단 import 추가!
 import { useCampaignDialStatusStore } from "@/store/campaignDialStatusStore";
 import { sseMessageChannel, logoutChannel } from '@/lib/broadcastChannel';
 import logoutFunction from "@/components/common/logoutFunction";
