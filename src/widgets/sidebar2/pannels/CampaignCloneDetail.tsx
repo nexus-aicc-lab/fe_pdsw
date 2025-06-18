@@ -307,7 +307,8 @@ export default function CampaignDetail() {
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
-    if (selectedCampaign && selectedCampaign !== null && typeof copyCampaignInfo.campaign_name !== 'undefined' && copyCampaignInfo.campaign_name === '') {
+    if (selectedCampaign && selectedCampaign !== null && typeof copyCampaignInfo.campaign_name !== 'undefined' && copyCampaignInfo.campaign_name === '' 
+      && schedules.length > 0) {
       setCopyCampaignInfo({
         ...copyCampaignInfo,
         campaign_id: 0,
@@ -1087,6 +1088,7 @@ export default function CampaignDetail() {
   }, [campaigns, campaignIdForCopyCampaign]);
 
   useEffect(() => {
+    //debugger;
     if (copyCampaignSchedule && typeof copyCampaignSchedule.campaign_id !== 'undefined') {
       setTempCampaignSchedule({ ...copyCampaignSchedule });
     } else {
