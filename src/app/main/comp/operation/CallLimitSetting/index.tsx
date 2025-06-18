@@ -285,6 +285,16 @@ const CampaignSettings = () => {
       return;
     }
 
+    if( isNaN(Number(limitCount)) ) {
+      showAlert('제한건수는 숫자로 입력되어야 합니다.');
+      return;
+    }
+
+    if( Number(limitCount) <= 0) {
+      showAlert('제한건수는 1 이상이어야 합니다.');
+      return;
+    }
+
     // 선택된 캠페인의 tenant_id 찾기
     const selectedCampaign = campaigns?.find(camp => camp.campaign_id === Number(campaignId));
     if (!selectedCampaign) {

@@ -1360,7 +1360,7 @@ const DistributionLimit = () => {
         } else if (row.level === 1) {
           hierarchyContent = `상담 그룹: ${row.group}`;
         } else if (row.level === 2) {
-          hierarchyContent = `상담 파트: ${row.part}`;
+          hierarchyContent = `상담 팀: ${row.part}`;
         } else if (row.level === 3) {
           // 상담사 레벨에서는 계층 표시 없이 센터 값만 보여줌
           return <div style={{ marginLeft: `${indent}px` }}>{centerContent}</div>;
