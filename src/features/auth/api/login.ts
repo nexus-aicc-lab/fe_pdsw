@@ -54,13 +54,13 @@ export const loginApi = {
       }
 
       const { data : ipdata } = await axiosRedisInstance.post(`/auth/getIp`);
-      console.log("🌐 클라이언트 IP:", ipdata);
+      // console.log("🌐 클라이언트 IP:", ipdata);
 
       // 🌐 클라이언트 IP 조회
-      const { data: dataSecond } = await axios.get<{ ip: string }>(
-        `https://api.ipify.org?format=json`
-      );
-      console.log("🌐 클라이언트 IP 222 :", dataSecond.ip);
+      // const { data: dataSecond } = await axios.get<{ ip: string }>(
+      //   `https://api.ipify.org?format=json`
+      // );
+      // console.log("🌐 클라이언트 IP 222 :", dataSecond.ip);
 
       // 🍪 쿠키 저장
       Cookies.set('userHost', ipdata, {
