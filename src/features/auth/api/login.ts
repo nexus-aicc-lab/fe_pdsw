@@ -1,7 +1,7 @@
 
 // features/auth/api/login.ts
 import { LoginCredentials, LoginRequest, LoginResponse, LoginResponseFirst } from '../types/loginIndex';
-import { axiosInstance, externalAxiosInstance } from '@/lib/axios';
+import { axiosInstance, axiosRedisInstance, externalAxiosInstance } from '@/lib/axios';
 import useStore, { UserInfoData } from '@/features/auth/hooks/store';
 import Cookies from 'js-cookie';
 import axios from 'axios';
@@ -53,13 +53,16 @@ export const loginApi = {
         throw new Error(data.result_msg || '로그인 실패');
       }
 
+      const { data : ipdata } = await axiosRedisInstance.post(`/auth/getIp`);
+      console.log("🌐 클라이언트 IP:", ipdata);
+
       // 🌐 클라이언트 IP 조회
-      const { data: dataSecond } = await axios.get<{ ip: string }>(
-        `https://api.ipify.org?format=json`
-      );
+      // const { data: dataSecond } = await axios.get<{ ip: string }>(
+      //   `https://api.ipify.org?format=json`
+      // );
 
       // 🍪 쿠키 저장
-      Cookies.set('userHost', dataSecond.ip, {
+      Cookies.set('userHost', ipdata, {
         expires: 1,
         secure: false,
         sameSite: 'Lax',
@@ -72,7 +75,7 @@ export const loginApi = {
         sameSite: 'Lax',
         path: '/'
       });
-
+      console.log("🍪 Cookies after setting userHost:", Cookies.get('userHost'));
       // ###### 로그인 시간 기준으로 세션키 만료시간 설정 ######
       const currentDate = new Date();
       const expiredDate = new Date(currentDate.getTime() + data.expires_in * 1000); // 초 더하기
