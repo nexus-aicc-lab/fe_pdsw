@@ -119,7 +119,9 @@ export function TreeMenusForCampaigns() {
       });
 
       // 트리 아이템 생성
-      const items: TreeItem[] = tenants.map(tenant => ({
+      const items: TreeItem[] = tenants
+      .filter(tenant => tenant.tenant_id !== 0) // tenant_id가 0이 아닌 것만
+      .map(tenant => ({
         id: tenant.tenant_id.toString(),
         label: tenant.tenant_name,
         type: 'folder',
