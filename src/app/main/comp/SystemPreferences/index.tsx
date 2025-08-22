@@ -861,13 +861,14 @@ const SystemPreferences = () => {
                         .map((assignValue, index) => ({
                             channelNumber: index,
                             channelName: `Channel No.${index}`,
-                            mode : assignValue.toString(),
+                            mode : assignValue.toString(), // 0인 경우 1로 변경 
                             // mode: getChannelMode(assignValue, selectedDeviceChannels.assign_kind),
                             assignValue: assignValue
                         }));
                         
                     setFilteredChannels(channels);
-                    setAllocationMode(selectedDeviceChannels.assign_kind.toString());
+                    // 현재 신규 장비가 추가되면 channel-assign api 결과에서 assign_kind 항목이 0으로 오고있음...만약 0이면 기존 1에 해당하는 캠페인으로 할당을 ui적으로 보이게 함
+                    setAllocationMode(selectedDeviceChannels.assign_kind === 0 ? '1' : selectedDeviceChannels.assign_kind.toString());
                     
                     // 이전에 선택된 채널 번호 확인
                     const prevChannelNumber = selectedChannel?.channelNumber;

@@ -98,6 +98,8 @@ export default function LoginPage() {
       router.push('/main');
     },
     onError: (error) => {
+      console.log('운용 가능 시간 조회 실패:', error);
+      // router.push('/main');
     }
   });
   const convertBinaryString = (input:string) => {
