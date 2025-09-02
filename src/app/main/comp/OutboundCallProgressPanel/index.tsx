@@ -562,7 +562,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       setSelectedCampaign( externalCampaignId );
       setShouldRenderSelect(false);
       setWaitingCounselorCnt( 0 );
-      debugger
+      
       _setCampaignData({
             ' ': {
               stats: {
