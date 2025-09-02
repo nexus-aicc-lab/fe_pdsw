@@ -827,6 +827,7 @@ const SystemPreferences = () => {
         setUpdatedChannelAssign([]);
         setSelectedCheckRows(new Set());
         setChangeRows(new Set());
+        setBatchChannelMode('');
     };
 
     // 할당 발신모드 옵션 생성

@@ -81,7 +81,7 @@ interface SummaryCallProgressStatusDataType {
   retryCall: number;                  //재시도 여부 : 0(재시도 없음), 1(재시도 있음)
   waiting: number;                    //대기상담사
   firstCall: number;                  //최초 발신
-  _retryCall: number;                 //재시도발신
+  // _retryCall: number;                 //재시도발신 사용 않는 것으로 수정 2025-09-02 - lab09
   distributing: number;               //분배 대기
   result: string;                     //다이얼 결과
   phoneType: string;                  //발신번호 구분
@@ -241,6 +241,90 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     }, 50);
   };
 
+  // const testData = [
+  //   {
+  //           "campaignId": 39889,
+  //           "campaignName": "테스트34234#$",
+  //           "waitingLstCnt": 0,
+  //           "event": 2,
+  //           "dialSequence": 1,
+  //           "dialResult": 0,
+  //           "customerName": "이정수",
+  //           "customerKey": "이정수",
+  //           "phoneNumber": [
+  //               "234432234",
+  //               "",
+  //               "",
+  //               "",
+  //               ""
+  //           ],
+  //           "phoneDialCount": [
+  //               0,
+  //               0,
+  //               0,
+  //               0,
+  //               0
+  //           ],
+  //           "dialedPhone": 1,
+  //           "reuseCount": 2,
+  //           "retryCall": 0
+  //       },
+  //       {
+  //           "campaignId": 39889,
+  //           "campaignName": "테스트34234#$",
+  //           "waitingLstCnt": 0,
+  //           "event": 2,
+  //           "dialSequence": 2,
+  //           "dialResult": 0,
+  //           "customerName": "이정수",
+  //           "customerKey": "이정수",
+  //           "phoneNumber": [
+  //               "234432234",
+  //               "",
+  //               "",
+  //               "",
+  //               ""
+  //           ],
+  //           "phoneDialCount": [
+  //               0,
+  //               0,
+  //               0,
+  //               0,
+  //               0
+  //           ],
+  //           "dialedPhone": 1,
+  //           "reuseCount": 2,
+  //           "retryCall": 0
+  //       },
+  //       {
+  //           "campaignId": 39889,
+  //           "campaignName": "테스트34234#$",
+  //           "waitingLstCnt": 0,
+  //           "event": 2,
+  //           "dialSequence": 3,
+  //           "dialResult": 0,
+  //           "customerName": "이정수",
+  //           "customerKey": "1",
+  //           "phoneNumber": [
+  //               "234432234",
+  //               "",
+  //               "",
+  //               "",
+  //               ""
+  //           ],
+  //           "phoneDialCount": [
+  //               0,
+  //               0,
+  //               0,
+  //               0,
+  //               0
+  //           ],
+  //           "dialedPhone": 1,
+  //           "reuseCount": 1,
+  //           "retryCall": 0
+  //       }
+  // ]
+
   // Select 컴포넌트 렌더링 여부 결정
   const [ shouldRenderSelect , setShouldRenderSelect ] = useState<boolean>(false);
 
@@ -248,17 +332,22 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const { mutate: fetchCallProgressStatus } = useApiForCallProgressStatus({
     onSuccess: (data) => {  
       const tempList = data.sendingProgressStatusList;
+      // const tempList = testData;
       const _campaignId = data.campaignId;
       if( tempList.length > 0 && (_campaignId === selectedCampaign+'' || (selectedCampaign === 'all' && _campaignId === '0')) ){
         setWaitingCounselorCnt( data.waitingCounselorCnt );
         const sumCallProgressStatus:SummaryCallProgressStatusDataType[] = [];
         for( let i=0;i<tempList.length;i++){
-          const index = sumCallProgressStatus.findIndex((data) => data.campaignId === tempList[i].campaignId);
+          const uniqueKey = `${tempList[i].campaignId}-${tempList[i].dialSequence}`;
+          const index = sumCallProgressStatus.findIndex((data) => `${data.campaignId}-${data.dialSequence}` === uniqueKey);
+          // const index = sumCallProgressStatus.findIndex((data) => data.campaignId === tempList[i].campaignId);
           if( index === -1){
             sumCallProgressStatus.push({...tempList[i],
+              dialSequence : tempList[i].dialSequence, // 다이얼 시퀀스별 추가
               waiting: 0,  //대기상담사
               firstCall: tempList[i].reuseCount === 1 ? 1 : 0, //최초 발신
-              _retryCall: tempList[i].reuseCount === 2 ? 1 : 0, //재시도발신
+              // _retryCall: tempList[i].reuseCount === 2 ? 1 : 0, //재시도발신 ??? _retryCall 사용되는곳 찾을수 없음
+              retryCall : tempList[i].reuseCount === 2 ? 1 : 0, // 재시도발신 으로 수정 2025-09-02 - lab09
               distributing: tempList[i].waitingLstCnt, //분배 대기
               result: campaigns.find((campaign) => campaign.campaign_id === tempList[i].campaignId)?.end_flag === 1 ? '진행중' : '완료',
               phoneType: tempList[i].dialedPhone + '', // 발신번호 구분으로 예측되는 dialedPhone 컬럼으로 변경 (05/27)
@@ -270,11 +359,12 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
             sumCallProgressStatus[index].distributing += tempList[i].waitingLstCnt;
           }
         }
+        // console.log("##### sumCallProgressStatus: ", sumCallProgressStatus);
 
         const tempCampaignData: CampaignDataMap = {};
         for( let i=0;i<sumCallProgressStatus.length;i++){
           const _tempCampaignData: CampaignDataMap = {
-            [sumCallProgressStatus[i].campaignId]: {
+            [`${sumCallProgressStatus[i].campaignId}-${sumCallProgressStatus[i].dialSequence}`]: {
               stats: {
                 waiting: sumCallProgressStatus[i].waiting,    //대기상담사
                 firstCall: sumCallProgressStatus[i].firstCall,//최초 발신
