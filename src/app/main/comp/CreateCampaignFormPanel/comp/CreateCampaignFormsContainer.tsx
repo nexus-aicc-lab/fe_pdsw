@@ -118,7 +118,7 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
       // });
     }
     if (type === 'dialMode' && value !== '') {
-      console.log('dialMode');
+      // console.log('dialMode');
       setTempCampaignsInfo({
         ...tempCampaignInfo,
         dial_mode: Number(value)
@@ -419,10 +419,11 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
 
   // tofix
   const handleCampaignSave = () => {
-    console.log("tempCampaignInfo : ", tempCampaignInfo);
-    console.log('power_divert_queue :: ' + tempCampaignInfo.power_divert_queue);
-    console.log('tenant_id :: ' + tenantId);
-
+    
+    // console.log("tempCampaignInfo : ", tempCampaignInfo);
+    // console.log('power_divert_queue :: ' + tempCampaignInfo.power_divert_queue);
+    // console.log('tenant_id :: ' + tenantId);
+    
     let saveErrorCheck = false;
 
     if (!saveErrorCheck && tempCampaignInfo.tenant_id < 0 && tenantId === "") {
@@ -476,7 +477,7 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
 
   // tofix 0427
   const handleCampaignSaveExecute = () => {
-    console.log("tempCampaignInfo at save !!!!!!!!!!!!!", tempCampaignInfo);
+    // console.log("tempCampaignInfo at save !!!!!!!!!!!!!", tempCampaignInfo);
     // Convert to MainDataResponse format using only tempCampaignInfo
     // const campaignDataToSend: MainDataResponse = {
     //     ...tempCampaignInfo,
@@ -526,7 +527,7 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
   //캠페인 정보 수정 api 호출
   const { mutate: fetchCampaignManagerInsert } = useApiForCampaignManagerInsert({
     onSuccess: (data) => {
-      console.log("캠페인 정보 입력 api 결과 : ", data);
+      // console.log("캠페인 정보 입력 api 결과 : ", data);
       removeTab(Number(activeTabId), activeTabKey + '');
       const newCampaignId = data.result_data.campaign_id;
       simulateHeaderMenuClick(2);

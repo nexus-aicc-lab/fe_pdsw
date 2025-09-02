@@ -635,12 +635,12 @@ export function TreeNodeForCounselorListForSideBar({
           tenantId
         );
       } else {
-        console.warn(`상담사 ${data.counselorname}의 tenantId를 찾을 수 없습니다.`);
+        // console.warn(`상담사 ${data.counselorname}의 tenantId를 찾을 수 없습니다.`);
       }
     }
 
     if (type === 'skill') {
-      console.log(`스킬 선택: ${data.skillName}, 상담사: ${currentCounselorId}, 테넌트: ${currentTenantId}`);
+      // console.log(`스킬 선택: ${data.skillName}, 상담사: ${currentCounselorId}, 테넌트: ${currentTenantId}`);
     }
   };
 

@@ -12,7 +12,7 @@ const MENU_ITEMS = [
     id: 37,
     label: "캠페인 그룹 추가",
     action: (nodeName: string, callback: () => void) => {
-      console.log(`캠페인 그룹 추가: ${nodeName}`);
+      // console.log(`캠페인 그룹 추가: ${nodeName}`);
       callback();
     }
   }

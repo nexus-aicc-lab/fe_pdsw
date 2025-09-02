@@ -43,11 +43,11 @@ const useApiForAddCampaignToSpecificCampaignGroup = (
         queryKey: ['sideMenuData']
       });
       
-      console.log('✅ 캠페인 그룹에 캠페인 추가 성공:', data);
+      // console.log('✅ 캠페인 그룹에 캠페인 추가 성공:', data);
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error, variables, context) => {
-      console.error('❌ 캠페인 그룹에 캠페인 추가 실패:', error);
+      // console.error('❌ 캠페인 그룹에 캠페인 추가 실패:', error);
       options?.onError?.(error, variables, context);
     },
   });

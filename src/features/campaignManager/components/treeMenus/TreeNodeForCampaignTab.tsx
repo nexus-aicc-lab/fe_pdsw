@@ -308,8 +308,12 @@ export function TreeNodeForCampaignTab({
         return (
           <ContextMenuForCampaignForCampaignTab
             item={updatedItem}
-            onEdit={() => console.log("Edit:", item)}
-            onMonitor={() => console.log("Monitor:", item)}
+            onEdit={() => {
+              // console.log("Edit:", item)
+            }}
+            onMonitor={() => {
+              // console.log("Monitor:", item)
+            }}
             onHandleCampaignCopy={onHandleCampaignCopy}
             tenantIdForCampaignTab={item.tenantId}
           >

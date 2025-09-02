@@ -16,9 +16,6 @@ export const fetchCampaignBlacklistCount = async (credentials: number): Promise<
       campaignBlacklistCountRequestData
     );
 
-    console.log("블랙 리스트 카운트 조회 api 응답 : ", data);
-    
-
     return data;
   } catch (error: any) {
     if (error.response?.status === 401) {

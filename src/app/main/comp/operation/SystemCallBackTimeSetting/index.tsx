@@ -160,7 +160,7 @@ const SystemCallBackTimeSetting = () => {
             tenant_id_array: tenants.map(tenant => tenant.tenant_id)
         });
 
-        console.log('TimeArray : ', timeArray);
+        // console.log('TimeArray : ', timeArray);
 
         
     }, []);
@@ -218,7 +218,7 @@ const SystemCallBackTimeSetting = () => {
                 use_flag,
                 ...(use_flag === 1 && { init_hour: formattedTime ?? "00" }), // init_flag가 1일 때만 init_hour 포함
             };
-            console.log('Request Data:', requestData);
+            // console.log('Request Data:', requestData);
             updateSystemCallBackTime(requestData); // API 호출
         }
 

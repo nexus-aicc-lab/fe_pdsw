@@ -16,7 +16,7 @@ const IContextMenuForCampaignTabTenant: React.FC<IContextMenuForCampaignTabTenan
   return (
     <CommonMenuItem
       onClick={() => {
-        console.log(`캠페인 그룹 추가: ${node.name}`);
+        // console.log(`캠페인 그룹 추가: ${node.name}`);
         setIsAddGroupDialogOpen(true);
       }}
     >

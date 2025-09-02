@@ -10,7 +10,7 @@ test('캠페인 무작위 선택하여 상태 전환', async ({ page }) => {
   await expect(campaignManagementButton).toBeVisible({ timeout: 5000 });
   await campaignManagementButton.click();
   await page.waitForTimeout(3000);
-  console.log('🖱️ 캠페인 관리 진입');
+  
 
   // 🎯 캠페인 트리 완전 로드 대기 (더 안정적)
   await page.waitForSelector('.tree-node', { timeout: 15000 });
@@ -18,7 +18,7 @@ test('캠페인 무작위 선택하여 상태 전환', async ({ page }) => {
   
   // DOM이 안정화될 때까지 추가 대기
   await page.waitForTimeout(3000);
-  console.log('📋 캠페인 트리 로드 완료');
+  
 
   // 🔍 상태 변경 가능한 캠페인 찾기 (더 구체적인 선택자)
   const pausedCampaigns = page.locator('div.campaign-node').filter({
@@ -33,10 +33,9 @@ test('캠페인 무작위 선택하여 상태 전환', async ({ page }) => {
   const stoppedCount = await stoppedCampaigns.count();
   const totalCount = pausedCount + stoppedCount;
 
-  console.log(`📊 캠페인 현황: 멈춤 ${pausedCount}개, 중지 ${stoppedCount}개, 총 ${totalCount}개`);
 
   if (totalCount === 0) {
-    console.log('⚠️ 상태 변경 가능한 캠페인이 없습니다. 테스트 종료');
+    
     return;
   }
 
@@ -51,24 +50,24 @@ test('캠페인 무작위 선택하여 상태 전환', async ({ page }) => {
     selectedCampaign = pausedCampaigns.nth(randomIndex);
     currentState = 'pause';
     targetState = 'stopped'; // 멈춤 → 중지
-    console.log(`🎯 멈춤 상태 캠페인 선택 (#${randomIndex + 1}/${pausedCount})`);
+    
   } else {
     // 중지 상태 캠페인 선택
     const randomIndex = Math.floor(Math.random() * stoppedCount);
     selectedCampaign = stoppedCampaigns.nth(randomIndex);
     currentState = 'stop';
     targetState = 'pending'; // 중지 → 멈춤
-    console.log(`🎯 중지 상태 캠페인 선택 (#${randomIndex + 1}/${stoppedCount})`);
+    
   }
 
   // 📍 선택된 캠페인 정보 출력
   const campaignName = await selectedCampaign.locator('span.text-555').textContent();
-  console.log(`📌 선택된 캠페인: ${campaignName?.trim() || '이름 없음'}`);
+  
 
   // 🖱️ 우클릭으로 컨텍스트 메뉴 열기
   await selectedCampaign.scrollIntoViewIfNeeded();
   await selectedCampaign.click({ button: 'right' });
-  console.log('🖱️ 컨텍스트 메뉴 열기');
+  
   
   // 📋 컨텍스트 메뉴 표시 확인
   const contextMenu = page.locator('[role="menu"]').first();
@@ -79,16 +78,16 @@ test('캠페인 무작위 선택하여 상태 전환', async ({ page }) => {
   const statusSubMenuTrigger = contextMenu.getByText('시작구분:', { exact: false });
   
   if (await statusSubMenuTrigger.count() === 0) {
-    console.log('❌ 시작구분 메뉴를 찾을 수 없습니다.');
+    
     // 디버깅을 위한 컨텍스트 메뉴 내용 출력
     const menuContent = await contextMenu.textContent();
-    console.log('🔍 컨텍스트 메뉴 내용:', menuContent);
+    
     return;
   }
 
   await expect(statusSubMenuTrigger).toBeVisible({ timeout: 3000 });
   await statusSubMenuTrigger.hover();
-  console.log('📋 시작구분 서브메뉴 호버');
+  
   
   // 서브메뉴가 나타날 때까지 대기
   await page.waitForTimeout(800);
@@ -96,7 +95,6 @@ test('캠페인 무작위 선택하여 상태 전환', async ({ page }) => {
   // 🔄 상태 전환 실행
   try {
     if (currentState === 'pause') {
-      console.log('🟡 멈춤 → 중지로 전환 시도');
       
       // 여러 방법으로 중지 메뉴 찾기
       const stopMenuSelectors = [
@@ -111,7 +109,7 @@ test('캠페인 무작위 선택하여 상태 전환', async ({ page }) => {
         if (await selector.count() > 0) {
           await expect(selector.first()).toBeVisible({ timeout: 3000 });
           await selector.first().click({ force: true });
-          console.log('✅ 중지 메뉴 클릭 성공');
+          
           clicked = true;
           break;
         }
@@ -122,7 +120,6 @@ test('캠페인 무작위 선택하여 상태 전환', async ({ page }) => {
       }
 
     } else {
-      console.log('🟠 중지 → 멈춤으로 전환 시도');
       
       // 여러 방법으로 멈춤 메뉴 찾기
       const pauseMenuSelectors = [
@@ -137,7 +134,7 @@ test('캠페인 무작위 선택하여 상태 전환', async ({ page }) => {
         if (await selector.count() > 0) {
           await expect(selector.first()).toBeVisible({ timeout: 3000 });
           await selector.first().click({ force: true });
-          console.log('✅ 멈춤 메뉴 클릭 성공');
+          
           clicked = true;
           break;
         }
@@ -149,11 +146,11 @@ test('캠페인 무작위 선택하여 상태 전환', async ({ page }) => {
     }
 
   } catch (error) {
-    console.log('❌ 상태 전환 실행 실패:', error);
+    
     
     // 디버깅 정보 출력
-    const allMenuItems = await page.locator('[role="menuitem"]').allTextContents();
-    console.log('🔍 사용 가능한 메뉴 항목들:', allMenuItems);
+    // const allMenuItems = await page.locator('[role="menuitem"]').allTextContents();
+    
     
     // 스크린샷 저장
     await page.screenshot({ path: 'campaign-context-menu-error.png' });
@@ -180,7 +177,7 @@ test('캠페인 무작위 선택하여 상태 전환', async ({ page }) => {
         const successElement = page.getByText(message, { exact: false });
         if (await successElement.count() > 0) {
           await expect(successElement).toBeVisible({ timeout: 2000 });
-          console.log(`✅ 성공 메시지 확인: "${message}"`);
+          
           
           // 확인 버튼 클릭
           const confirmButtons = [
@@ -193,7 +190,7 @@ test('캠페인 무작위 선택하여 상태 전환', async ({ page }) => {
           for (const button of confirmButtons) {
             if (await button.count() > 0) {
               await button.click();
-              console.log('✅ 확인 버튼 클릭');
+              
               break;
             }
           }
@@ -207,21 +204,21 @@ test('캠페인 무작위 선택하여 상태 전환', async ({ page }) => {
     }
 
     if (!successFound) {
-      console.log('⚠️ 성공 메시지를 찾을 수 없지만 상태 변경은 완료되었을 수 있습니다');
+      
       
       // 디버깅을 위한 현재 페이지 상태 출력
-      const currentUrl = page.url();
-      console.log(`📍 현재 URL: ${currentUrl}`);
+      // const currentUrl = page.url();
+      // console.log(`📍 현재 URL: ${currentUrl}`);
       
       // 알림/다이얼로그가 있는지 확인
       const alertTexts = await page.locator('[role="dialog"], [role="alert"], .alert').allTextContents();
       if (alertTexts.length > 0) {
-        console.log('🔔 페이지의 알림/다이얼로그:', alertTexts);
+        // console.log('🔔 페이지의 알림/다이얼로그:', alertTexts);
       }
     }
 
   } catch (error) {
-    console.log('⚠️ 결과 확인 중 오류:', error);
+    // console.log('⚠️ 결과 확인 중 오류:', error);
     
     // 최종 디버깅 스크린샷
     await page.screenshot({ path: 'campaign-status-change-final.png' });
@@ -229,5 +226,5 @@ test('캠페인 무작위 선택하여 상태 전환', async ({ page }) => {
   
   // 🏁 최종 대기 및 정리
   await page.waitForTimeout(2000);
-  console.log('🎉 캠페인 상태 변경 테스트 완료!');
+  
 });

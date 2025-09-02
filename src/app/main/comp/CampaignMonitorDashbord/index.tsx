@@ -175,7 +175,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
       // 캠페인 정보 찾기
       if (campaigns && campaigns.length > 0) {
         const tempCampaign = campaigns.find(data => data.campaign_id === numericCampaignId);
-        console.log("찾은 캠페인 정보:", tempCampaign);
+        // console.log("찾은 캠페인 정보:", tempCampaign);
         
         if (tempCampaign) {
           setCampaignInfo(tempCampaign);

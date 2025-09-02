@@ -80,7 +80,7 @@ export default function Header() {
         useEnvironmentStore.getState().setCenterInfo(data.centerInfoList[0].centerId, data.centerInfoList[0].centerName);
       },
       onError: (error) => {
-        console.log('센터 정보 조회 실패:', error);
+        // console.log('센터 정보 조회 실패:', error);
         // ServerErrorCheck('센터 정보 조회', error.message);
       }
   });
@@ -130,7 +130,7 @@ export default function Header() {
   const openInNewWindow = () => {
     // 이미 팝업이 열려 있는 경우 새로 열지 않음
     if (popupRef.current && !popupRef.current.closed) {
-      console.log('팝업이 이미 열려 있습니다.');
+      // console.log('팝업이 이미 열려 있습니다.');
       popupRef.current.moveTo(100, 100);    // 화면 좌표로 이동
       popupRef.current.resizeTo(600, 400);  // 크기 조절
       popupRef.current.focus(); // 기존 창으로 포커스 이동
@@ -205,7 +205,7 @@ export default function Header() {
       // 로딩 상태 해제
       ServerErrorCheck('스킬 리스트 조회', error.message);
       useCampainManagerStore.getState().setSkillsLoading(false); // ??
-      console.log("Error loading skills data:", error);
+      // console.log("Error loading skills data:", error);
     },
     retry: 0,
   });
@@ -290,7 +290,7 @@ export default function Header() {
     },
     onError: (error) => {
       // tofix 로그인 에러 발생
-      console.log("error 에러 발생 여기 !!!!!! : ", error);
+      // console.log("error 에러 발생 여기 !!!!!! : ", error);
       useMainStore.getState().setTenantsLoading(false);
 
       ServerErrorCheck('테넌트 리스트 조회', error.message);
@@ -317,7 +317,7 @@ export default function Header() {
 
       // 로딩 중이면 중복 호출 방지
       if (store.tenantsLoading) {
-        console.log("Tenants loading in progress, skipping duplicate call");
+        
         return;
       }
 
@@ -385,7 +385,7 @@ export default function Header() {
     onError: (error) => {
       // 로딩 상태 해제
       useMainStore.getState().setCampaignsLoading(false);
-      console.log("Error loading campaign data:", error);
+      // console.log("Error loading campaign data:", error);
       ServerErrorCheck('캠페인 리스트 조회', error.message);
     }
   });
@@ -410,13 +410,11 @@ export default function Header() {
 
       // 로딩 중이면 중복 호출 방지
       if (store.skillsLoading) {
-        console.log("Skills loading in progress, skipping duplicate call");
         return;
       }
 
       // 로딩 시작
       store.setSkillsLoading(true);
-      console.log("Starting skills data fetch from header");
 
     }
   }, [tenants, _sessionKey]);

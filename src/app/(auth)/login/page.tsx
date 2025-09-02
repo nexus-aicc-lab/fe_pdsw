@@ -98,7 +98,7 @@ export default function LoginPage() {
       router.push('/main');
     },
     onError: (error) => {
-      console.log('운용 가능 시간 조회 실패:', error);
+      // console.log('운용 가능 시간 조회 실패:', error);
       // router.push('/main');
     }
   });
@@ -116,7 +116,7 @@ export default function LoginPage() {
       useEnvironmentStore.getState().setCenterInfo(data.centerInfoList[0].centerId,data.centerInfoList[0].centerName);
     },
     onError: (error) => {
-      console.error('센터 정보 로드 실패:', error);
+      // console.error('센터 정보 로드 실패:', error);
       setAlertState({
         isOpen: true,
         message: '센터 정보를 불러오는데 실패했습니다.',
@@ -135,7 +135,7 @@ export default function LoginPage() {
       
     },
     onError: (error) => {
-      console.error('환경설정 데이터 로드 실패:', error);
+      // console.error('환경설정 데이터 로드 실패:', error);
       setAlertState({
         isOpen: true,
         message: '환경설정 데이터를 불러오는데 실패했습니다.',

@@ -102,7 +102,7 @@ const UsageTimePopup: React.FC<UsageTimePopupProps> = ({ campaignIdList,dialKind
         }
       },
       onError: (error) => {
-        console.error('캠페인 운영 이력 조회:', error);
+        // console.error('캠페인 운영 이력 조회:', error);
       }
   });
 

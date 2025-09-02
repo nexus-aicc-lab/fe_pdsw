@@ -490,7 +490,7 @@ const ListManager: React.FC = () => {
           }else if( listManagerFileFormat === 'txt' && file.name.indexOf('.xls') == -1 ){
             reader.onload = (event) => {
               const fileContent = event.target?.result;       
-              console.log("File content:", fileContent);
+              // console.log("File content:", fileContent);
               if( fileContent != null && fileContent !== '' ){
                 let tempdata = [];
                 if( (fileContent+'').indexOf('\r\n') > -1){
@@ -618,11 +618,11 @@ const ListManager: React.FC = () => {
           
           // Handle file reading errors
           reader.onerror = (error) => {
-            console.error("Error reading file:", error);
+            // console.error("Error reading file:", error);
           };
         }
       } catch (e) {
-        console.error("Error processing file:", e);
+        // console.error("Error processing file:", e);
   
       }finally{
         setNextId(nextId + 1);

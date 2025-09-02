@@ -34,8 +34,6 @@ export function useApiForSideMenuTreeData(
     enabled: boolean = true
 ): UseQueryResult<TreeNode[], CombinedDataError> {
 
-    console.log("tenant_id at 사이드 메뉴 호출 : ", tenant_id);
-
     return useQuery<ExtendedCombinedData, CombinedDataError, TreeNode[]>({
         queryKey: ['sideMenuTreeData', tenant_id],
         queryFn: () => apiForCombinedTenantAndCampaignGroup(tenant_id) as Promise<ExtendedCombinedData>,

@@ -19,14 +19,11 @@ export function useApiForCampaignGroupNameUpdate(
     mutationFn: ({ group_id, group_name, tenant_id }: UpdateCampaignGroupNameParams) => 
       apiForUpdateCampaignGroupName(group_id, group_name, tenant_id),
     onSuccess: (data: SuccessResponse, variables, context) => {
-      console.log('캠페인 그룹 이름 업데이트 성공:', {
-        code: data.result_code,
-        message: data.result_msg,
-      });
+      
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: ApiError, variables: UpdateCampaignGroupNameParams, context: unknown) => {
-      console.error('캠페인 그룹 이름 업데이트 실패:', error);
+      // console.error('캠페인 그룹 이름 업데이트 실패:', error);
       // 필요한 경우 여기에 toast 메시지 추가
       options?.onError?.(error, variables, context);
     },

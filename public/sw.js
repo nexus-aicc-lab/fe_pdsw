@@ -1,17 +1,17 @@
 // C:\nproject\fe_pdsw\public\sw.js
 self.addEventListener("install", (event) => {
-    console.log("[Service Worker] 설치됨");
+    // console.log("[Service Worker] 설치됨");
     self.skipWaiting();
   });
   
   self.addEventListener("activate", (event) => {
-    console.log("[Service Worker] 활성화됨");
+    // console.log("[Service Worker] 활성화됨");
     event.waitUntil(clients.claim());
   });
   
   // 알림 닫힘 이벤트 처리
   self.addEventListener("notificationclose", (event) => {
-    console.log("[Service Worker] 알림이 닫힘:", event.notification.tag);
+    // console.log("[Service Worker] 알림이 닫힘:", event.notification.tag);
   });
   
   // 알림 클릭 이벤트 처리
@@ -20,7 +20,7 @@ self.addEventListener("install", (event) => {
     const action = event.action;
     const data = notification.data || {};
     
-    console.log("[Service Worker] 알림이 클릭됨:", notification.tag, "액션:", action);
+    // console.log("[Service Worker] 알림이 클릭됨:", notification.tag, "액션:", action);
     
     // 알림 닫기
     notification.close();
@@ -50,7 +50,7 @@ self.addEventListener("install", (event) => {
       );
     } else if (action === "dismiss") {
       // 나중에 다시 알림 (15분 후)
-      console.log("[Service Worker] 알림 나중에 다시 표시:", notification.title);
+      // console.log("[Service Worker] 알림 나중에 다시 표시:", notification.title);
       
       // 자체 타이머는 서비스 워커 생명주기에 의존적이므로 대신 postMessage 사용
       self.registration.active.postMessage({
@@ -80,11 +80,11 @@ self.addEventListener("install", (event) => {
     try {
       data = event.data ? event.data.json() : {};
     } catch (e) {
-      console.error("[Service Worker] Push 데이터 파싱 실패:", e);
+      // console.error("[Service Worker] Push 데이터 파싱 실패:", e);
       data = {};
     }
   
-    console.log("[Service Worker] Push Event Received:", data);
+    // console.log("[Service Worker] Push Event Received:", data);
     
     if (!data.timestamp) {
       data.timestamp = Date.now();
@@ -126,7 +126,7 @@ self.addEventListener("install", (event) => {
   
   // 메시지 수신 처리 (나중에 알림 다시 표시용)
   self.addEventListener("message", (event) => {
-    console.log("[Service Worker] 메시지 수신:", event.data);
+    // console.log("[Service Worker] 메시지 수신:", event.data);
     
     if (event.data && event.data.type === "REMIND_LATER") {
       const notificationData = event.data.notification;

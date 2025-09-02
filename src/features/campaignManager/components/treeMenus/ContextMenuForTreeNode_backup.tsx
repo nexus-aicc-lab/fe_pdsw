@@ -164,9 +164,6 @@ export function ContextMenuForTreeNode({
 
   const handleCampaignListDelete = (campaingId: any) => {
 
-    console.log('캠페인 리스트 삭제 클릭 id ??? : ', campaingId);
-    
-
     if (currentStatus !== 'stopped') {
       toast.error("캠페인이 중지 상태일 때만 리스트를 삭제할 수 있습니다.", {
         position: "top-center",
@@ -228,7 +225,7 @@ export function ContextMenuForTreeNode({
   };
 
   const onCampaignDelete = (status: string, campaignId: any, campaignName: string) => {
-    console.log('캠페인 삭제 클릭 : ', status);
+    
     const uniqueKey = `monitor-${Date.now()}`;
 
     if (status !== 'stopped') {
@@ -304,12 +301,12 @@ export function ContextMenuForTreeNode({
       // });
 
     } catch (error) {
-      console.error('Error changing campaign status:', {
-        campaignId: item.id,
-        campaignName: item.label,
-        attemptedStatus: status,
-        error: error
-      });
+      // console.error('Error changing campaign status:', {
+      //   campaignId: item.id,
+      //   campaignName: item.label,
+      //   attemptedStatus: status,
+      //   error: error
+      // });
     }
   };
 

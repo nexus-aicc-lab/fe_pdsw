@@ -319,7 +319,7 @@ const createToast = (
     window.dispatchEvent(toastEvent);
     return toast.id; // ID 반환
   } catch (err) {
-    console.error('Failed to dispatch toast event:', err);
+    // console.error('Failed to dispatch toast event:', err);
     return null;
   }
 };
@@ -342,7 +342,7 @@ const removeToast = (id: string) => {
     });
     window.dispatchEvent(toastEvent);
   } catch (err) {
-    console.error('Failed to dispatch toast remove event:', err);
+    // console.error('Failed to dispatch toast remove event:', err);
   }
 };
 
@@ -376,6 +376,6 @@ export const initToasts = () => {
     const root = createRoot(toastContainer);
     root.render(<ToastContainer />);
   } catch (err) {
-    console.error('Failed to initialize toast container:', err);
+    // console.error('Failed to initialize toast container:', err);
   }
 };

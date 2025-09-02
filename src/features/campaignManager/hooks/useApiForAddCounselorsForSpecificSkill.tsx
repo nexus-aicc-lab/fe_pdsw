@@ -29,11 +29,11 @@ export function useApiForAddCounselorsForSpecificSkill(
         queryKey: ['counselorList', tenant_id]
       });
       
-      console.log('✅ 스킬에 상담사 추가 성공:', data);
+      // console.log('✅ 스킬에 상담사 추가 성공:', data);
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error, variables, context) => {
-      console.error('❌ 스킬에 상담사 추가 실패:', error);
+      // console.error('❌ 스킬에 상담사 추가 실패:', error);
       options?.onError?.(error, variables, context);
     },
   });

@@ -14,8 +14,7 @@ export const useApiForGetRelatedInfoForAssignSkilToCounselor = (
     counselorId: string | null,
     tenantId: number
 ) => {
-    console.log("📌 useApiForGetRelatedInfoForAssignSkilToCounselor 실행:", counselorId, tenantId);
-
+    
     // 상태 관리
     const [assignedSkills, setAssignedSkills] = useState<CounselorSkillListResponse | null>(null);
     const [assignableSkills, setAssignableSkills] = useState<CounselorSkillListResponse | null>(null);
@@ -35,13 +34,10 @@ export const useApiForGetRelatedInfoForAssignSkilToCounselor = (
                     tenantId
                 );
 
-                // console.log("✅ 상담사가 보유한 스킬:", assignedSkills);
-                console.log("✅ 상담사에게 할당 가능한 스킬:", assignableSkills);
-
                 setAssignedSkills(assignedSkills);
                 setAssignableSkills(assignableSkills);
             } catch (err) {
-                console.error("❌ 상담사 스킬 데이터 불러오기 실패:", err);
+                // console.error("❌ 상담사 스킬 데이터 불러오기 실패:", err);
                 setError("스킬 데이터를 불러오는 중 오류가 발생했습니다.");
             } finally {
                 setIsLoading(false);

@@ -202,12 +202,12 @@ export function TreeMenusForAgentTab() {
 
   // 🌟 Window 상태 업데이트 콜백 함수들 - 스킬 정보 보존
   const updateSidebarCallback = useCallback((updatedData: any) => {
-    console.log('🔄 Window 콜백으로 사이드바 데이터 업데이트 받음');
+    
     if (updatedData?.organizationList) {
-      console.log('🔍 업데이트된 데이터의 스킬 정보 확인:', {
-        orgCount: updatedData.organizationList.length,
-        firstOrgHasSkills: updatedData.organizationList[0]?.tenantInfo?.[0]?.groupInfo?.[0]?.teamInfo?.[0]?.counselorInfo?.[0]?.assignedSkills?.length || 0
-      });
+      // console.log('🔍 업데이트된 데이터의 스킬 정보 확인:', {
+      //   orgCount: updatedData.organizationList.length,
+      //   firstOrgHasSkills: updatedData.organizationList[0]?.tenantInfo?.[0]?.groupInfo?.[0]?.teamInfo?.[0]?.counselorInfo?.[0]?.assignedSkills?.length || 0
+      // });
 
       // 정렬 적용 후 상태 업데이트 (스킬 정보 보존)
       const sorted = applySorting([...updatedData.organizationList]);
@@ -218,19 +218,19 @@ export function TreeMenusForAgentTab() {
       setAllCounselors(counselors);
 
       dataVersionRef.current += 1;
-      console.log(`✅ UI 업데이트 완료 (버전: ${dataVersionRef.current})`);
+      // console.log(`✅ UI 업데이트 완료 (버전: ${dataVersionRef.current})`);
     } else {
-      console.warn('⚠️ 업데이트된 데이터에 organizationList가 없습니다:', updatedData);
+      // console.warn('⚠️ 업데이트된 데이터에 organizationList가 없습니다:', updatedData);
     }
   }, [applySorting]);
 
   const setExpandedNodesCallback = useCallback((nodes: Set<string>) => {
-    console.log('🔄 Window 콜백으로 확장 노드 상태 업데이트:', nodes.size);
+    // console.log('🔄 Window 콜백으로 확장 노드 상태 업데이트:', nodes.size);
     setExpandedNodes(nodes);
   }, []);
 
   const setSelectedNodeCallback = useCallback((nodeId?: string) => {
-    console.log('🔄 Window 콜백으로 선택된 노드 상태 업데이트:', nodeId);
+    // console.log('🔄 Window 콜백으로 선택된 노드 상태 업데이트:', nodeId);
     setSelectedNodeId(nodeId);
   }, []);
 

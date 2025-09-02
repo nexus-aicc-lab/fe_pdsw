@@ -569,17 +569,16 @@ export function useApiDeleteCounselorsFromSkills(tenantId: string) {
 
   // 실제 API 호출 함수
   const deleteSkills = async ({ skillIds, counselorIds }: Omit<DeleteCounselorsFromSkillsParams, 'tenantId'>) => {
-    console.log('🚀 API 호출 시작:', { skillIds, counselorIds, tenantId });
     
     const results = await Promise.allSettled(
       skillIds.map(skillId => 
         apiForDeleteCounselorsForSpecificSkill(skillId, counselorIds)
           .then(response => {
-            console.log(`✅ 스킬 ${skillId} 삭제 성공`);
+            // console.log(`✅ 스킬 ${skillId} 삭제 성공`);
             return { skillId, success: true, response };
           })
           .catch(error => {
-            console.error(`❌ 스킬 ${skillId} 삭제 실패:`, error);
+            // console.error(`❌ 스킬 ${skillId} 삭제 실패:`, error);
             return { skillId, success: false, error };
           })
       )
@@ -590,7 +589,6 @@ export function useApiDeleteCounselorsFromSkills(tenantId: string) {
       .filter(r => r.status === 'fulfilled' && !r.value.success)
       .map(r => (r as any).value.skillId);
 
-    console.log('🏁 API 호출 완료:', { successCount, failedSkills });
 
     return {
       success: successCount > 0,
@@ -605,12 +603,10 @@ export function useApiDeleteCounselorsFromSkills(tenantId: string) {
     const windowState = window.__COUNSELOR_TREE_STATE__;
     
     if (!windowState?.sidebarData?.organizationList) {
-      console.warn('⚠️ Window에 사이드바 데이터가 없습니다');
+      // console.warn('⚠️ Window에 사이드바 데이터가 없습니다');
       return;
     }
 
-    console.log('🔄 Window에서 스킬 제거:', { skillIds, counselorIds });
-    
     // 데이터에서 해당 스킬들 제거
     windowState.sidebarData.organizationList.forEach((org: any) => {
       org.tenantInfo?.forEach((tenant: any) => {
@@ -624,7 +620,7 @@ export function useApiDeleteCounselorsFromSkills(tenantId: string) {
                 );
                 const after = counselor.assignedSkills.length;
                 if (before > after) {
-                  console.log(`🔄 상담사 ${counselor.counselorId}: ${before - after}개 스킬 제거`);
+                  // console.log(`🔄 상담사 ${counselor.counselorId}: ${before - after}개 스킬 제거`);
                 }
               }
             });
@@ -636,7 +632,7 @@ export function useApiDeleteCounselorsFromSkills(tenantId: string) {
     // UI 업데이트 콜백 호출
     if (windowState.updateSidebarCallback) {
       windowState.updateSidebarCallback(windowState.sidebarData);
-      console.log('✅ UI 업데이트 완료');
+      
     }
   };
 
@@ -652,12 +648,11 @@ export function useApiDeleteCounselorsFromSkills(tenantId: string) {
         // 다른 컴포넌트에 알리기
         setAgentSkillStatus(true);
         
-        console.log('🎉 스킬 삭제 및 UI 업데이트 완료');
       }
     },
     
     onError: (error) => {
-      console.error('💥 스킬 삭제 실패:', error);
+      // console.error('💥 스킬 삭제 실패:', error);
     }
   });
 }

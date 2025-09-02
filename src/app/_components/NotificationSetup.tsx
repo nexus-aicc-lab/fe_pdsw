@@ -15,43 +15,43 @@ export const NotificationSetup = () => {
           const registrations = await navigator.serviceWorker.getRegistrations();
           for (const registration of registrations) {
             await registration.unregister();
-            console.log("기존 SW 등록 해제됨");
+            // console.log("기존 SW 등록 해제됨");
           }
 
           // 새 서비스 워커 등록
           const registration = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
-          console.log("SW 등록 완료", registration);
+          // console.log("SW 등록 완료", registration);
 
           setSwRegistration(registration);
 
           // 서비스 워커 상태 확인
           if (registration.active) {
-            console.log("SW가 이미 활성화됨");
+            // console.log("SW가 이미 활성화됨");
           } else if (registration.installing) {
-            console.log("SW 설치 중...");
+            // console.log("SW 설치 중...");
             const installingWorker = registration.installing;
             installingWorker?.addEventListener("statechange", () => {
-              console.log("SW 상태 변경:", installingWorker.state);
+              // console.log("SW 상태 변경:", installingWorker.state);
               if (installingWorker.state === "activated") {
-                console.log("SW 활성화 완료!");
+                // console.log("SW 활성화 완료!");
               }
             });
           } else if (registration.waiting) {
-            console.log("SW 대기 중...");
+            // console.log("SW 대기 중...");
           }
 
           // 알림 권한 요청
           const permission = await Notification.requestPermission();
-          console.log("알림 권한 상태:", permission);
+          // console.log("알림 권한 상태:", permission);
 
           if (permission !== "granted") {
-            console.warn("알림 권한이 필요합니다.");
+            // console.warn("알림 권한이 필요합니다.");
           }
         } catch (err) {
-          console.error("SW 등록 실패", err);
+          // console.error("SW 등록 실패", err);
         }
       } else {
-        console.warn("이 브라우저는 서비스 워커 또는 푸시 알림을 지원하지 않습니다.");
+        // console.warn("이 브라우저는 서비스 워커 또는 푸시 알림을 지원하지 않습니다.");
       }
     };
 
@@ -67,35 +67,35 @@ export const showPushNotification = async (
   body: string,
   tag: string = "campaign-event"
 ) => {
-  console.log("[showPushNotification] 호출됨", { title, body, tag });
+  // console.log("[showPushNotification] 호출됨", { title, body, tag });
 
   try {
     // 권한 확인 및 요청
     if (Notification.permission !== "granted") {
-      console.warn("[showPushNotification] 알림 권한이 없음");
+      // console.warn("[showPushNotification] 알림 권한이 없음");
       const permission = await Notification.requestPermission();
       if (permission !== "granted") {
-        console.error("[showPushNotification] 알림 권한 거부됨");
+        // console.error("[showPushNotification] 알림 권한 거부됨");
         return;
       }
     }
 
     // 서비스 워커 등록 확인
     const reg = await navigator.serviceWorker.getRegistration();
-    console.log("[showPushNotification] 서비스 워커 등록 정보:", reg);
+    // console.log("[showPushNotification] 서비스 워커 등록 정보:", reg);
 
     if (!reg) {
-      console.error("[showPushNotification] 등록된 서비스 워커가 없음");
+      // console.error("[showPushNotification] 등록된 서비스 워커가 없음");
       return;
     }
 
     // 활성화 확인
     if (!reg.active) {
-      console.warn("[showPushNotification] 서비스 워커가 활성화되지 않음, 대기 중...");
+      // console.warn("[showPushNotification] 서비스 워커가 활성화되지 않음, 대기 중...");
       await new Promise((resolve) => setTimeout(resolve, 1500));
       const updatedReg = await navigator.serviceWorker.getRegistration();
       if (!updatedReg?.active) {
-        console.error("[showPushNotification] 서비스 워커 활성화 타임아웃");
+        // console.error("[showPushNotification] 서비스 워커 활성화 타임아웃");
         return;
       }
     }
@@ -109,8 +109,8 @@ export const showPushNotification = async (
       requireInteraction: true,
     } as any); // vibrate 허용을 위해 타입 단언
 
-    console.log("[showPushNotification] 알림 호출 성공");
+    // console.log("[showPushNotification] 알림 호출 성공");
   } catch (err) {
-    console.error("[showPushNotification] 에러 발생", err);
+    // console.error("[showPushNotification] 에러 발생", err);
   }
 };

@@ -207,7 +207,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
         showAlert('발신 업무 시간 저장 중 오류가 발생하였습니다.');
         return;
       }
-      console.log(data);
+      // console.log(data);
     },
     onError: (error) => {
 

@@ -19,10 +19,7 @@ export async function assignSkillsToCounselor(
   counselorIds: string[],
   selectedSkills: number[]
 ): Promise<CounselorSkillAssignmentResponse[]> {
-  console.log("✅ 상담사 스킬 할당 API 호출!");
-  console.log("🎯 상담사 목록:", counselorIds);
-  console.log("🔗 할당할 스킬 목록:", selectedSkills);
-
+  
   const requests = selectedSkills.map((skillId) =>
     axiosInstance.put<CounselorSkillAssignmentResponse>(
       `skills/${skillId}/agent-list`,
@@ -115,7 +112,7 @@ export const getAssignedSkillsForCounselor = async (
     return data;
   } catch (error) {
     const typedError = error as CounselorSkillApiError;
-    console.error("❌ 상담사 스킬 목록 조회 실패:", error);
+    // console.error("❌ 상담사 스킬 목록 조회 실패:", error);
     throw new Error(
       typedError.response?.data?.result_msg || "상담사의 스킬 목록을 가져오는 데 실패했습니다."
     );
@@ -145,7 +142,7 @@ export const apiForGetRelatedInfoForAssignSkilToCounselor = async (
 
     return { assignedSkills, assignableSkills };
   } catch (error) {
-    console.error("❌ 상담사 스킬 조회 실패:", error);
+    // console.error("❌ 상담사 스킬 조회 실패:", error);
     throw new Error("스킬 데이터를 가져오는 중 오류가 발생했습니다.");
   }
 };
@@ -162,9 +159,6 @@ export const apiForDeleteCounselorsForSpecificSkill = async (
   skillId: number,
   counselorIds: string[]
 ): Promise<CounselorSkillAssignmentResponse> => {
-  console.log("📌 스킬에서 상담사 해제 시작");
-  console.log("🎯 대상 스킬 ID:", skillId);
-  console.log("🔗 해제할 상담사 목록:", counselorIds);
 
   try {
     // API 엔드포인트가 정확하지 않을 수 있으므로 실제 API에 맞게 수정 필요
@@ -179,10 +173,10 @@ export const apiForDeleteCounselorsForSpecificSkill = async (
       }
     );
 
-    console.log("✅ 스킬을 가진 상담사 목록에서 특정 상담사들 해제 성공:", data);
+    // console.log("✅ 스킬을 가진 상담사 목록에서 특정 상담사들 해제 성공:", data);
     return data;
   } catch (error) {
-    console.error("❌ 스킬에서 상담사 해제 실패:", error);
+    // console.error("❌ 스킬에서 상담사 해제 실패:", error);
     const typedError = error as CounselorSkillApiError;
     throw new Error(
       typedError.response?.data?.result_msg || "스킬에서 상담사 해제 중 오류가 발생했습니다."
@@ -196,10 +190,7 @@ export const apiForAddCounselorsForSpecificSkill = async (
   skillId: number,
   counselorIds: string[]
 ): Promise<CounselorSkillAssignmentResponse> => {
-  console.log("📌 스킬에 상담사 추가 시작");
-  console.log("🎯 대상 스킬 ID:", skillId);
-  console.log("🔗 추가할 상담사 목록:", counselorIds);
-
+  
   try {
     const { data } = await axiosInstance.post<CounselorSkillAssignmentResponse>(
       `skills/${skillId}/agent-list`,
@@ -210,7 +201,6 @@ export const apiForAddCounselorsForSpecificSkill = async (
       }
     );
 
-    console.log("✅ 스킬을 가진 상담사 목록에 특정 상담사들 추가 성공:", data);
     return data;
   } catch (error:any) {
 
@@ -221,7 +211,7 @@ export const apiForAddCounselorsForSpecificSkill = async (
     //   });
     // }
 
-    console.error("❌ 스킬에 상담사 추가 실패:", error);
+    // console.error("❌ 스킬에 상담사 추가 실패:", error);
     const typedError = error as CounselorSkillApiError;
     throw new Error(
       typedError.response?.data?.result_msg || "스킬에 상담사 추가 중 오류가 발생했습니다."

@@ -205,7 +205,7 @@ const ChannelGroupSetting = () => {
             
         }, 
         onError: (data) => {
-            console.log('채널 그룹 조회 실패:', data);
+            // console.log('채널 그룹 조회 실패:', data);
         
             ServerErrorCheck('채널 그룹 조회', data.message);
         }

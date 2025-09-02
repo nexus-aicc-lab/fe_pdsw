@@ -28,24 +28,22 @@ export function TeamSkillAssignmentTab() {
   const { candidateMembersForSkilAssign } = useCounselorFilterStore();
 
   // 컴포넌트 마운트 시 상담사 정보 디버깅
-  useEffect(() => {
-    console.group("🔍 [TeamSkillAssignmentTab] 컴포넌트 마운트");
-    console.log("📋 candidateMembersForSkilAssign 데이터:", candidateMembersForSkilAssign);
-
-    if (Array.isArray(candidateMembersForSkilAssign) && candidateMembersForSkilAssign.length > 0) {
-      console.log("👤 첫 번째 상담사:", candidateMembersForSkilAssign[0]);
-      console.log("👥 총 상담사 수:", candidateMembersForSkilAssign.length);
-
-      // 상담사 ID 목록 추출
-      const counselorIds = candidateMembersForSkilAssign
-        .filter(c => c && c.counselorId)
-        .map(c => c.counselorId);
-      console.log("🆔 유효한 상담사 ID 목록:", counselorIds);
-    } else {
-      console.warn("⚠️ 상담사 데이터가 없거나 형식이 올바르지 않습니다.");
-    }
-    console.groupEnd();
-  }, [candidateMembersForSkilAssign]);
+  // useEffect(() => {
+  //   console.group("🔍 [TeamSkillAssignmentTab] 컴포넌트 마운트");
+  //   console.log("📋 candidateMembersForSkilAssign 데이터:", candidateMembersForSkilAssign);
+  //   if (Array.isArray(candidateMembersForSkilAssign) && candidateMembersForSkilAssign.length > 0) {
+  //     console.log("👤 첫 번째 상담사:", candidateMembersForSkilAssign[0]);
+  //     console.log("👥 총 상담사 수:", candidateMembersForSkilAssign.length);
+  //     // 상담사 ID 목록 추출
+  //     const counselorIds = candidateMembersForSkilAssign
+  //       .filter(c => c && c.counselorId)
+  //       .map(c => c.counselorId);
+  //     console.log("🆔 유효한 상담사 ID 목록:", counselorIds);
+  //   } else {
+  //     console.warn("⚠️ 상담사 데이터가 없거나 형식이 올바르지 않습니다.");
+  //   }
+  //   console.groupEnd();
+  // }, [candidateMembersForSkilAssign]);
 
   // 상담사 배열이 유효한지 확인
   const isValidCounselorsArray = Array.isArray(candidateMembersForSkilAssign) && candidateMembersForSkilAssign.length > 0;
@@ -54,9 +52,6 @@ export function TeamSkillAssignmentTab() {
   const firstCounselor = isValidCounselorsArray ? candidateMembersForSkilAssign[0] : null;
   const tenantId = firstCounselor?.tenantId ? Number(firstCounselor.tenantId) : undefined;
   const counselorId = firstCounselor?.counselorId || "";
-
-  console.log("🏢 테넌트 ID:", tenantId);
-  console.log("👤 대표 상담사 ID:", counselorId);
 
   // useAssignableSkills 훅 사용
   const { data: assignableSkills, isLoading, error } = useAssignableSkills(tenantId);
@@ -76,16 +71,16 @@ export function TeamSkillAssignmentTab() {
       const assignedSkillIds = assignedSkills.result_data.map(item => item.skill_id);
       setSelectedSkills(assignedSkillIds);
       setInitialSkills(assignedSkillIds);
-      console.log("✅ 할당된 스킬 ID:", assignedSkillIds);
+      // console.log("✅ 할당된 스킬 ID:", assignedSkillIds);
     } else {
-      console.log("ℹ️ 할당된 스킬 없음");
+      // console.log("ℹ️ 할당된 스킬 없음");
     }
   }, [assignedSkills]);
 
   // 할당 가능한 스킬 로그
   useEffect(() => {
     if (assignableSkills) {
-      console.log("✅ 할당 가능한 스킬 데이터:", assignableSkills);
+      // console.log("✅ 할당 가능한 스킬 데이터:", assignableSkills);
     }
   }, [assignableSkills]);
 
@@ -93,7 +88,7 @@ export function TeamSkillAssignmentTab() {
 // 유효한 상담사 ID 배열 생성 함수
 const getValidCounselorIds = () => {
   if (!isValidCounselorsArray) {
-    console.warn("⚠️ 유효한 상담사 배열이 없습니다.");
+    // console.warn("⚠️ 유효한 상담사 배열이 없습니다.");
     return [];
   }
 
@@ -101,7 +96,6 @@ const getValidCounselorIds = () => {
   const validIds = candidateMembersForSkilAssign
     .filter(counselor => {
       // 더 자세한 디버깅
-      console.log("각 상담사 객체:", counselor);
       
       // 여러 경로로 ID 접근 시도
       const id = 
@@ -109,7 +103,7 @@ const getValidCounselorIds = () => {
         counselor.counselorId ||                          // 직접 접근하는 경우
         (typeof counselor === 'object' ? JSON.stringify(counselor) : counselor); // 객체 구조 자체 확인
       
-      console.log("추출한 ID:", id);
+      
       return id && id !== '-';
     })
     .map(counselor => {
@@ -117,13 +111,13 @@ const getValidCounselorIds = () => {
       return (counselor.data && counselor.data.counselorId) || counselor.counselorId;
     });
   
-  console.log("✅ 추출된 상담사 ID 목록:", validIds, "개수:", validIds.length);
+  // console.log("✅ 추출된 상담사 ID 목록:", validIds, "개수:", validIds.length);
   
   // 빈 배열이라면 다시 검증
-  if (validIds.length === 0) {
-    console.error("❌ 상담사 데이터는 있지만 유효한 ID를 추출하지 못했습니다.");
-    console.log("전체 객체 구조:", JSON.stringify(candidateMembersForSkilAssign));
-  }
+  // if (validIds.length === 0) {
+  //   console.error("❌ 상담사 데이터는 있지만 유효한 ID를 추출하지 못했습니다.");
+  //   console.log("전체 객체 구조:", JSON.stringify(candidateMembersForSkilAssign));
+  // }
   
   return validIds;
 };
@@ -141,12 +135,7 @@ const getValidCounselorIds = () => {
       const isCurrentlySelected = prev.includes(skillId);
 
       if (isCurrentlySelected) {
-        console.log("📌 체크 해제된 스킬 정보:", {
-          skillId: skillId,
-          counselorIds: counselorIds,
-          counselorCount: counselorIds.length
-        });
-
+        
         deleteCounselorMutation.mutate({
           skillId: skillId,
           counselorIds: counselorIds
@@ -155,17 +144,12 @@ const getValidCounselorIds = () => {
             toast.success('스킬이 해제되었습니다.');
           },
           onError: (error) => {
-            console.error('스킬 해제 오류:', error);
+            // console.error('스킬 해제 오류:', error);
             toast.error('스킬 해제 중 오류가 발생했습니다.');
           }
         });
       } else {
-        console.log("📌 체크된 스킬 정보:", {
-          skillId: skillId,
-          counselorIds: counselorIds,
-          counselorCount: counselorIds.length
-        });
-
+        
         addCounselorMutation.mutate({
           skillId: skillId,
           counselorIds: counselorIds
@@ -174,7 +158,7 @@ const getValidCounselorIds = () => {
             toast.success('스킬이 할당되었습니다.');
           },
           onError: (error) => {
-            console.error('스킬 할당 오류:', error);
+            // console.error('스킬 할당 오류:', error);
             toast.error('스킬 할당 중 오류가 발생했습니다.');
           }
         });
@@ -204,13 +188,6 @@ const getValidCounselorIds = () => {
 
     const skillsToAdd = selectedSkills.filter(skillId => !initialSkills.includes(skillId));
     const skillsToRemove = initialSkills.filter(skillId => !selectedSkills.includes(skillId));
-
-    console.log("📊 스킬 변경 정보:", {
-      추가할_스킬: skillsToAdd,
-      제거할_스킬: skillsToRemove,
-      상담사_IDs: counselorIds,
-      상담사_수: counselorIds.length
-    });
 
     // 변경사항이 있는지 확인
     const hasChanges = skillsToAdd.length > 0 || skillsToRemove.length > 0;
@@ -246,11 +223,11 @@ const getValidCounselorIds = () => {
           counselorIds
         }, {
           onSuccess: () => {
-            console.log(`✅ 스킬(ID: ${skillId}) 할당 성공`);
+            // console.log(`✅ 스킬(ID: ${skillId}) 할당 성공`);
             checkCompletion();
           },
           onError: (error) => {
-            console.error(`❌ 스킬(ID: ${skillId}) 할당 실패:`, error);
+            // console.error(`❌ 스킬(ID: ${skillId}) 할당 실패:`, error);
             checkCompletion();
           }
         });
@@ -265,11 +242,11 @@ const getValidCounselorIds = () => {
           counselorIds
         }, {
           onSuccess: () => {
-            console.log(`✅ 스킬(ID: ${skillId}) 해제 성공`);
+            // console.log(`✅ 스킬(ID: ${skillId}) 해제 성공`);
             checkCompletion();
           },
           onError: (error) => {
-            console.error(`❌ 스킬(ID: ${skillId}) 해제 실패:`, error);
+            // console.error(`❌ 스킬(ID: ${skillId}) 해제 실패:`, error);
             checkCompletion();
           }
         });
@@ -421,8 +398,8 @@ const getValidCounselorIds = () => {
                       const name = counselor.data?.counselorname || counselor.counselorname || '-';
                       const tenantId = counselor.data?.tenantId || counselor.tenantId || '-';
 
-                      console.log(`상담사 ${index} 데이터:`, counselor);
-                      console.log(`추출한 값:`, { id, name, tenantId });
+                      // console.log(`상담사 ${index} 데이터:`, counselor);
+                      // console.log(`추출한 값:`, { id, name, tenantId });
 
                       return (
                         <TableRow key={`counselor-${index}`} className="custom-hover">

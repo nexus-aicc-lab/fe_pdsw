@@ -4,7 +4,7 @@ import { CampaignInfoDeleteRequest, UpdateResponse } from '../types/campaignMana
 
 // 캠페인 스케줄 삭제 요청
 export const fetchCampaignScheduleDelete = async (credentials: CampaignInfoDeleteRequest): Promise<UpdateResponse> => {
-  console.log("tenant_id ???????????????????????????", credentials.tenant_id);
+  
   const campaignScheduleDeleteRequestData = {
     request_data: {      
       tenant_id: credentials.tenant_id

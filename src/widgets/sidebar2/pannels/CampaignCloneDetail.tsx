@@ -560,7 +560,7 @@ export default function CampaignDetail() {
 
   //스킬 선택 팝업 버튼이벤트
   const handleOpenSkillPopup = () => {
-    console.log(copyTenantId);
+    
     if (copyTenantId === ' ') {
       setAlertState({
         ...errorMessage,

@@ -56,7 +56,7 @@ const SkillListPopupForNewCampaign = ({
     tenant_id_array: [tenantId],
   });
 
-  console.log("API Data for skillist popup:", skillsData);
+  // console.log("API Data for skillist popup:", skillsData);
   
 
   // 테스트용 가짜 데이터 (개발 중 사용)
@@ -72,16 +72,16 @@ const SkillListPopupForNewCampaign = ({
   });
   
   // 디버깅용 로그
-  useEffect(() => {
-    console.log("Initial param:", param);
-    console.log("Selected rows:", Array.from(selectedRows));
-  }, [param, selectedRows]);
+  // useEffect(() => {
+  //   console.log("Initial param:", param);
+  //   console.log("Selected rows:", Array.from(selectedRows));
+  // }, [param, selectedRows]);
   
   // 확인 버튼 클릭 처리
   const handleConfirm = () => {
     const selectedArray = Array.from(selectedRows);
     const resultString = selectedArray.sort((a, b) => a - b).join(',') + (selectedArray.length > 0 ? ',' : '');
-    console.log("Confirm selection:", resultString);
+    // console.log("Confirm selection:", resultString);
     
     // 현재 tenantId가 초기값과 다르면 updatedTenantId도 함께 전달
     onConfirm(resultString);
@@ -96,7 +96,7 @@ const SkillListPopupForNewCampaign = ({
 
   // 선택 변경 핸들러
   const handleSelectedRowsChange = (newSelection: Set<number>) => {
-    console.log("Selection changed:", Array.from(newSelection));
+    // console.log("Selection changed:", Array.from(newSelection));
     setSelectedRows(newSelection);
   };
 

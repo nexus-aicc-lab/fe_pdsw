@@ -68,11 +68,11 @@ export const CampaignContextMenu = ({
 
   const { mutate: updateCampaignStatus, isPending } = useApiForCampaignStatusUpdate({
     onSuccess: (data, variables) => {
-      console.log("캠페인 상태 업데이트 성공2:", data);
+      
       // onStatusChange?.(variables.campaign_id, variables.status);
     },
     onError: (error) => {
-      console.error("캠페인 상태 업데이트 실패:", error);
+      // console.error("캠페인 상태 업데이트 실패:", error);
     },
   });
 

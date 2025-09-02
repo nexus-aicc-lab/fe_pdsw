@@ -172,10 +172,6 @@ const GroupCampaignList: React.FC<Props> = ({
   const { skills: dataForSkilMaster } = useCampainManagerStore();
   const { campaignSkills } = useMainStore();
 
-  console.log("dataForSkilMaster :: ", dataForSkilMaster);
-  console.log("groupCampaigns :: ", groupCampaigns);
-  console.log("campaignSkills :: ", campaignSkills);
-  console.log("campaignListData :: ", campaignListData);
   
   // 캠페인 ID로 해당 캠페인이 속한 스킬들을 찾는 함수
   const getSkillsForCampaign = (campaignId: number) => {

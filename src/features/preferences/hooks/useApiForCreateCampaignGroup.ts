@@ -26,15 +26,11 @@ export function useApiForCreateCampaignGroup(
       apiForCreateCampaignGroup(credentials),
     onSuccess: (data, variables, context) => {
 
-      console.log("data:", data);
-      console.log("variables:", variables);
-      
       // sideMenuTreeData 쿼리 캐시 무효화 - 이것만 무효화해도 데이터가 갱신됨
       queryClient.invalidateQueries({
         queryKey: ['sideMenuTreeData']
       });
       
-      console.log('✅ 캠페인 그룹 생성 성공:', data);
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -47,7 +43,7 @@ export function useApiForCreateCampaignGroup(
         return
       }
 
-      console.error('❌ 캠페인 그룹 생성 실패:', error);
+      // console.error('❌ 캠페인 그룹 생성 실패:', error);
       options?.onError?.(error, variables, context);
     },
   });

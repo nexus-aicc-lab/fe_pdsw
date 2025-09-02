@@ -48,7 +48,7 @@ const useStore = create<
                 }, 0);
             },
             resetUserInfo: () => {
-                console.log("🔄 resetUserInfo 호출됨");
+                // console.log("🔄 resetUserInfo 호출됨");
                 set({ ...initialState }, false, "resetUserInfo");
             }
         }),
@@ -62,7 +62,7 @@ const useStore = create<
 // 현재 상태 확인을 위한 디버깅 함수
 export const logCurrentState = () => {
     const state = useStore.getState();
-    console.log("📊 현재 스토어 상태:", state);
+    // console.log("📊 현재 스토어 상태:", state);
     return state;
 };
 

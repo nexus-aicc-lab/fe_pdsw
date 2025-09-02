@@ -39,10 +39,6 @@ const useApiForCampaignListDelete = (
       });
     },
     onSuccess: (data, deletedCampaignId, context) => {
-      console.log('API Response (Delete):', {
-        code: data.result_code,
-        message: data.result_msg
-      });
       
       toast.success('캠페인 리스트 삭제 성공 check !!!!!!!!!!!');
 
@@ -69,7 +65,7 @@ const useApiForCampaignListDelete = (
       options?.onSuccess?.(data, deletedCampaignId, context);
     },
     onError: (error: ListManagerApiError, variables: number, context: unknown) => {
-      console.error('API Error (Delete):', error);
+      // console.error('API Error (Delete):', error);
       
       // 사용자가 의도적으로 취소한 경우가 아니라면 에러 메시지 표시
       if (error.message !== '사용자가 삭제를 취소했습니다.') {

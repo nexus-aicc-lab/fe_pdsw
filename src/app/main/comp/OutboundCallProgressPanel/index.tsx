@@ -387,6 +387,10 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       const campaignInfo = campaigns.find(data => data.campaign_id === Number(selectedCampaign));
       const tenantId = campaignInfo?.tenant_id+'' || '1';
       const campaignId = campaignInfo?.campaign_id+'' || '0';
+
+      // 09/01 dial_sequence 추가
+      // const dial_sequence = campaignInfo?.dial_sequence || '0';
+
       fetchCallProgressStatus({ tenantId, campaignId });
       if( statisticsUpdateCycle > 0 ){  
         intervalRef.current = setInterval(() => {

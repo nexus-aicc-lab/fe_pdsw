@@ -6,14 +6,14 @@ export const NotificationListener = () => {
   useEffect(() => {
     // 서비스 워커 메시지 리스너 등록
     const handleServiceWorkerMessage = (event: MessageEvent) => {
-      console.log("[NotificationListener] 서비스 워커 메시지 수신:", event.data);
+      // console.log("[NotificationListener] 서비스 워커 메시지 수신:", event.data);
       
       if (event.data && event.data.type === "SCHEDULE_NOTIFICATION") {
         const { notification, delay } = event.data;
         
         // 지연 후 알림 다시 표시
         setTimeout(() => {
-          console.log("[NotificationListener] 지연된 알림 표시:", notification);
+          // console.log("[NotificationListener] 지연된 알림 표시:", notification);
           
           // 서비스 워커 등록 정보 가져오기
           navigator.serviceWorker.getRegistration().then(reg => {

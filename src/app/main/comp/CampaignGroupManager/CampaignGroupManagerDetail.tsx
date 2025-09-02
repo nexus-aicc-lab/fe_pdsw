@@ -813,8 +813,8 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
 
   //캠페인 저장
   const handleCampaignSave = () => {
-    console.log(tempCampaignManagerInfo);
-    console.log('power_divert_queue :: ' + tempCampaignManagerInfo.power_divert_queue);
+    // console.log(tempCampaignManagerInfo);
+    // console.log('power_divert_queue :: ' + tempCampaignManagerInfo.power_divert_queue);
     let saveErrorCheck = false;
     if (!saveErrorCheck && tempCampaignManagerInfo.tenant_id < 0) {
       saveErrorCheck = true;

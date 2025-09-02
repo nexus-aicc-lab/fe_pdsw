@@ -69,7 +69,7 @@ export const useTreeMenuStore = create<TreeMenuState>()(
       // 정렬 옵션 설정 (완전한 옵션으로 설정)
       setCampaignSort: (option) => 
         set(() => {
-          console.log("setCampaignSort 호출:", option);
+          // console.log("setCampaignSort 호출:", option);
           return { 
             campaignSort: {
               type: option.type,
@@ -83,7 +83,7 @@ export const useTreeMenuStore = create<TreeMenuState>()(
       // 정렬 액션 - 노드 타입별 정렬 설정
       sortByNodeType: (nodeType, sortType, direction) => 
         set((state) => {
-          console.log("sortByNodeType 호출:", { nodeType, sortType, direction });
+          // console.log("sortByNodeType 호출:", { nodeType, sortType, direction });
           
           // 정렬 타입이 변경된 경우
           if (state.selectedNodeType !== nodeType) {
@@ -124,12 +124,12 @@ export const useTreeMenuStore = create<TreeMenuState>()(
             setTimeout(() => {
               if (mode === 'tenant') {
                 if (window.expandTenantsOnly) {
-                  console.log("테넌트 노드만 확장 (모드 변경)");
+                  // console.log("테넌트 노드만 확장 (모드 변경)");
                   window.expandTenantsOnly();
                 }
               } else {
                 if (window.expandAllNodes) {
-                  console.log("모든 노드 확장 (모드 변경)");
+                  // console.log("모든 노드 확장 (모드 변경)");
                   window.expandAllNodes();
                 }
               }

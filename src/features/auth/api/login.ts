@@ -76,7 +76,7 @@ export const loginApi = {
         sameSite: 'Lax',
         path: '/'
       });
-      console.log("🍪 Cookies after setting userHost:", Cookies.get('userHost'));
+      // console.log("🍪 Cookies after setting userHost:", Cookies.get('userHost'));
       // ###### 로그인 시간 기준으로 세션키 만료시간 설정 ######
       const currentDate = new Date();
       const expiredDate = new Date(currentDate.getTime() + data.expires_in * 1000); // 초 더하기
@@ -96,12 +96,12 @@ export const loginApi = {
       Cookies.set('role_id', String(data.role_id), { expires: 1, path: '/' });
       Cookies.set('menu_role_id', String(data.menu_role_id), { expires: 1, path: '/' });
 
-      console.log("🍪 Cookies after setting:", {
-        session_key: Cookies.get('session_key'),
-        tenant_id: Cookies.get('tenant_id'),
-        role_id: Cookies.get('role_id'),
-        menu_role_id: Cookies.get('menu_role_id'),
-      });
+      // console.log("🍪 Cookies after setting:", {
+      //   session_key: Cookies.get('session_key'),
+      //   tenant_id: Cookies.get('tenant_id'),
+      //   role_id: Cookies.get('role_id'),
+      //   menu_role_id: Cookies.get('menu_role_id'),
+      // });
 
       // 🧠 사용자 정보 저장 (Zustand)
       const userInfo: UserInfoData = {

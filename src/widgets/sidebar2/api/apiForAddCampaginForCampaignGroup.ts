@@ -26,7 +26,7 @@ export const apiForTotalSkillList = async (
 
     return response.data;
   } catch (error: any) {
-    console.error("Skill list API call failed:", error);
+    // console.error("Skill list API call failed:", error);
 
     // 에러 객체에 custom 속성 추가
     const enhancedError = new Error(
@@ -83,7 +83,7 @@ export const apiForTotalCampaignList = async (
 
     return response.data;
   } catch (error: any) {
-    console.error("Campaign list API call failed:", error);
+    // console.error("Campaign list API call failed:", error);
 
     // 에러 객체에 custom 속성 추가
     const enhancedError = new Error(
@@ -138,7 +138,7 @@ export const apiForFetchSkilsWithCampaigns = async (
 
     return response.data;
   } catch (error: any) {
-    console.error("Campaign skills API call failed:", error);
+    // console.error("Campaign skills API call failed:", error);
 
     // 에러 객체에 custom 속성 추가
     const enhancedError = new Error(
@@ -196,7 +196,7 @@ export const apiForGetCampaignListForCampaignGroup = async (
 
     return response.data;
   } catch (error: any) {
-    console.error("Campaign Group skills API call failed:", error);
+    // console.error("Campaign Group skills API call failed:", error);
 
     // 에러 객체에 custom 속성 추가
     const enhancedError = new Error(

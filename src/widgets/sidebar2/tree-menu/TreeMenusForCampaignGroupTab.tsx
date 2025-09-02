@@ -282,7 +282,7 @@ export const TreeMenusForCampaignGroupTab = memo(function TreeMenusForCampaignGr
   // Log only once with useEffect instead of on every render
   useEffect(() => {
     if (!hasLoggedRef.current) {
-      console.log("TreeMenusForCampaignGroupTab 렌더링", treeData);
+      // console.log("TreeMenusForCampaignGroupTab 렌더링", treeData);
       hasLoggedRef.current = true;
     }
   }, [treeData]);
@@ -290,7 +290,7 @@ export const TreeMenusForCampaignGroupTab = memo(function TreeMenusForCampaignGr
   // 필요시에만 사용할 forceUpdate 함수
   const handleForceUpdate = useCallback(() => {
     // 상태 기반 업데이트 대신 store의 refetch 함수 사용 권장
-    console.log("Force update 요청됨");
+    // console.log("Force update 요청됨");
     // 실제로는 store의 데이터를 다시 가져오는 것이 더 안전
   }, []);
 
@@ -298,7 +298,7 @@ export const TreeMenusForCampaignGroupTab = memo(function TreeMenusForCampaignGr
     const id = typeof campaignId === 'string' ? campaignId : campaignId.toString();
     removeCampaignFromGroup(id);
     // handleForceUpdate(); // ✅ 제거
-    console.log(`캠페인 ID ${id}가 그룹 트리에서 제거됨`);
+    // console.log(`캠페인 ID ${id}가 그룹 트리에서 제거됨`);
   }, [removeCampaignFromGroup]);
 
   // Set global objects only when values actually change
@@ -319,7 +319,7 @@ export const TreeMenusForCampaignGroupTab = memo(function TreeMenusForCampaignGr
     if (treeData && treeData.length > 0 && !hasInitiallyExpandedRef.current) {
       expandTenantAndGroup();
       hasInitiallyExpandedRef.current = true;
-      console.log("초기 확장 실행됨");
+      // console.log("초기 확장 실행됨");
     }
   }, [treeData, expandTenantAndGroup]); // ✅ dependency에서 hasInitiallyExpanded 제거
 

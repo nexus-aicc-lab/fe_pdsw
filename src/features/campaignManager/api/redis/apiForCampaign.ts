@@ -11,10 +11,10 @@ export const apiForRedisTest = async (): Promise<string> => {
   try {
     const { data } = await axios.get<string>("http://localhost:4000/api/v1/monitor/hello-pub");
 
-    console.log("✅ Redis 테스트 성공:", data);
+    
     return data;
   } catch (error) {
-    console.error("❌ Redis 테스트 실패:", error);
+    // console.error("❌ Redis 테스트 실패:", error);
     throw new Error("Redis 테스트 요청 중 오류가 발생했습니다.");
   }
 };

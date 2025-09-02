@@ -7,7 +7,7 @@ declare global {
 
 export const getRuntimeEnv = (key: string): string => {
     if (typeof window !== 'undefined') {
-      console.log(">>>URL: {}", window.__RUNTIME_CONFIG__)
+      // console.log(">>>URL: {}", window.__RUNTIME_CONFIG__)
       return window.__RUNTIME_CONFIG__?.[key] ?? '';
     }
     return '';

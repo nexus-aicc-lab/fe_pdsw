@@ -6,7 +6,6 @@ import { loginAsAdmin } from './helpers/login.helper';
 test('캠페인 관리 탭 생성 테스트', async ({ page }) => {
   // 로그인
   await loginAsAdmin(page);
-  console.log('✅ 로그인 완료');
   
   await page.waitForTimeout(1000);
   
@@ -16,7 +15,7 @@ test('캠페인 관리 탭 생성 테스트', async ({ page }) => {
   const campaignButton = page.getByText('캠페인 관리');
   await expect(campaignButton).toBeVisible({ timeout: 5000 });
   await campaignButton.click();
-  console.log('🖱️ 캠페인 관리 버튼 클릭');
+  
   
   // 2. 캠페인 관리 탭이 등록되었는지 확인
   await page.waitForTimeout(2000);
@@ -25,7 +24,7 @@ test('캠페인 관리 탭 생성 테스트', async ({ page }) => {
   const tabByRole = page.getByRole('tab', { name: '캠페인 관리' });
   if (await tabByRole.count() > 0) {
     await expect(tabByRole).toBeVisible();
-    console.log('✅ [role=tab] 캠페인 관리 탭 등록 확인');
+    
     return;
   }
   
@@ -33,7 +32,5 @@ test('캠페인 관리 탭 생성 테스트', async ({ page }) => {
   const campaignTexts = page.getByText('캠페인 관리');
   const count = await campaignTexts.count();
   expect(count).toBeGreaterThanOrEqual(2);
-  console.log(`✅ 캠페인 관리 텍스트 ${count}개 확인 (버튼 + 탭)`);
   
-  console.log('🎉 캠페인 관리 탭 생성 테스트 완료!');
 });

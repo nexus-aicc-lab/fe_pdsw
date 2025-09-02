@@ -57,10 +57,6 @@ export function SkillAssignmentTab() {
       const isCurrentlySelected = prev.includes(skillId);
 
       if (isCurrentlySelected) {
-        console.log("📌 체크 해제된 스킬 정보:", {
-          skillId: skillId,
-          counselorId: selectedCounselor.counselorId,
-        });
 
         deleteCounselorMutation.mutate({
           skillId: skillId,
@@ -71,10 +67,6 @@ export function SkillAssignmentTab() {
           }
         });
       } else {
-        console.log("📌 체크된 스킬 정보:", {
-          skillId: skillId,
-          counselorId: selectedCounselor.counselorId,
-        });
 
         if (prev.length >= 10) {
           toast.error('최대 10개의 스킬만 할당할 수 있습니다.');

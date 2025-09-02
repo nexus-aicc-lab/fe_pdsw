@@ -273,17 +273,17 @@ export function TreeNodeForCampaignTab({
   const statusIcon = item.type === "campaign" ? getStatusIcon(item.status) : null;
 
   // 디버깅 - 자식 노드 목록 로깅
-  useEffect(() => {
-    if (hasChildren && item.type === "folder" && level === 1) { // 테넌트 폴더만 확인
-      console.log(`폴더 ${item.label} 자식 노드 목록:`, 
-        item.children?.map((child: typeof item) => `${child.label}(${child.type})`));
-    }
-  }, [item, hasChildren, level]);
+  // useEffect(() => {
+  //   if (hasChildren && item.type === "folder" && level === 1) { // 테넌트 폴더만 확인
+  //     console.log(`폴더 ${item.label} 자식 노드 목록:`, 
+  //       item.children?.map((child: typeof item) => `${child.label}(${child.type})`));
+  //   }
+  // }, [item, hasChildren, level]);
 
   const handleClick = useCallback(() => {
     onNodeSelect(item.id);
     if (hasChildren) {
-      console.log(`노드 클릭: ${item.id} (${item.label}), 자식: ${item.children?.length || 0}`);
+      // console.log(`노드 클릭: ${item.id} (${item.label}), 자식: ${item.children?.length || 0}`);
       onNodeToggle(item.id);
     }
   }, [item, hasChildren, onNodeSelect, onNodeToggle]);
@@ -299,15 +299,15 @@ export function TreeNodeForCampaignTab({
   }, [item, simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu]);
 
   const handleEdit = useCallback(() => {
-    console.log("Edit clicked:", { id: item.id, label: item.label, type: item.type });
+    // console.log("Edit clicked:", { id: item.id, label: item.label, type: item.type });
   }, [item.id, item.label, item.type]);
   
   const handleMonitor = useCallback(() => {
-    console.log("Monitor clicked:", { id: item.id, label: item.label, type: item.type });
+    // console.log("Monitor clicked:", { id: item.id, label: item.label, type: item.type });
   }, [item.id, item.label, item.type]);
   
   const onHandleCampaignCopy = useCallback(() => {
-    console.log("Copy clicked:", { id: item.id, label: item.label, type: item.type });
+    //console.log("Copy clicked:", { id: item.id, label: item.label, type: item.type });
     setCampaignIdForUpdateFromSideMenu(item.id);
     setCampaignIdForCopyCampaign(item.id);
     addTab({

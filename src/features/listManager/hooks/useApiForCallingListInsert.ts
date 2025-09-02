@@ -11,13 +11,7 @@ export function useApiForCallingListInsert(
     mutationKey: ['mainCallingListInsert'],
     mutationFn: fetchCallingListInsert,
     onSuccess: (data, variables, context) => {
-      console.log('API Response:', {
-        code: data.result_code,
-        message: data.result_msg,
-        count: data.result_count,
-        requestCount: data.request_count,
-        data: data.result_data
-      });
+      
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: ListManagerApiError, variables: CallingListInsertRequest, context: unknown) => {

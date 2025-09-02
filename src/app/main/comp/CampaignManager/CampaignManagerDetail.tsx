@@ -1430,7 +1430,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
             onClose: () => goLogin(),
           });
         } else {
-          console.error('캠페인 삭제 중 오류 발생:', e);
+          // console.error('캠페인 삭제 중 오류 발생:', e);
           setAlertState({
             ...errorMessage,
             isOpen: true,

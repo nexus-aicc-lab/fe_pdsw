@@ -849,7 +849,7 @@ export default function Footer({
       let skill_id = "";
 
       eventSource.addEventListener('message', (event) => {
-        console.log("footer sse event = ", event.data);
+        // console.log("footer sse event = ", event.data);
 
         if (event.data !== "Connected!!") {
           try {
@@ -886,7 +886,7 @@ export default function Footer({
               });
             }
           } catch (error) {
-            console.error("SSE JSON parse error: ", error);
+            // console.error("SSE JSON parse error: ", error);
           }
         }
       });
@@ -918,7 +918,7 @@ export default function Footer({
       const { type, message } = event.data;
 
       if (type === 'sseMessage') {
-        console.log('sseMessageChannel :: ' + message);
+        // console.log('sseMessageChannel :: ' + message);
 
         const tempEventData = JSON.parse(message);
         const announce = tempEventData["announce"];
@@ -983,7 +983,7 @@ export default function Footer({
       const messageId = `${announce}_${command}_${campaign_id}_${skill_id}_${JSON.stringify(data)}`;
 
       if (lastProcessedMessageRef.current === messageId) {
-        console.log("🔄 [중복 메시지 감지] 처리 건너뜀:", messageId);
+        // console.log("🔄 [중복 메시지 감지] 처리 건너뜀:", messageId);
         return;
       }
 
@@ -999,7 +999,7 @@ export default function Footer({
         tempEventData
       );
     } catch (error) {
-      console.error("🚨 [SSE 메시지 처리 오류]", error);
+      // console.error("🚨 [SSE 메시지 처리 오류]", error);
     }
   };
 
@@ -1044,7 +1044,7 @@ export default function Footer({
 
   useEffect(() => {
     if (sseData != '') {
-      console.log('sseData :: ' + sseData);
+      // console.log('sseData :: ' + sseData);
       const tempEventData = JSON.parse(sseData);
       const announce = tempEventData["announce"];
       const data = tempEventData["data"];

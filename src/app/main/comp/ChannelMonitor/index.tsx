@@ -250,7 +250,7 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
           window.close();
         }
       }else{
-        console.log('ChannelMonitor: fetchChannelStateMonitoringList error', error);
+        // console.log('ChannelMonitor: fetchChannelStateMonitoringList error', error);
         ServerErrorCheck('장비 목록 조회', error.message);  
       }
     }

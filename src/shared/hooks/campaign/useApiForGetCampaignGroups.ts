@@ -34,7 +34,7 @@ export const useApiForGetCampaignGroups = (options?: UseApiForGetCampaignGroupsO
         
         return response;
       } catch (error) {
-        console.error("Error loading campaign groups data:", error);
+        // console.error("Error loading campaign groups data:", error);
         throw error;
       } finally {
         setCampaignGroupsLoading(false);

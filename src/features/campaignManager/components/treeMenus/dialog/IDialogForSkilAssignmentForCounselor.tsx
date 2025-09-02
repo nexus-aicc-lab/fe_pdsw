@@ -164,7 +164,7 @@ export function IDialogForSkilAssignmentForCounselor({
 
       onClose();
     } catch (error) {
-      console.error("스킬 할당/해제 중 오류 발생:", error);
+      // console.error("스킬 할당/해제 중 오류 발생:", error);
       toast.error("스킬 처리 중 오류가 발생했습니다.");
     }
   };

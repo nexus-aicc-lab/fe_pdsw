@@ -31,7 +31,7 @@ export const getCampaignGroupMenuItems = (
       key="bulk-update"
       style={itemStyle}
       onClick={() => {
-        console.log(`캠페인 그룹 일괄 수정: ${node.name}`);
+        // console.log(`캠페인 그룹 일괄 수정: ${node.name}`);
         addTabCurrentOnly({
           id: 1,
           title: `캠페인 그룹 관리: ${node.name}`,
@@ -49,7 +49,9 @@ export const getCampaignGroupMenuItems = (
     <Item
       key="bulk-start"
       style={itemStyle}
-      onClick={() => console.log(`캠페인 그룹 일괄 시작: ${node.name}`)}
+      onClick={() => {
+        //console.log(`캠페인 그룹 일괄 시작: ${node.name}`)
+      }}
     >
       캠페인 그룹 일괄 시작
     </Item>,
@@ -57,7 +59,9 @@ export const getCampaignGroupMenuItems = (
     <Item
       key="bulk-complete"
       style={itemStyle}
-      onClick={() => console.log(`캠페인 그룹 일괄 완료: ${node.name}`)}
+      onClick={() => {
+        // console.log(`캠페인 그룹 일괄 완료: ${node.name}`)
+      }}
     >
       캠페인 그룹 일괄 멈춤
     </Item>,
@@ -65,7 +69,9 @@ export const getCampaignGroupMenuItems = (
     <Item
       key="bulk-stop"
       style={itemStyle}
-      onClick={() => console.log(`캠페인 그룹 일괄 중지: ${node.name}`)}
+      onClick={() => {
+        // console.log(`캠페인 그룹 일괄 중지: ${node.name}`)
+      }}
     >
       캠페인 그룹 일괄 중지
     </Item>,
@@ -77,7 +83,7 @@ export const getCampaignGroupMenuItems = (
       key="rename"
       style={itemStyle}
       onClick={() => {
-        console.log("캠페인 그룹 이름 변경:", node);
+        // console.log("캠페인 그룹 이름 변경:", node);
         setIsRenameDialogOpen(true);
       }}
     >
@@ -88,7 +94,7 @@ export const getCampaignGroupMenuItems = (
       key="delete"
       style={itemStyle}
       onClick={() => {
-        console.log(`캠페인 그룹 삭제: ${node.name}`);
+        // console.log(`캠페인 그룹 삭제: ${node.name}`);
         setIsDeleteDialogOpen(true);
       }}
     >
@@ -102,7 +108,7 @@ export const getCampaignGroupMenuItems = (
       key="add-campaign"
       style={itemStyle}
       onClick={() => {
-        console.log(`캠페인 추가/제외: ${node.name}`);
+        // console.log(`캠페인 추가/제외: ${node.name}`);
         setIsCampaignAddPopupOpen(true);
       }}
     >
@@ -112,7 +118,9 @@ export const getCampaignGroupMenuItems = (
     <Item
       key="resend"
       style={itemStyle}
-      onClick={() => console.log(`캠페인 그룹 실시간 재발신: ${node.name}`)}
+      onClick={() => {
+        // console.log(`캠페인 그룹 실시간 재발신: ${node.name}`)
+      }}
     >
       캠페인 그룹 실시간 재발신
     </Item>,

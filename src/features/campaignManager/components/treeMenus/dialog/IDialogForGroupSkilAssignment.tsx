@@ -510,7 +510,7 @@ export function IDialogForGroupSkilAssignment({
   // 유효한 상담사 ID 배열 생성
   const getValidCounselorIds = () => {
     if (!groupMembers || groupMembers.length === 0) {
-      console.warn("⚠️ 유효한 상담사 배열이 없습니다.");
+      // console.warn("⚠️ 유효한 상담사 배열이 없습니다.");
       return [];
     }
     const validIds = groupMembers
@@ -617,7 +617,7 @@ export function IDialogForGroupSkilAssignment({
 
       onClose();
     } catch (error) {
-      console.error("스킬 할당/해제 중 오류 발생:", error);
+      // console.error("스킬 할당/해제 중 오류 발생:", error);
       toast.error("스킬 처리 중 오류가 발생했습니다.");
     }
   };

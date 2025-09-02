@@ -22,7 +22,7 @@ const StatusTimer: React.FC<StatusTimerProps> = ({
         const [hours, minutes, seconds] = time.split(':').map(Number);
         return (hours * 3600) + (minutes * 60) + seconds;
       } catch (e) {
-        console.error('Error parsing time:', time, e);
+        // console.error('Error parsing time:', time, e);
         return 0;
       }
     }

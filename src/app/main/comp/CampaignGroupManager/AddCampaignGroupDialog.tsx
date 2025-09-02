@@ -68,7 +68,7 @@ export function AddCampaignGroupDialog({
       }
       handleClose();      
     },onError: (data) => {      
-      console.log('error', data.message.split('||')[1]);
+      // console.log('error', data.message.split('||')[1]);
       if (data.message.split('||')[0] === '5') {
         setAlertState({
           ...errorMessage,

@@ -245,7 +245,7 @@ const CampaignDeletePanel = ({ campaignId, campaignName }: Props) => {
             handleCloseTab();
         },
         onError: (error, variables, context) => {
-            console.error('캠페인 삭제 실패:', error);
+            // console.error('캠페인 삭제 실패:', error);
             toast.error(error.message || '캠페인 삭제에 실패했습니다.');
             // 에러 메시지 처리 추가 가능
         }

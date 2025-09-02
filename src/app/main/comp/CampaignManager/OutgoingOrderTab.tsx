@@ -242,7 +242,7 @@ const OutgoingOrderTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onC
 
   useEffect(() => {
     if (selectedRight != null) {
-      console.log(selectedRight);
+      // console.log(selectedRight);
     }
   }, [selectedRight]);
    

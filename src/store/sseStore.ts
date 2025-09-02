@@ -51,7 +51,7 @@ export const useSseStore = create<SseState>((set, get) => ({
 
     // Subscribe the store to updates from the service
     unsubscribeFromService = sseService.subscribe((data) => {
-        console.log("Zustand Store: Received data from SSE service", data);
+        // console.log("Zustand Store: Received data from SSE service", data);
         get()._setLatestMessage(data); // Use internal action via get()
     });
 
@@ -89,7 +89,7 @@ export const useSseStore = create<SseState>((set, get) => ({
 
   // Initial disconnect action - will be overwritten by the one created in connect
   disconnect: () => {
-    console.log("Zustand Store: Initial disconnect called (should be replaced by connect's cleanup).");
+    // console.log("Zustand Store: Initial disconnect called (should be replaced by connect's cleanup).");
     if (unsubscribeFromService) {
         unsubscribeFromService();
         unsubscribeFromService = null;

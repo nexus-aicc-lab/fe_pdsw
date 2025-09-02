@@ -11,10 +11,7 @@ export function useApiForCampaignScheduleUpdate(
     mutationKey: ['mainCampaignScheduleUpdate'],
     mutationFn: fetchCampaignScheduleUpdate,
     onSuccess: (data, variables, context) => {
-      console.log('API Response:', {
-        code: data.result_code,
-        message: data.result_msg,
-      });
+      
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: CampaignApiError, variables: CampaignScheDuleListDataResponse, context: unknown) => {

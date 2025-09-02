@@ -46,7 +46,6 @@ export const useOptimisticUpdateStore = create<OptimisticUpdateStore>((set, get)
       ]
     }));
     
-    console.log(`🚀 스킬 삭제 시작: ${skillId} (상담사: ${counselorId})`);
   },
 
   endSkillDeletion: (skillId, counselorId) => {
@@ -56,7 +55,6 @@ export const useOptimisticUpdateStore = create<OptimisticUpdateStore>((set, get)
       )
     }));
     
-    console.log(`🏁 스킬 삭제 완료: ${skillId} (상담사: ${counselorId})`);
   },
 
   isSkillDeleting: (skillId, counselorId) => {
@@ -68,7 +66,7 @@ export const useOptimisticUpdateStore = create<OptimisticUpdateStore>((set, get)
 
   clearAllDeletions: () => {
     set({ deletingSkills: [] });
-    console.log('🧹 모든 삭제 상태 초기화');
+    
   },
 
   cleanupStaleOperations: () => {

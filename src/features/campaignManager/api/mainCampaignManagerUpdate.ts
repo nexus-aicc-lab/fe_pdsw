@@ -5,8 +5,6 @@ import { CampaignInfoUpdateRequest, UpdateResponse } from '../types/campaignMana
 // 캠페인 관리 수정 요청
 export const fetchCampaignManagerUpdate = async (credentials: CampaignInfoUpdateRequest): Promise<UpdateResponse> => {
 
-  console.log("credentials.update_user ?????????????? ", credentials.update_user);
-
   const campaignManagerUpdateRequestData = {
     request_data: {      
       campaign_name: credentials.campaign_name, 

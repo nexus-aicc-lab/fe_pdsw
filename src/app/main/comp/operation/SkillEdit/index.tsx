@@ -500,7 +500,7 @@ const SkillEdit = () => {
         onError: (error) => {
           if ( error.message.split('||')[0] === '403') {
             showAlert(`이미 존재하는 스킬 아이디입니다. 다시 입력해주세요.`);
-            console.log(`error info : ${error.message}`);
+            // console.log(`error info : ${error.message}`);
           }
           else if(window.opener){
             if(error.message.split('||')[0] === '5'){
@@ -531,7 +531,7 @@ const SkillEdit = () => {
             }
           }else{
             if ( error.message.split('||')[0] === '403') {
-              console.log(`스킬 데이터 error info : ${error.message}`);
+              // console.log(`스킬 데이터 error info : ${error.message}`);
             } else{
               ServerErrorCheck('스킬 데이터 수정', error.message);  
             }

@@ -178,7 +178,7 @@ export const TreeRoot = () => {
     setConfirmedCampaignIds(selectedCampaignIds);
     setShowConfirmation(true);
     
-    console.log('Confirmed campaign IDs:', selectedCampaignIds);
+    // console.log('Confirmed campaign IDs:', selectedCampaignIds);
   };
 
   if (isLoading) {
@@ -202,7 +202,9 @@ export const TreeRoot = () => {
       
       <Tree
         nodes={treeData}
-        onSelect={(node) => console.log("선택된 객체:", node.data)}
+        onSelect={(node) => {
+          // console.log("선택된 객체:", node.data)
+        }}
         checkedIds={checkedIds}
         onCheckChange={handleCheckChange}
       />

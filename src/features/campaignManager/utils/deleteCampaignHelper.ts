@@ -83,33 +83,30 @@ export const useDeleteCampaignHelper = () => {
     // 캠페인 스킬이 있다면 초기화
     const { mutateAsync: fetchCampaignSkillUpdate } = useApiForCampaignSkillUpdate({
         onSuccess: (data) => {
-            console.log('캠페인 스킬 업데이트 성공');
-            console.log('data : ', data);
+
         },
         onError: (error) => {
-            console.error('캠페인 스킬 업데이트 실패:', error);
+            // console.error('캠페인 스킬 업데이트 실패:', error);
         }
     });
 
     // 발신번호가 있다면 삭제
     const { mutateAsync: fetchCallingNumberDelete } = useApiForCallingNumberDelete({
         onSuccess: (data) => {
-            console.log('발신번호 삭제 성공');
-            console.log('data : ', data);
+            
         },
         onError: (error) => {
-            console.error('발신번호 삭제 실패:', error);
+            // console.error('발신번호 삭제 실패:', error);
         }
     });
 
     // 캠페인 스케줄 삭제
     const { mutateAsync: fetchCampaignScheduleDelete } = useApiForCampaignScheduleDelete({
         onSuccess: (data) => {
-            console.log('캠페인 스케줄 삭제 성공');
-            console.log('data : ', data);
+            
         },
         onError: (error) => {
-            console.error('캠페인 스케줄 삭제 실패:', error);
+            // console.error('캠페인 스케줄 삭제 실패:', error);
             if (error.message.split('||')[0] === '5') {
                 throw new Error('SESSION_EXPIRED');
             }
@@ -120,66 +117,60 @@ export const useDeleteCampaignHelper = () => {
     // 예약콜 삭제
     const { mutateAsync: fetchReservedCallDelete } = useApiForReservedCallDelete({
         onSuccess: (data) => {
-            console.log('예약콜 삭제 성공');
-            console.log('data : ', data);
+            
         },
         onError: (error) => {
-            console.error('예약콜 삭제 실패:', error);
+            // console.error('예약콜 삭제 실패:', error);
         }
     });
 
     // 캠페인 상담사 조회
     const { mutateAsync: fetchCampaignAgents } = useApiForCampaignAgent({
         onSuccess: (data) => {
-            console.log('캠페인 상담사 조회 성공');
-            console.log('data : ', data);
+            
         },
         onError: (error) => {
-            console.error('캠페인 상담사 조회 실패:', error);
+            // console.error('캠페인 상담사 조회 실패:', error);
         }
     });
 
     // 캠페인 상담사 조회 후 삭제
     const { mutateAsync: fetchMaxcallExtDelete } = useApiForMaxcallExtDelete({
         onSuccess: (data) => {
-            console.log('분배제한 정보 삭제 성공');
-            console.log('data : ', data);
+            
         },
         onError: (error) => {
-            console.error('분배제한 정보 삭제 실패:', error);
+            // console.error('분배제한 정보 삭제 실패:', error);
         }
     });
 
     // 재발신 조회
     const { mutateAsync: fetchAutoRedials } = useApiForAutoRedial({
         onSuccess: (data) => {
-            console.log('재발신 정보 조회 성공');
-            console.log('data : ', data);
+            
         },
         onError: (error) => {
-            console.error('재발신 정보 조회 실패:', error);
+            // console.error('재발신 정보 조회 실패:', error);
         }
     });
 
     // 재발신 조회 후 삭제
     const { mutateAsync: fetchAutoRedialDelete } = useApiForAutoRedialDelete({
         onSuccess: (data) => {
-            console.log('재발신 삭제 성공');
-            console.log('data : ', data);
+            
         },
         onError: (error) => {
-            console.error('재발신 삭제 실패:', error);
+            // console.error('재발신 삭제 실패:', error);
         }
     });
 
     // 캠페인 정보 삭제 (가장 마지막)
     const { mutateAsync: fetchCampaignManagerDelete } = useApiForCampaignManagerDelete({
         onSuccess: (data) => {
-            console.log('캠페인 정보 삭제 성공');
-            console.log('data : ', data);
+            
         },
         onError: (error) => {
-            console.error('캠페인 정보 삭제 실패:', error);
+            // console.error('캠페인 정보 삭제 실패:', error);
         }
     });
   
@@ -263,7 +254,7 @@ export const useDeleteCampaignHelper = () => {
 
 
         } catch (e : any) {
-            console.error('캠페인 삭제 중 오류 발생:', e);
+            // console.error('캠페인 삭제 중 오류 발생:', e);
             if (e.message === 'SESSION_EXPIRED') {
                 throw e;
             }

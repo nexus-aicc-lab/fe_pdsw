@@ -21,7 +21,7 @@ const CreateCampaignFormPanel = ({ tenantId }: Props) => {
 
   useEffect(() => {
     if (typeof tenantId !== 'undefined') {
-      console.log("새캠페인 탭에 전달된 tenant id", tenantId);
+      // console.log("새캠페인 탭에 전달된 tenant id", tenantId);
     }
   }, [tenantId]);
 

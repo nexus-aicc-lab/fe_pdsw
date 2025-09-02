@@ -286,7 +286,7 @@ const ITableForSkillListWithCampaign: React.FC<Props> = ({
   // 기본값은 빈 배열
   existingCampaignIds = [],
 }) => {
-  console.log("existingCampaignIds :: ", existingCampaignIds);
+  
   // 이미 등록된 캠페인들을 제외한 필터링된 스킬 목록 생성
   // const filteredSkillsWithoutExisting = useMemo(() => {
   //   // 등록된 캠페인이 없으면 원래 목록 그대로 반환
@@ -339,9 +339,9 @@ const ITableForSkillListWithCampaign: React.FC<Props> = ({
         // 이미지의 오른쪽 목록에 있는 ID 형식과 일치
 
         // 디버깅용 로그
-        if (normalizedExistingIds.includes(campaignIdStr)) {
-          console.log(`Filtering out campaign ${campaignIdStr} from skill ${skill.skillId}`);
-        }
+        // if (normalizedExistingIds.includes(campaignIdStr)) {
+        //   console.log(`Filtering out campaign ${campaignIdStr} from skill ${skill.skillId}`);
+        // }
 
         // 두 형식 모두 체크하여 이미 존재하는 ID가 아닌 경우만 포함
         return !normalizedExistingIds.includes(compositeId) &&

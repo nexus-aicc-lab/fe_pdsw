@@ -85,7 +85,7 @@ export const apiForCombinedTenantAndCampaignGroup = async (
         //   }
 
         // tofix for hyunsok
-        console.error("Combined API call failed:", error);
+        // console.error("Combined API call failed:", error);
 
         // 에러 객체에 custom 속성 추가
         const enhancedError = new Error(
@@ -134,7 +134,7 @@ export const apiForCampaignListForCampaignGroup = async (
             result_count: data.result_count || 0
         };
     } catch (error: any) {
-        console.error("Error fetching campaign group list:", error);
+        // console.error("Error fetching campaign group list:", error);
 
         if (error.response?.status === 401) {
             throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
@@ -297,7 +297,7 @@ export const apiForCreateCampaignGroup = async (
             throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
         }
 
-        console.log("error ", error);
+        // console.log("error ", error);
 
         throw error;
     }
@@ -375,7 +375,7 @@ export const apiForDeleteCampaignGroup = async (
             throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
         }
 
-        console.error("캠페인 그룹 삭제 실패:", error);
+        // console.error("캠페인 그룹 삭제 실패:", error);
 
         throw new Error(
             `${error.response?.data?.result_code || ''}||${error.response?.data?.result_msg || '캠페인 그룹 삭제 실패'}`
@@ -415,7 +415,7 @@ export const apiForUpdateCampaignGroupName = async (
             throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
         }
 
-        console.error("캠페인 그룹 이름 업데이트 실패:", error);
+        // console.error("캠페인 그룹 이름 업데이트 실패:", error);
 
         throw new Error(
             `${error.response?.data?.result_code || ''}||${error.response?.data?.result_msg || '캠페인 그룹 이름 업데이트 실패'}`
@@ -454,7 +454,7 @@ export const apiForAddCampaignToSpecificCampaignGroup = async (
             throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
         }
 
-        console.error("캠페인 그룹에 캠페인 추가 실패:", error);
+        // console.error("캠페인 그룹에 캠페인 추가 실패:", error);
 
         throw new Error(
             `${error.response?.data?.result_code || ''}||${error.response?.data?.result_msg || '캠페인 그룹에 캠페인 추가 실패'}`
@@ -494,7 +494,7 @@ export const apiForRemoveCampaignFromCampaignGroup = async (
             throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
         }
 
-        console.error("캠페인 그룹에서 캠페인 제거 실패:", error);
+        // console.error("캠페인 그룹에서 캠페인 제거 실패:", error);
 
         throw new Error(
             `${error.response?.data?.result_code || ''}||${error.response?.data?.result_msg || '캠페인 그룹에서 캠페인 제거 실패'}`

@@ -15,7 +15,7 @@ export function useApiForCounselorAssignList(
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: Error, variables: CounselorAssignListCredentials, context: unknown) => {
-      console.error('API Error:', error);
+      // console.error('API Error:', error);
       options?.onError?.(error, variables, context);
     },
   })

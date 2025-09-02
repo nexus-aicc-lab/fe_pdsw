@@ -9,8 +9,8 @@ type Props = {
 
 const NewCampaignManager = ({tenantId, is_new}: Props) => {
   
-  console.log("NewCampaignManager tenantId : ", tenantId);
-  console.log("NewCampaignManager is_new : ", is_new);
+  // console.log("NewCampaignManager tenantId : ", tenantId);
+  // console.log("NewCampaignManager is_new : ", is_new);
   
 
   return (

@@ -26,10 +26,7 @@ export function useApiForAssignCheckedSkilsToCounselor(): UseApiForAssignChecked
     setIsLoading(true);
     setError(null);
     try {
-      console.log("✅ API for 상담사 스킬 할당 check!");
-      console.log("🎯 상담사 목록:", counselorIds);
-      console.log("🔗 할당할 스킬 목록:", selectedSkills);
-
+      
       const response = await assignSkillsToCounselor(counselorIds, selectedSkills);
       setData(response);
       return response;

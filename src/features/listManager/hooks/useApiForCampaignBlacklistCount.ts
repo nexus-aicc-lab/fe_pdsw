@@ -11,11 +11,7 @@ export function useApiForCampaignBlacklistCount(
     mutationKey: ['mainCampaignBlacklistCount'],
     mutationFn: fetchCampaignBlacklistCount,
     onSuccess: (data, variables, context) => {
-      console.log('API Response:', {
-        code: data.result_code,
-        message: data.result_msg,
-        data: data.result_data
-      });
+      
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: ListManagerApiError, variables: number, context: unknown) => {

@@ -135,7 +135,7 @@ const IContextMenuForSkill: React.FC<IContextMenuForSkillProps> = ({
       return;
     }
 
-    console.log('🎯 스킬 삭제 요청:', { item, counselorIds, tenantId });
+    // console.log('🎯 스킬 삭제 요청:', { item, counselorIds, tenantId });
     
     if (onUnassignSkill) {
       onUnassignSkill(item);
@@ -158,7 +158,7 @@ const IContextMenuForSkill: React.FC<IContextMenuForSkillProps> = ({
         }
       },
       onError: (error) => {
-        console.error('스킬 삭제 오류:', error);
+        // console.error('스킬 삭제 오류:', error);
         toast.error(`"${item.name}" 스킬 해제 중 오류가 발생했습니다.`, {
           autoClose: 3000
         });

@@ -1,16 +1,15 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
-import DataGrid, { CellClickArgs } from 'react-data-grid';
+import DataGrid, { CellClickArgs, SelectColumn } from 'react-data-grid';
 import { useAuthStore, useMainStore } from '@/store';
 import { ChannelListDataResponse, DialingDeviceListDataResponse } from '@/features/preferences/types/SystemPreferences';
 import { useApiForChannelList } from '@/features/preferences/hooks/useApiForChannelList';
 import { useApiForChannelEdit } from '@/features/preferences/hooks/useApiForChannelEdit';
 import { useApiForDialingDevice, useApiForDialingDeviceCreate, useApiForDialingDeviceDelete, useApiForDialingDeviceUpdate } from '@/features/preferences/hooks/useApiForDialingDevice';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
-import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { useEnvironmentStore } from '@/store/environmentStore';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
@@ -56,10 +55,29 @@ const SystemPreferences = () => {
     const [equipmentNumber, setEquipmentNumber] = useState("");
     const [equipmentName, setEquipmentName] = useState("");
     const [allocationMode, setAllocationMode] = useState("");
-    const [allocationOutboundMode, setAllocationOutboundMode] = useState("");
     
-    const [selectedDevice, setSelectedDevice] = useState<EquipmentRow | null>(null);
+    // 체크된 채널 일괄 적용될 채널 할당모드
+    const [batchChannelMode, setBatchChannelMode] = useState("");
+
+    // 데이터그리드 체크박스용
+    const [selectedCheckRows, setSelectedCheckRows] = useState<ReadonlySet<string | number>>(new Set());
+    
+    // 시프트클릭으로 멀티체크를 위한 상태
+    const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
+
+    // 최초 데이터 로드 값을 저장해서 변경상태 검사를 위한 원본 데이터
+    const [originalChannels, setOriginalChannels] =  useState<ChannelRow[]>([]); // 원본 데이터 저장
+
+    // 변경된 행 추적을 위한 상태
+    const [changeRows, setChangeRows] = useState(new Set());
+
+    // 사용자가 직접 renderCell로 수정한 경우
+    const [selectEditChannel, setSelectEditChannel] = useState<Set<string>>(new Set());
+
     const [selectedChannel, setSelectedChannel] = useState<ChannelRow | null>(null);
+
+    const [selectedDevice, setSelectedDevice] = useState<EquipmentRow | null>(null);
+    
     const [filteredChannels, setFilteredChannels] = useState<ChannelRow[]>([]);
     const [isEditable, setIsEditable] = useState(false);
     const [scheduleData, setScheduleData] = useState<any[]>([]);
@@ -235,7 +253,22 @@ const SystemPreferences = () => {
     // 채널 목록 조회
     const { mutate: fetchChannelList } = useApiForChannelList({
         onSuccess: (data) => {
-            setChannelList(data.result_data);
+
+            // 현재 신규 장비가 추가되면 channel-assign api 결과에서 assign_kind 항목이 0으로 오고있음...만약 0이면 기존 1에 해당하는 캠페인으로 할당을 ui적으로 보이게 함
+            if(data && data.result_data.length > 0){
+                // assign_kind가 0인 경우 1로 대체
+                const updatedData = data.result_data.map((ele) => ({
+                    ...ele,
+                    assign_kind: ele.assign_kind === 0 ? 1 : ele.assign_kind,
+                }));
+
+                setChannelList(updatedData);
+
+            } else {
+
+                setChannelList(data.result_data);
+            }
+
         },onError: (error) => {      
             ServerErrorCheck('채널 목록 조회', error.message);
         }
@@ -334,6 +367,35 @@ const SystemPreferences = () => {
             fetchChannelGroupList();
         } 
     }, [tenants]);
+
+
+    // 체크박스가 체크될때 선택 발신 모드 할당이 선택 되었다면 선택된 걸로 체크된 행 일괄 적용
+    useEffect(() => {
+        if (batchChannelMode === null || batchChannelMode.trim() === '') return;
+
+        filteredChannels.forEach((channel) => {
+            const chNumStr = channel.channelNumber.toString();
+
+            if (selectedCheckRows.has(chNumStr)) {
+                // 단일 변경 로직 재사용
+                handleModeChange(channel.channelNumber, batchChannelMode);
+            } else {
+
+                // renderCell로 변경된 행은 복원하지 않고 패스
+                if (selectEditChannel.has(chNumStr)) return;
+
+                // 체크 해제된 항목은 원래 값 복원
+                const original = originalChannels.find(
+                    (org) => org.channelNumber === channel.channelNumber
+                );
+
+                if (original && original.mode !== channel.mode) {
+                    handleModeChange(channel.channelNumber, original.mode);
+                }
+            }
+        });
+    }, [selectedCheckRows, batchChannelMode]);
+
 
     // 장비의 사용여부를 확인하는 함수 (실시간 상태 반영)
     const getDeviceUsage = (deviceId: number): string => {
@@ -451,42 +513,45 @@ const SystemPreferences = () => {
         { key: "device_name", name: "장비 이름" },
         { key: "usage", name: "사용 여부" }
     ];
-
     
 
     // 채널 목록 데이터 구성
     const channelColumns = [
+        SelectColumn,
         { key: "channelNumber", name: "채널 번호" },
         { key: "channelName", name: "채널 이름" },
         {
             key: "mode",
             name: "할당 발신모드",
-            renderCell: ({ row }: { row: ChannelRow }) => (
-              <div className="flex justify-center items-center w-full h-full">
-                <select
-                  value={row.mode}
-                  onClick={(e) => {
-                    e.stopPropagation(); // 이벤트 전파 중단
-                    handleChannelCellClick({ row } as CellClickArgs<ChannelRow>);// onCellClick 수동 호출
-                  }}
-                  onChange={(e) =>
-                    handleModeChange(row.channelNumber, e.target.value)
-                  }
-                  className="p-1 text-sm w-full h-full bg-transparent focus:outline-none" // select 태그 투명하게해서 cell 스타일 적용하기
-                  style={{
-                    textAlign: "center",
-                    padding: "0.25rem",
-                    boxSizing: "border-box",
-                  }}
-                >
-                  {getAllocationOutboundModeOptions().map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ),
+            renderCell: ({ row, column }: { row: ChannelRow, column : any }) => 
+                    (
+                    <div className="flex justify-center items-center w-full h-full">
+                        <select
+                        value={row.mode}
+                        onClick={(e) => {
+                            e.stopPropagation(); // 이벤트 전파 중단
+                            handleChannelCellClick({ row, column } as CellClickArgs<ChannelRow>);// onCellClick 수동 호출
+                        }}
+                        onChange={(e) =>
+                            handleModeChange(row.channelNumber, e.target.value, true)
+                        }
+                        className="p-1 text-sm w-full h-full bg-transparent focus:outline-none" // select 태그 투명하게해서 cell 스타일 적용하기
+                        style={{
+                            textAlign: "center",
+                            padding: "0.25rem",
+                            boxSizing: "border-box",
+                        }}
+                        // 체크박스가 체크가 되었다면 해당 발신모드는 선택할수없게 하고 선택발신모드로 할당으로만 수정할수있게끔 
+                        disabled={selectedCheckRows.size > 0 && selectedCheckRows.has(row.channelNumber.toString())}
+                        >
+                        {getAllocationOutboundModeOptions().map((option) => (
+                            <option key={option.value} value={option.value}>
+                            {option.label}
+                            </option>
+                        ))}
+                        </select>
+                    </div>
+                ),
           }
           
       ];
@@ -494,7 +559,22 @@ const SystemPreferences = () => {
       // #################### 배열로 넣자 #######################
 
       // 채널 전체가 가야한다!!!! 채널 원본 전체데이터에서 수정된것만 수정해서 가야함!
-      const handleModeChange = (channelNumber: number, newMode: string) => {
+      const handleModeChange = (channelNumber: number, newMode: string, isSelectEdit? : boolean) => {
+
+        if(isSelectEdit){
+
+            setSelectEditChannel( (prev)=>{
+                const channelKey = channelNumber.toString();
+                const newSet = new Set(prev);
+                newSet.add(channelKey);
+                return newSet;
+            });
+            
+        }
+
+        // 원본 데이터에서 해당 채널의 원래 모드 값 찾기
+        const originalChannel = originalChannels.find(channel => channel.channelNumber === channelNumber);
+        const originalMode = originalChannel ? originalChannel.mode : null
         
         setUpdatedChannelAssign((prevAssign) => {
             const updatedAssign = [...prevAssign];
@@ -508,7 +588,26 @@ const SystemPreferences = () => {
         
             return updatedAssign;
         });
-        
+
+    
+        // 변경된 행 추적: 원본 값과 비교해서 다르면 추가, 같으면 제거
+        setChangeRows(prev => {
+            const newSet = new Set(prev);
+            const channelKey = channelNumber.toString();
+            
+            if (originalMode !== null && newMode !== originalMode) {
+                // 원본과 다른 경우 - 변경된 행으로 추가
+                newSet.add(channelKey);
+                // console.log(`#### 채널 ${channelNumber} 변경됨: ${originalMode} -> ${newMode}`);
+            } else if (originalMode !== null && newMode === originalMode) {
+                // 원본과 같은 경우 - 변경된 행에서 제거
+                newSet.delete(channelKey);
+                // console.log(`#### 채널 ${channelNumber} 원래 값으로 복원됨: ${newMode}`);
+            }
+            
+            return newSet;
+        });
+
         // UI 업데이트를 위해 filteredChannels도 업데이트
         setFilteredChannels((prevChannels) =>
           prevChannels.map((channel) =>
@@ -518,20 +617,23 @@ const SystemPreferences = () => {
           )
         );
       
-    };
+    };    
 
     // 장비 목록 클릭 핸들러
     const handleEquipmentCellClick = ({ row }: CellClickArgs<EquipmentRow>) => {
         if (row) {
             setSelectedDevice(row);
             setSaveSelectDevice(row.device_id);
-        }
-    };
-
-    // 채널 목록 클릭 핸들러
-    const handleChannelCellClick = ({ row }: CellClickArgs<ChannelRow>) => {
-        if (row) {
-            setSelectedChannel(row);
+            // 다른 장비를 선택하면 선택 채널 초기화
+            setSelectedChannel(null);
+            // 선택 발신 모드 할당 초기화
+            setBatchChannelMode('');
+            // 체크박스 선택 초기화
+            setSelectedCheckRows(new Set());
+            // renderCell 초기화
+            setSelectEditChannel(new Set());
+            // 추척하는 changeRows 초기화
+            setChangeRows(new Set());
         }
     };
 
@@ -559,7 +661,6 @@ const SystemPreferences = () => {
         setFilteredChannels([]);
         setSelectedChannel(null);
         setAllocationMode("");
-        setAllocationOutboundMode("");
         setIsEditable(true);
     };
     
@@ -638,7 +739,6 @@ const SystemPreferences = () => {
                         setFilteredChannels([]);
                         setSelectedChannel(null);
                         setAllocationMode("");
-                        setAllocationOutboundMode("");
                         setIsEditable(false);
                     }
                 });
@@ -682,8 +782,26 @@ const SystemPreferences = () => {
         updatedChannelAssign.forEach(({ channelNumber, mode }) => {
             if (channelNumber >= 0 && channelNumber < updatedAssign.length) {
                 updatedAssign[channelNumber] = parseInt(mode);
-            }
+            }            
         });
+
+        // console.log("##### befor updatedAssign: ", updatedAssign);
+        // 체크박스가 체크가 되었다면 해당 채널번호에 선택발신모드 할당 적용
+        if(selectedCheckRows.size > 0){
+            if(batchChannelMode === '' || batchChannelMode === null){
+                showAlert('체크된 채널에 적용될 선택 발신 모드 할당에 설정된 값이 없습니다.');
+                return;
+            }
+
+            // 체크된 행의 index, 즉 채널번호
+            selectedCheckRows.forEach((channelNumber) => {
+                const channelIndex = Number(channelNumber); // string일 경우 대비
+                if (channelIndex >= 0 && channelIndex < updatedAssign.length) {
+                updatedAssign[channelIndex] = parseInt(batchChannelMode);
+                }
+            });
+        }
+        // console.log("##### after updatedAssign: ", updatedAssign);
 
         // 유효성 검사: updatedAssign 배열이 유효한지 확인
         if (!Array.isArray(updatedAssign) || updatedAssign.length !== selectedDevice.channel_count) {
@@ -707,6 +825,8 @@ const SystemPreferences = () => {
 
         // 상태 업데이트
         setUpdatedChannelAssign([]);
+        setSelectedCheckRows(new Set());
+        setChangeRows(new Set());
     };
 
     // 할당 발신모드 옵션 생성
@@ -837,8 +957,14 @@ const SystemPreferences = () => {
     };
     
     // 채널 목록용 rowClass 함수
+    // 행 클래스 지정 (변경된 행과 선택된 행에 음영 효과)
     const getChannelRowClass = (row: ChannelRow) => {
-        return selectedChannel?.channelNumber === row.channelNumber ? 'bg-[#FFFAEE]' : '';
+
+        const rowKey = row.channelNumber.toString();
+        // const isSelected = selectedCheckRows.has(rowKey);
+        const isChanged = changeRows.has(rowKey);
+
+        return isChanged ? 'bg-[#FFFAEE]' : '';
     };
 
     // 장비 목록에서 선택된 장비가 변경될 때마다 채널 목록 업데이트
@@ -861,14 +987,17 @@ const SystemPreferences = () => {
                         .map((assignValue, index) => ({
                             channelNumber: index,
                             channelName: `Channel No.${index}`,
-                            mode : assignValue.toString(), // 0인 경우 1로 변경 
+                            mode : assignValue.toString(), 
                             // mode: getChannelMode(assignValue, selectedDeviceChannels.assign_kind),
                             assignValue: assignValue
                         }));
-                        
+                    
+                    // 원본데이터 저장용
+                    setOriginalChannels(channels);
+                    
                     setFilteredChannels(channels);
-                    // 현재 신규 장비가 추가되면 channel-assign api 결과에서 assign_kind 항목이 0으로 오고있음...만약 0이면 기존 1에 해당하는 캠페인으로 할당을 ui적으로 보이게 함
-                    setAllocationMode(selectedDeviceChannels.assign_kind === 0 ? '1' : selectedDeviceChannels.assign_kind.toString());
+                    
+                    setAllocationMode(selectedDeviceChannels.assign_kind.toString());
                     
                     // 이전에 선택된 채널 번호 확인
                     const prevChannelNumber = selectedChannel?.channelNumber;
@@ -876,30 +1005,30 @@ const SystemPreferences = () => {
                         const existingChannel = channels.find(c => c.channelNumber === prevChannelNumber);
                         if (existingChannel) {
                             setSelectedChannel(existingChannel);
-                            setAllocationOutboundMode(existingChannel.assignValue.toString());
+                            // setAllocationOutboundMode(existingChannel.assignValue.toString());
                             return;
                         }
                     }
     
                     // 첫 번째 채널 선택
-                    if (channels.length > 0) {
-                        setSelectedChannel(channels[0]);
-                        setAllocationOutboundMode(channels[0].assignValue.toString());
-                    } else {
-                        setSelectedChannel(null);
-                        setAllocationOutboundMode("");
-                    }
+                    // if (channels.length > 0) {
+                    //     setSelectedChannel(channels[0]);
+                    //     setAllocationOutboundMode(channels[0].assignValue.toString());
+                    // } else {
+                    //     setSelectedChannel(null);
+                    //     setAllocationOutboundMode("");
+                    // }
                 } else {
                     setFilteredChannels([]);
                     setSelectedChannel(null);
                     setAllocationMode("");
-                    setAllocationOutboundMode("");
+                    
                 }
             } else {
                 setFilteredChannels([]);
                 setSelectedChannel(null);
                 setAllocationMode("");
-                setAllocationOutboundMode("");
+                
             }
 
             setUpdatedChannelAssign([]); // 수정된 데이터 초기화
@@ -908,12 +1037,12 @@ const SystemPreferences = () => {
     }, [selectedDevice, channelList]);
 
     // 채널 선택 시 상세 정보 업데이트
-    useEffect(() => {
-        // console.log("campaigns", campaigns);
-        if (selectedChannel) {
-            setAllocationOutboundMode(selectedChannel.assignValue.toString());
-        }
-    }, [selectedChannel]);
+    // useEffect(() => {
+    //     // console.log("campaigns", campaigns);
+    //     if (selectedChannel) {
+    //         setAllocationOutboundMode(selectedChannel.assignValue.toString());
+    //     }
+    // }, [selectedChannel]);
 
     
     // 장비 할당모드 변경시 채널목록 초기화
@@ -942,6 +1071,9 @@ const SystemPreferences = () => {
             // 수정된 데이터 초기화
             setUpdatedChannelAssign([]);
 
+            // 선택 발신모드 할당 초기화
+            setBatchChannelMode('');
+
 
           } else if( deviceChannels){
             // 장비의 할당모드와 같은걸 선택했다면 기존 장비의 assignValue 사용
@@ -960,6 +1092,57 @@ const SystemPreferences = () => {
           }
         }
     }, [allocationMode]);
+
+    const handleChannelCellClick = ({ row, column }: CellClickArgs<ChannelRow>, event?: React.MouseEvent) => {
+        if (row) {
+            setSelectedChannel(row);
+        }
+        if(row.channelNumber != null){
+            // 채널 번호만 멀티 체크박스기능 추가 09/01
+            
+            // 채널번호가 아닌 key는 return
+            if (column.key !== 'channelNumber') return;
+            const clickedIndex = filteredChannels.findIndex(r => r.channelNumber === row.channelNumber);
+            
+            if (event?.shiftKey && lastSelectedIndex !== null) {
+                // Shift 키가 눌린 상태 -> 다중 선택
+                const start = Math.min(lastSelectedIndex, clickedIndex);
+                const end = Math.max(lastSelectedIndex, clickedIndex);
+
+                const updatedSet = new Set(selectedCheckRows);
+                let shouldCheck = true;
+
+                // 기준: 클릭한 애가 선택되어 있으면 -> 전체 해제
+                if (selectedCheckRows.has(row.channelNumber.toString())) {
+                shouldCheck = false;
+                }
+
+                for (let i = start; i <= end; i++) {
+                const chNum = filteredChannels[i].channelNumber.toString();
+                if (shouldCheck) {
+                    updatedSet.add(chNum);
+                } else {
+                    updatedSet.delete(chNum);
+                }
+                }
+
+                setSelectedCheckRows(updatedSet);
+            } else {
+                // 일반 클릭 시 단일 토글
+                const updatedSet = new Set(selectedCheckRows);
+                const chNum = row.channelNumber.toString();
+
+                if (updatedSet.has(chNum)) {
+                updatedSet.delete(chNum);
+                } else {
+                updatedSet.add(chNum);
+                }
+
+                setSelectedCheckRows(updatedSet);
+                setLastSelectedIndex(clickedIndex);
+            }
+        }
+    };
 
 
     
@@ -1059,16 +1242,37 @@ const SystemPreferences = () => {
                                 </SelectContent>
                             </Select>
                         </div>
+
+                        <div className="flex items-center gap-1">
+                            <Label className="w-[5.6rem] min-w-[5.6rem]">선택 발신 모드 할당</Label>
+                            <Select 
+                                value={batchChannelMode} 
+                                onValueChange={setBatchChannelMode}
+                                disabled={!selectedDevice}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="할당 모드 선택" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {getAllocationOutboundModeOptions().map(option => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
                         <TitleWrap title="채널 목록" totalCount={filteredChannels?.length || 0} />
-                        <div className="grid-custom-wrap h-[300px]">
+                        <div className="grid-custom-wrap h-[300px]" style={{userSelect:'none'}}>
                         <DataGrid<ChannelRow>
                             columns={channelColumns}
                             rows={filteredChannels} // filteredChannels를 rows로 전달
                             className="grid-custom cursor-pointer"
-                            onCellClick={handleChannelCellClick}
-                            selectedRows={
-                                selectedChannel ? new Set([selectedChannel.channelNumber.toString()]) : new Set()
-                            }
+                            onCellClick={(args, event) => {
+                                handleChannelCellClick(args, event); // 기존 클릭 핸들 유지
+                            }}
+                            selectedRows={selectedCheckRows} // 멀티 선택 상태 연결
+                            onSelectedRowsChange={(rows) => setSelectedCheckRows(new Set(Array.from(rows) as Array<string | number>))} // 선택 변경 핸들러 연결
                             rowKeyGetter={(row) => row.channelNumber.toString()}
                             rowHeight={30}
                             headerRowHeight={30}
@@ -1132,7 +1336,7 @@ const SystemPreferences = () => {
                                 { 
                                     label: "적용", 
                                     onClick: handleChannelEdit,
-                                    disabled: !selectedDevice || !selectedChannel 
+                                    disabled: !selectedDevice || !selectedChannel  || !selectedCheckRows
                                 },
                             ]}
                         />

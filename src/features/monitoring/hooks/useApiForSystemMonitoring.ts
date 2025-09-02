@@ -12,7 +12,7 @@ export function useApiForSystemMonitoring(
             options?.onSuccess?.(data, variables, context);
         },
         onError: (error: SystemMonitoringError, variables: unknown, context: unknown) => {
-            console.error('API Error:', error);
+            // console.error('API Error:', error);
             options?.onError?.(error, variables, context);
         },
     })

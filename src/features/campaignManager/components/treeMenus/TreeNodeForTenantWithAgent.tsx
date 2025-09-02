@@ -33,25 +33,25 @@ export function TreeNodeForTenantWithAgent({
   const isExpanded = expandedNodes.has(item.id);
   const isSelected = selectedNodeId === item.id;
 
-  console.log("Rendering Node:", item.label, "Type:", item.type); // ✅ 타입 디버깅 로그 추가
+  // console.log("Rendering Node:", item.label, "Type:", item.type); // ✅ 타입 디버깅 로그 추가
 
   // 타입에 따른 아이콘 렌더링
   const renderIcon = () => {
     switch (item.type?.toLowerCase()) { // ✅ 대소문자 통일
       case "tenant":
-        console.log("Tenant Icon:", item.label);
+        // console.log("Tenant Icon:", item.label);
         return <Building className="h-4 w-4 text-blue-600" />;
       case "group":
-        console.log("Group Icon:", item.label);
+        // console.log("Group Icon:", item.label);
         return <Boxes className="h-4 w-4 text-green-600" />;
       case "team":
-        console.log("Team Icon:", item.label);
+        // console.log("Team Icon:", item.label);
         return <Users className="h-4 w-4 text-purple-600" />;
       case "counselor":
-        console.log("Counselor Icon:", item.label);
+        // console.log("Counselor Icon:", item.label);
         return <UserCircle2 className="h-4 w-4 text-gray-600" />;
       default:
-        console.log("Default Icon:", item.label);
+        // console.log("Default Icon:", item.label);
         return <Building className="h-4 w-4 text-gray-500" />;
     }
   };
@@ -66,15 +66,15 @@ export function TreeNodeForTenantWithAgent({
 
   // 우클릭 메뉴 핸들러
   const handleEdit = () => {
-    console.log("Edit item:", { id: item.id, label: item.label, type: item.type });
+    // console.log("Edit item:", { id: item.id, label: item.label, type: item.type });
   };
 
   const handleDelete = () => {
-    console.log("Delete item:", { id: item.id, label: item.label, type: item.type });
+    // console.log("Delete item:", { id: item.id, label: item.label, type: item.type });
   };
 
   const handleManage = () => {
-    console.log("Manage item:", { id: item.id, label: item.label, type: item.type });
+    // console.log("Manage item:", { id: item.id, label: item.label, type: item.type });
   };
 
   return (

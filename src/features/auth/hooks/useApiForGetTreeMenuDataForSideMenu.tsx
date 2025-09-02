@@ -155,11 +155,11 @@ export function useApiForGetTreeMenuDataForSideMenu(): TreeMenuQueryResult {
         // 메세지 출력
         // tofix ohs 0509
         // PDS 서버 시스템과 연결할 수 없습니다. 서버 동작 상태를 확인하여 주십시오. 프로그램을 종료합니다.
-        console.error("generateTreeMenuData error: undefined||undefined");
+        // console.error("generateTreeMenuData error: undefined||undefined");
         return [];
       }
 
-      console.error("generateTreeMenuData error:", err);
+      // console.error("generateTreeMenuData error:", err);
       return [];
     }
   };

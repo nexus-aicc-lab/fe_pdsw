@@ -147,8 +147,7 @@ const CampaignAddPopup: React.FC<Props> = ({
 
   useEffect(() => {
     // 데이터 로그 추가
-    console.log("스킬-캠페인 매핑 원본 데이터:", data);
-
+    
     if (data?.result_data) {
       const skillMap: Record<number, SkillWithCampaigns> = {};
 
@@ -185,7 +184,7 @@ const CampaignAddPopup: React.FC<Props> = ({
       });
 
       const skillArray = Object.values(skillMap).sort((a, b) => a.skillId - b.skillId);
-      console.log("가공된 스킬-캠페인 데이터:", skillArray);
+      
       setSkillsWithCampaigns(skillArray);
     }
   }, [data, skillListData]);
@@ -438,7 +437,7 @@ const CampaignAddPopup: React.FC<Props> = ({
             setShowAlert(false);
           },
           onError: (error) => {
-            console.error('캠페인 추가 중 오류 발생:', error);
+            // console.error('캠페인 추가 중 오류 발생:', error);
             toast.error('캠페인 추가 과정에서 오류가 발생했습니다.');
             setProcessingCampaigns(false);
             setShowAlert(false);
@@ -453,7 +452,7 @@ const CampaignAddPopup: React.FC<Props> = ({
         setShowAlert(false);
       }
     } catch (error) {
-      console.error('캠페인 추가 중 오류 발생:', error);
+      // console.error('캠페인 추가 중 오류 발생:', error);
       toast.error('캠페인 추가 과정에서 오류가 발생했습니다.');
       setProcessingCampaigns(false);
       setShowAlert(false);
@@ -505,7 +504,7 @@ const CampaignAddPopup: React.FC<Props> = ({
           setCampaignGroupManagerInit(true);
         },
         onError: (error) => {
-          console.error('캠페인 삭제 중 오류 발생:', error);
+          // console.error('캠페인 삭제 중 오류 발생:', error);
           toast.error('캠페인 삭제 과정에서 오류가 발생했습니다.');
           setRemovingCampaigns(false);
           setShowAlert(false);
@@ -514,7 +513,7 @@ const CampaignAddPopup: React.FC<Props> = ({
         }
       });
     } catch (error) {
-      console.error('캠페인 삭제 중 오류 발생:', error);
+      // console.error('캠페인 삭제 중 오류 발생:', error);
       toast.error('캠페인 삭제 과정에서 오류가 발생했습니다.');
       setRemovingCampaigns(false);
       setShowAlert(false);

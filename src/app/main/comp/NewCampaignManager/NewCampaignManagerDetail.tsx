@@ -399,7 +399,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId, is_new }: Props) 
       });
     }
     if (type === 'dialMode' && value !== '') {
-      console.log('dialMode');
+      // console.log('dialMode');
       setNewCampaignInfo({
         ...newCampaignInfo,
         dial_mode: Number(value)
@@ -416,7 +416,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId, is_new }: Props) 
   }
   //스킬 선택 팝업 버튼이벤트
   const handleOpenSkillPopup = () => {
-    console.log(newTenantId);
+    // console.log(newTenantId);
     if (newTenantId === ' ') {
       setAlertState({
         ...errorMessage,
@@ -1038,7 +1038,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId, is_new }: Props) 
         position: 'top-right',
       });
 
-      console.log("Initializing new campaign with tenant:", tenantId);
+      // console.log("Initializing new campaign with tenant:", tenantId);
 
       // Reset campaign state with tenantId
       resetCampaignState(tenantId);

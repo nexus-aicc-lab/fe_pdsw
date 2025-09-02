@@ -150,7 +150,7 @@ export const useCounselorFilterStore = create<CounselorFilterState>()(
         }
         
         set({ sortOption: option }, false, 'counselorFilter/setSortOption');
-        console.log(`Sort option updated - Type: ${option.type}, Direction: ${option.direction}, NodeType: ${option.nodeType}`);
+        // console.log(`Sort option updated - Type: ${option.type}, Direction: ${option.direction}, NodeType: ${option.nodeType}`);
       },
 
       // 확장 관련 액션
@@ -169,7 +169,7 @@ export const useCounselorFilterStore = create<CounselorFilterState>()(
           false,
           'counselorFilter/expandAll'
         );
-        console.log('Expanded all nodes (level 5)');
+        
       },
 
       collapseAll: () => {
@@ -178,7 +178,7 @@ export const useCounselorFilterStore = create<CounselorFilterState>()(
           false,
           'counselorFilter/collapseAll'
         );
-        console.log('Collapsed all nodes (level 1)');
+        
       },
 
       applyDefaultExpansion: () => {
@@ -187,7 +187,7 @@ export const useCounselorFilterStore = create<CounselorFilterState>()(
           false,
           'counselorFilter/applyDefaultExpansion'
         );
-        console.log('Applied default expansion (level 4)');
+        
       }
     }),
     {

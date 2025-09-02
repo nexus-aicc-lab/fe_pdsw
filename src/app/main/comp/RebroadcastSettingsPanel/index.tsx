@@ -957,7 +957,7 @@ const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
     const { mutate: fetchCampaignProgressInformation } = useApiForCampaignProgressInformation({
         onSuccess: (data) => {      
             if (data && data.progressInfoList && data.progressInfoList.length > 0 ) {
-                console.log(data.progressInfoList.length);
+                // console.log(data.progressInfoList.length);
                 const tempList = data.progressInfoList.sort((a, b) => a.reuseCnt - b.reuseCnt);
                 const campaignProgressInfo = tempList[tempList.length-1];
                 const waitlist = campaignProgressInfo.totLstCnt - campaignProgressInfo.scct
@@ -1201,7 +1201,7 @@ const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
                     outgoingSuccessOk = true;
                     outgoingSuccessNo = true;
                 }
-                console.log('#### outgoingSuccessOk : ', outgoingSuccessOk, ' #### outgoingSuccessNo : ', outgoingSuccessNo);
+                // console.log('#### outgoingSuccessOk : ', outgoingSuccessOk, ' #### outgoingSuccessNo : ', outgoingSuccessNo);
                 let failBusy = false;           //80174, "통화중 실패"
                 if( listRedialQuery.indexOf('26232') > -1 ){   
                     // 2018.07.10 Gideon #24364 삼성화재(중국) 장애현상 수정 - 아래 || str == "0026232" 부분 추가

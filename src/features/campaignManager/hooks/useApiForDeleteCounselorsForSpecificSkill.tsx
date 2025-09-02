@@ -29,11 +29,10 @@ export function useApiForDeleteCounselorsForSpecificSkill(
         queryKey: ['counselorList', tenant_id]
       });
       
-      console.log('✅ 스킬에서 상담사 제외 성공:', data);
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error, variables, context) => {
-      console.error('❌ 스킬에서 상담사 제외 실패:', error);
+      // console.error('❌ 스킬에서 상담사 제외 실패:', error);
       options?.onError?.(error, variables, context);
     },
   });

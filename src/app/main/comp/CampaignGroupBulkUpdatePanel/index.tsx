@@ -8,7 +8,7 @@ interface Props {
 }
 
 const CampaignGroupBulkUpdatePanel: React.FC<Props> = ({ groupId, groupName }) => {
-    console.log("CampaignGroupBulkUpdatePanel !!!!!!!!!: ", groupId, groupName);
+    // console.log("CampaignGroupBulkUpdatePanel !!!!!!!!!: ", groupId, groupName);
         
   return (
     <div className="w-full h-full flex flex-col border border-gray-300 bg-gray-100">

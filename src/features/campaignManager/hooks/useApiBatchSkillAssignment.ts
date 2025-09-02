@@ -59,7 +59,7 @@ export function useApiBatchSkillAssignment(tenantId: string) {
               return true;
             })
             .catch(error => {
-              console.error(`스킬 ID ${skillId} ${isUnassignment ? '해제' : '할당'} 실패:`, error);
+              // console.error(`스킬 ID ${skillId} ${isUnassignment ? '해제' : '할당'} 실패:`, error);
               result.failedSkills.push(skillId);
               result.success = false;
               return false;
@@ -72,7 +72,7 @@ export function useApiBatchSkillAssignment(tenantId: string) {
       
       return result;
     } catch (error) {
-      console.error(`배치 스킬 ${isUnassignment ? '해제' : '할당'} 중 오류 발생:`, error);
+      // console.error(`배치 스킬 ${isUnassignment ? '해제' : '할당'} 중 오류 발생:`, error);
       result.success = false;
       result.error = error instanceof Error ? error : new Error(String(error));
       return result;

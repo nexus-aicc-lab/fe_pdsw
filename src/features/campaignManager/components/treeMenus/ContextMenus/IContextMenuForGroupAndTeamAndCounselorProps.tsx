@@ -318,24 +318,24 @@ export function IContextMenuForGroupAndTeamAndCounselor({
   };
 
   // 디버깅용 로그
-  const logDebugInfo = (actionType: string, data: any) => {
-    console.group(`🔍 [ContextMenu] ${actionType}`);
-    console.log("타입:", item.type);
-    console.log("이름:", item.name);
-    console.log("ID:", item.id);
-    console.log("테넌트 ID:", item.tenantId);
-    if (item.members) {
-      console.log("멤버 수:", item.members.length);
-      console.log("첫 번째 멤버 샘플:", item.members[0]);
-    }
-    console.log("전달 데이터:", data);
-    console.groupEnd();
-  };
+  // const logDebugInfo = (actionType: string, data: any) => {
+  //   console.group(`🔍 [ContextMenu] ${actionType}`);
+  //   console.log("타입:", item.type);
+  //   console.log("이름:", item.name);
+  //   console.log("ID:", item.id);
+  //   console.log("테넌트 ID:", item.tenantId);
+  //   if (item.members) {
+  //     console.log("멤버 수:", item.members.length);
+  //     console.log("첫 번째 멤버 샘플:", item.members[0]);
+  //   }
+  //   console.log("전달 데이터:", data);
+  //   console.groupEnd();
+  // };
 
   // tenantId 유효성 검증
   const validateTenantId = () => {
     if (!item.tenantId) {
-      console.error("⚠️ Context Menu: tenantId가 누락되었습니다. item:", item);
+      // console.error("⚠️ Context Menu: tenantId가 누락되었습니다. item:", item);
       return false;
     }
     return true;
@@ -345,12 +345,12 @@ export function IContextMenuForGroupAndTeamAndCounselor({
   const handleCounselorSkillAssignment = (isUnassign: boolean) => {
     if (!validateTenantId()) return;
     
-    logDebugInfo(isUnassign ? "상담사 스킬 해제" : "상담사 스킬 할당", {
-      counselorId: item.id,
-      counselorName: item.name,
-      tenantId: item.tenantId,
-      isUnassignment: isUnassign,
-    });
+    // logDebugInfo(isUnassign ? "상담사 스킬 해제" : "상담사 스킬 할당", {
+    //   counselorId: item.id,
+    //   counselorName: item.name,
+    //   tenantId: item.tenantId,
+    //   isUnassignment: isUnassign,
+    // });
     
     setIsUnassignment(isUnassign);
     setIsDialogActive(true); // 다이얼로그 활성화 상태로 설정
@@ -370,13 +370,13 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       tenantId: item.tenantId,
     }));
     
-    logDebugInfo(isUnassign ? "팀 스킬 해제" : "팀 스킬 할당", {
-      teamId: item.id,
-      teamName: item.name,
-      memberCount: membersWithTenantId.length,
-      tenantId: item.tenantId,
-      isUnassignment: isUnassign,
-    });
+    // logDebugInfo(isUnassign ? "팀 스킬 해제" : "팀 스킬 할당", {
+    //   teamId: item.id,
+    //   teamName: item.name,
+    //   memberCount: membersWithTenantId.length,
+    //   tenantId: item.tenantId,
+    //   isUnassignment: isUnassign,
+    // });
     
     setIsUnassignment(isUnassign);
     setCandidateMembersForSkilAssign(membersWithTenantId);
@@ -397,13 +397,13 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       tenantId: item.tenantId,
     }));
     
-    logDebugInfo(isUnassign ? "그룹 스킬 해제" : "그룹 스킬 할당", {
-      groupId: item.id,
-      groupName: item.name,
-      memberCount: membersWithTenantId.length,
-      tenantId: item.tenantId,
-      isUnassignment: isUnassign,
-    });
+    // logDebugInfo(isUnassign ? "그룹 스킬 해제" : "그룹 스킬 할당", {
+    //   groupId: item.id,
+    //   groupName: item.name,
+    //   memberCount: membersWithTenantId.length,
+    //   tenantId: item.tenantId,
+    //   isUnassignment: isUnassign,
+    // });
     
     setIsUnassignment(isUnassign);
     setCandidateMembersForSkilAssign(membersWithTenantId);
@@ -424,7 +424,7 @@ export function IContextMenuForGroupAndTeamAndCounselor({
         handleGroupSkillAssignment(isUnassign);
         break;
       default:
-        console.warn(`⚠️ 알 수 없는 타입: ${item.type}`);
+        // console.warn(`⚠️ 알 수 없는 타입: ${item.type}`);
     }
   };
 

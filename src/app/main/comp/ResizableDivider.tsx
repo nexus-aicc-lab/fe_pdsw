@@ -52,7 +52,7 @@ const ResizableDivider: React.FC<ResizableDividerProps> = ({
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
     
-    console.log("Resize started", rowId, initialWidthsRef.current);
+    // console.log("Resize started", rowId, initialWidthsRef.current);
   }, [rows, rowId, setResizing, onResizeStart]);
 
   // 드래그 중 이벤트 핸들러
@@ -81,7 +81,7 @@ const ResizableDivider: React.FC<ResizableDividerProps> = ({
     // 섹션 너비 업데이트 (전역 상태 업데이트)
     updateSectionWidths(rowId, [newWidth1, newWidth2]);
     
-    console.log("Resizing", rowId, [newWidth1, newWidth2]);
+    // console.log("Resizing", rowId, [newWidth1, newWidth2]);
   }, [rowId, updateSectionWidths]);
 
   // 드래그 종료 이벤트 핸들러
@@ -100,7 +100,7 @@ const ResizableDivider: React.FC<ResizableDividerProps> = ({
     setResizing(false);
     if (onResizeEnd) onResizeEnd();
     
-    console.log("Resize ended");
+    // console.log("Resize ended");
   }, [setResizing, handleMouseMove, onResizeEnd]);
 
   // 컴포넌트 언마운트 시 정리

@@ -42,7 +42,7 @@ const IDialogForUpdateCampaignGroupName: FC<IDialogForUpdateCampaignGroupNamePro
       onSuccess?.();
     },
     onError: (error) => {
-      console.error("캠페인 그룹 이름 변경 실패:", error);
+      // console.error("캠페인 그룹 이름 변경 실패:", error);
       toast.error("캠페인 그룹 이름 변경에 실패했습니다.");
     },
   });

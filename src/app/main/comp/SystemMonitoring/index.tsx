@@ -128,7 +128,7 @@ const SystemMonitoring: React.FC = () => {
       }
     },
     onError: (error) => {
-      console.error(error);
+      // console.error(error);
     }
   });
 

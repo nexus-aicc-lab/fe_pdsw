@@ -134,7 +134,7 @@ export const useApiForGetTreeDataForCampaignGroupTab = (initialTenantId?: number
     const targetTenantId = tenant_id || tenant_id;
     
     if (targetTenantId === undefined || targetTenantId === null) {
-      console.error("테넌트 ID가 없습니다.");
+      
       return null;
     }
     
@@ -162,7 +162,7 @@ export const useApiForGetTreeDataForCampaignGroupTab = (initialTenantId?: number
       
       return result;
     } catch (error) {
-      console.error("트리 데이터 다시 가져오기 오류:", error);
+      // console.error("트리 데이터 다시 가져오기 오류:", error);
       return null;
     }
   }, [tenant_id, queryClient, setExpandedNodes, setSelectedNodeId, getQueryKey]);

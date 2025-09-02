@@ -242,12 +242,12 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
   const handleAddGroup = useCallback((groupName: string, groupCode: string) => {
     // 실제 그룹 추가 로직 구현 필요
-    console.log("새 그룹 추가:", {
-      tenantId: node.tenant_id,
-      tenantName: node.name,
-      groupName,
-      groupCode,
-    });
+    // console.log("새 그룹 추가:", {
+    //   tenantId: node.tenant_id,
+    //   tenantName: node.name,
+    //   groupName,
+    //   groupCode,
+    // });
   }, [node.tenant_id, node.name]);
 
   // 수정된 handleBulkAction 함수
@@ -262,7 +262,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
           // API 호출
           const result = await updateCampaignsStatus(campaignIds, statusMap[actionKey]);
-          console.log("캠페인 시작 업데이트 결과:", result);
+          // console.log("캠페인 시작 업데이트 결과:", result);
 
           // 작업 완료 후 트리 데이터 갱신 - Portal Provider에서 처리됨
           setTimeout(() => {
@@ -271,7 +271,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
           return result;
         } catch (error) {
-          console.error("캠페인 시작 오류:", error);
+          // console.error("캠페인 시작 오류:", error);
           throw error;
         }
       });
@@ -309,7 +309,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
       await refetchTreeDataForCampaignGroupTab();
       return result;
     } catch (e: any) {
-      console.error("캠페인 상태 업데이트 오류:", e);
+      // console.error("캠페인 상태 업데이트 오류:", e);
       setBulkResultDialog({
         open: true,
         title: "처리 중 오류",
@@ -561,7 +561,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   }, [node.name, node.campaign_id]);
 
   const handleCopyCampaign = useCallback(() => {
-    console.log(`캠페인 복사: ${node.name} (ID: ${node.campaign_id})`);
+    // console.log(`캠페인 복사: ${node.name} (ID: ${node.campaign_id})`);
     toast.info("캠페인 복사 기능이 준비 중입니다.");
   }, [node.name, node.campaign_id]);
 

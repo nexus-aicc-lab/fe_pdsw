@@ -11,10 +11,7 @@ export function useApiForCampaignGroupCampaignListDelete(
     mutationKey: ['mainCampaignGroupCampaignListDelete'],
     mutationFn: fetchCampaignGroupCampaignListDelete,
     onSuccess: (data, variables, context) => {
-      console.log('API Response:', {
-        code: data.result_code,
-        message: data.result_msg,
-      });
+
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: CampaignGroupManagerApiError, variables: CampaignGroupCampaignListDeleteDataRequest, context: unknown) => {

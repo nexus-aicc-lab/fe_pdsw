@@ -76,7 +76,7 @@ const ConsultResultSetting = () => {
     showConfirm(
       '선택된 열을 삭제 하시겠습니까?\n※ 주의 : 삭제 시 데이터베이스에서 완전 삭제됩니다.\n다시 한번 확인해 주시고 삭제해 주세요.', 
       () => {
-        console.log('Delete:', selectedRow);
+        // console.log('Delete:', selectedRow);
       }
     );
   };
@@ -95,11 +95,11 @@ const ConsultResultSetting = () => {
 
     if (selectedRow) {
       showConfirm('수정하시겠습니까?', () => {
-        console.log('Update:', saveData);
+        // console.log('Update:', saveData);
       });
     } else {
       showConfirm('저장하시겠습니까?', () => {
-        console.log('Create:', saveData);
+        // console.log('Create:', saveData);
       });
     }
   };

@@ -11,10 +11,7 @@ export function useApiForCallingListDelete(
     mutationKey: ['mainCallingListDelete'],
     mutationFn: fetchCallingListDelete,
     onSuccess: (data, variables, context) => {
-      console.log('API Response:', {
-        code: data.result_code,
-        message: data.result_msg,
-      });
+      
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: ListManagerApiError, variables: number, context: unknown) => {

@@ -163,8 +163,7 @@ export function IContextMenuForCampaignForCampaignGroup({
 
   const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
     onSuccess: () => {
-      console.log("캠페인 상태 업데이트 !!!!!!!!!!!!!!!!!!!!!");
-
+      
       // CustomAlert 대신 상태 업데이트
       // setStatusAlertProps({
       //   message: "캠페인 상태가 변경되었습니다.",
@@ -271,8 +270,7 @@ export function IContextMenuForCampaignForCampaignGroup({
   }, [setCampaignIdForUpdateFromSideMenu, addTab]);
 
   const handleMonitorClick = useCallback((tenantIdForCampaignTab: any, campaignId: any, campaignName: string) => {
-    console.log("캠페인 그룹에서 상담원 상태 모니터 클릭 했을때 tenantId : ", tenantIdForCampaignTab);
-
+    
     const uniqueKey = `monitor-${Date.now()}`;
 
     addMultiTab({
@@ -298,7 +296,6 @@ export function IContextMenuForCampaignForCampaignGroup({
     //   return;
     // }
 
-    console.log(`캠페인 복사: ${item.label} (ID: ${item.id})`);
     setCampaignIdForUpdateFromSideMenu(item.id);
     setCampaignIdForCopyCampaign(item.id);
     // setSelectedNodeType(item.type);
@@ -367,7 +364,7 @@ export function IContextMenuForCampaignForCampaignGroup({
       setActiveSubMenu(null);
 
     } catch (error) {
-      console.error('Error changing campaign status:', error);
+      // console.error('Error changing campaign status:', error);
       setIsProcessing(false);
     }
   }, [currentStatus, updateCampaignStatusMutation, item.id, updateCampaignStatus, isProcessing]);

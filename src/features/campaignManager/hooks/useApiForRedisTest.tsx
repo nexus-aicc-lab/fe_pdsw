@@ -13,7 +13,7 @@ export const useApiForRedisTest = () => {
     },
     onError: (error) => {
       toast.error("❌ Redis Test Failed!");
-      console.error("❌ Redis Test Error:", error);
+      // console.error("❌ Redis Test Error:", error);
     },
   });
 };

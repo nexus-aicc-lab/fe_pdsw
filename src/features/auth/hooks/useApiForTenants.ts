@@ -31,12 +31,12 @@ export function useApiForTenants(
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: any, variables: MainCredentials, context: unknown) => {
-      console.error('API Error:', error);
+      // console.error('API Error:', error);
 
       if (error.response?.data?.result_code === 5) {
-        console.log('세션 만료, 로그인으로 이동');
+        // console.log('세션 만료, 로그인으로 이동');
       } else {
-        console.log('다른 에러:', error.response?.data?.result_code);
+        // console.log('다른 에러:', error.response?.data?.result_code);
       }
 
       options?.onError?.(error, variables, context);

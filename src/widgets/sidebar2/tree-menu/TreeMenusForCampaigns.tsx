@@ -33,14 +33,14 @@ const useTreeStore = create<TreeState>((set, get) => ({
   setSelectedNodeId: (nodeId) => set({ selectedNodeId: nodeId }),
   toggleNode: (nodeId) =>
     set((state) => {
-      console.log(`노드 토글: ${nodeId}`);
+      // console.log(`노드 토글: ${nodeId}`);
       const newExpanded = new Set(state.expandedNodes);
       if (newExpanded.has(nodeId)) {
         newExpanded.delete(nodeId);
       } else {
         newExpanded.add(nodeId);
       }
-      console.log(`확장된 노드 수: ${newExpanded.size}`);
+      // console.log(`확장된 노드 수: ${newExpanded.size}`);
       return { expandedNodes: newExpanded };
     }),
   expandNodes: (nodes) => set({ expandedNodes: nodes }),
@@ -156,7 +156,7 @@ export function TreeMenusForCampaigns() {
         }]
       }], null];
     } catch (err) {
-      console.error("트리 메뉴 데이터 생성 오류:", err);
+      // console.error("트리 메뉴 데이터 생성 오류:", err);
       return [[], err];
     }
   }, [isReady, tenants, campaigns, campaignSkills]);
@@ -466,7 +466,7 @@ export function TreeMenusForCampaigns() {
       // 테넌트 모드에서 캠페인 모드로 전환하는 경우, 테넌트 모드의 상태를 저장
       if (lastViewMode === 'tenant' && viewMode === 'campaign') {
         savePreviousState();
-        console.log('테넌트 뷰 상태 저장됨', expandedNodes.size);
+        // console.log('테넌트 뷰 상태 저장됨', expandedNodes.size);
       }
     }
 
@@ -487,7 +487,7 @@ export function TreeMenusForCampaigns() {
         // 사용자가 직접 조작한 테넌트 뷰 상태가 있으면 복원
         if (hasCustomTenantState && viewMode === 'tenant') {
           restorePreviousState();
-          console.log('테넌트 뷰의 사용자 정의 상태 복원됨', useTreeStore.getState().expandedNodes.size);
+          // console.log('테넌트 뷰의 사용자 정의 상태 복원됨', useTreeStore.getState().expandedNodes.size);
           return;
         }
 
@@ -504,7 +504,7 @@ export function TreeMenusForCampaigns() {
         }
 
         expandNodes(newExpanded);
-        console.log("테넌트 뷰: 루트만 확장, 테넌트 폴더는 접힘 상태", newExpanded.size);
+        // console.log("테넌트 뷰: 루트만 확장, 테넌트 폴더는 접힘 상태", newExpanded.size);
       };
 
       // 모든 노드 확장 함수

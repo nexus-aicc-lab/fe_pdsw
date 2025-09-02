@@ -30,10 +30,10 @@ export default function ClientProvider({ children }: { children: React.ReactNode
   useEffect(() => {
     const checkRuntimeEnv = () => {
       if (typeof window !== "undefined" && window.__RUNTIME_CONFIG__) {
-        console.log("🛠️ RUNTIME_CONFIG 로딩됨:", window.__RUNTIME_CONFIG__);
+        // console.log("🛠️ RUNTIME_CONFIG 로딩됨:", window.__RUNTIME_CONFIG__);
         setIsEnvLoaded(true);
       } else {
-        console.warn("⚠️ window.__RUNTIME_CONFIG__ 아직 로드 안됨");
+        // console.warn("⚠️ window.__RUNTIME_CONFIG__ 아직 로드 안됨");
       }
     };
 

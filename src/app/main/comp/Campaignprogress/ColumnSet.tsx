@@ -112,7 +112,7 @@ const ColumnSet: React.FC<ColumnSetProps> = ({ isOpen, onConfirm, onClose, colum
       setSelectedLeftKey(null);
       setSelectedRightIndex(null);
       
-      console.log("초기 데이터 설정 완료");
+      // console.log("초기 데이터 설정 완료");
     }
   }, [isOpen, columns]);
 

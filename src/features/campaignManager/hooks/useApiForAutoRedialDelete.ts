@@ -11,10 +11,7 @@ export function useApiForAutoRedialDelete(
     mutationKey: ['mainAutoRedialDelete'],
     mutationFn: fetchAutoRedialDelete,
     onSuccess: (data, variables, context) => {
-      console.log('API Response:', {
-        code: data.result_code,
-        message: data.result_msg,
-      });
+      
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: CampaignApiError, variables: AutoRedialDataRequest, context: unknown) => {

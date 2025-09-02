@@ -51,7 +51,7 @@ export function SortButtonForCampaign() {
   };
 
   const handleNodeTypeSort = (nodeType: NodeType, direction: SortDirection) => {
-    console.log("정렬 버튼 클릭:", { nodeType, direction });
+    // console.log("정렬 버튼 클릭:", { nodeType, direction });
     
     sortByNodeType(nodeType, campaignSort.type, direction);
     setSelectedNodeType(nodeType);
@@ -85,7 +85,7 @@ export function SortButtonForCampaign() {
   };
 
   const handleViewModeChange = (mode: ViewMode) => {
-    console.log("뷰 모드 변경:", mode);
+    // console.log("뷰 모드 변경:", mode);
     
     // 이미 같은 모드인지 확인
     if (viewMode === mode) {

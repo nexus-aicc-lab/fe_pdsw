@@ -31,7 +31,7 @@ export const useApiForGetCampaignSkills = (options?: UseApiForCampaignSkillsOpti
         
         return response;
       } catch (error) {
-        console.error("Error loading campaign skills data:", error);
+        // console.error("Error loading campaign skills data:", error);
         throw error;
       } finally {
         setCampaignSkillsLoading(false);

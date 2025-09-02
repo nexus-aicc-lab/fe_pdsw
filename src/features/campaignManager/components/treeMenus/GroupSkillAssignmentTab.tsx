@@ -65,10 +65,9 @@ const useAssignableSkills = (tenantId?: number) => {
   return useQuery({
     queryKey: ["assignableSkills", tenantId],
     queryFn: async () => {
-      console.log("🟢 할당 가능한 스킬 목록을 불러오는 중...");
       
       if (!tenantId) {
-        console.warn("⚠️ 테넌트 ID가 없습니다.");
+        // console.warn("⚠️ 테넌트 ID가 없습니다.");
         return [];
       }
 
@@ -86,7 +85,7 @@ const useAssignableSkills = (tenantId?: number) => {
           throw new Error(`API 오류: ${response.result_msg}`);
         }
       } catch (error) {
-        console.error("❌ 스킬 목록 조회 실패:", error);
+        // console.error("❌ 스킬 목록 조회 실패:", error);
         throw error;
       }
     },
@@ -110,8 +109,6 @@ export function GroupSkillAssignmentTab(): JSX.Element {
     : firstCounselor?.data?.tenantId 
       ? Number(firstCounselor.data.tenantId) 
       : undefined;
-  
-  console.log("🏢 테넌트 ID:", tenantId);
 
   // 할당 가능한 스킬 목록 가져오기
   const { data: assignableSkills, isLoading, error } = useAssignableSkills(tenantId);
@@ -121,26 +118,24 @@ export function GroupSkillAssignmentTab(): JSX.Element {
   const addCounselorMutation = useApiForAddCounselorsForSpecificSkill(String(tenantId) ?? "0");
 
   // 컴포넌트 마운트 시 디버깅 로그
-  useEffect(() => {
-    console.group("🔍 [GroupSkillAssignmentTab] 컴포넌트 마운트");
-    console.log("📋 candidateMembersForSkilAssign 데이터:", candidateMembersForSkilAssign);
-    
-    if (isValidCounselorsArray) {
-      console.log("👤 첫 번째 상담사:", candidateMembersForSkilAssign[0]);
-      console.log("👥 총 상담사 수:", candidateMembersForSkilAssign.length);
-      
-      const counselorIds = getValidCounselorIds();
-      console.log("🆔 유효한 상담사 ID 목록:", counselorIds);
-    } else {
-      console.warn("⚠️ 상담사 데이터가 없거나 형식이 올바르지 않습니다.");
-    }
-    console.groupEnd();
-  }, [candidateMembersForSkilAssign]);
+  // useEffect(() => {
+  //   console.group("🔍 [GroupSkillAssignmentTab] 컴포넌트 마운트");
+  //   console.log("📋 candidateMembersForSkilAssign 데이터:", candidateMembersForSkilAssign);
+  //   if (isValidCounselorsArray) {
+  //     console.log("👤 첫 번째 상담사:", candidateMembersForSkilAssign[0]);
+  //     console.log("👥 총 상담사 수:", candidateMembersForSkilAssign.length);
+  //     const counselorIds = getValidCounselorIds();
+  //     console.log("🆔 유효한 상담사 ID 목록:", counselorIds);
+  //   } else {
+  //     console.warn("⚠️ 상담사 데이터가 없거나 형식이 올바르지 않습니다.");
+  //   }
+  //   console.groupEnd();
+  // }, [candidateMembersForSkilAssign]);
 
   // 유효한 상담사 ID 배열 생성 함수
   const getValidCounselorIds = (): string[] => {
     if (!isValidCounselorsArray) {
-      console.warn("⚠️ 유효한 상담사 배열이 없습니다.");
+      // console.warn("⚠️ 유효한 상담사 배열이 없습니다.");
       return [];
     }
 
@@ -158,7 +153,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
         return (counselor.data && counselor.data.counselorId) || counselor.counselorId;
       });
     
-    console.log("✅ 추출된 상담사 ID 목록:", validIds, "개수:", validIds.length);
+    // console.log("✅ 추출된 상담사 ID 목록:", validIds, "개수:", validIds.length);
     
     return validIds;
   };
@@ -176,12 +171,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
       const isCurrentlySelected = prev.includes(skillId);
 
       if (isCurrentlySelected) {
-        console.log("📌 체크 해제된 스킬 정보:", {
-          skillId: skillId,
-          counselorIds: counselorIds,
-          counselorCount: counselorIds.length
-        });
-
+        
         deleteCounselorMutation.mutate({
           skillId: skillId,
           counselorIds: counselorIds
@@ -190,17 +180,12 @@ export function GroupSkillAssignmentTab(): JSX.Element {
             toast.success('스킬이 해제되었습니다.');
           },
           onError: (error) => {
-            console.error('스킬 해제 오류:', error);
+            // console.error('스킬 해제 오류:', error);
             toast.error('스킬 해제 중 오류가 발생했습니다.');
           }
         });
       } else {
-        console.log("📌 체크된 스킬 정보:", {
-          skillId: skillId,
-          counselorIds: counselorIds,
-          counselorCount: counselorIds.length
-        });
-
+        
         addCounselorMutation.mutate({
           skillId: skillId,
           counselorIds: counselorIds
@@ -209,7 +194,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
             toast.success('스킬이 할당되었습니다.');
           },
           onError: (error) => {
-            console.error('스킬 할당 오류:', error);
+            // console.error('스킬 할당 오류:', error);
             toast.error('스킬 할당 중 오류가 발생했습니다.');
           }
         });
@@ -224,12 +209,12 @@ export function GroupSkillAssignmentTab(): JSX.Element {
   // 취소 버튼 핸들러
   const handleCancel = () => {
     // 아직 탭 스토어 연결되지 않음 - 필요시 추가
-    console.log("취소 버튼 클릭");
+    // console.log("취소 버튼 클릭");
   };
 
   // 확인 버튼 핸들러
   const handleConfirm = () => {
-    console.log("확인 버튼 클릭 - 선택된 스킬:", selectedSkills);
+    // console.log("확인 버튼 클릭 - 선택된 스킬:", selectedSkills);
     toast.success('스킬 할당이 완료되었습니다.');
   };
 

@@ -97,7 +97,7 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
       // 확장 상태 설정
       useSideMenuCampaignGroupTabStore.setState({ expandedNodes: newExpandedNodes });
 
-      console.log(`${nodeType} 정렬 후 확장된 노드 수: ${newExpandedNodes.size}`);
+      // console.log(`${nodeType} 정렬 후 확장된 노드 수: ${newExpandedNodes.size}`);
     }, 100);
 
     // 팝오버 닫기

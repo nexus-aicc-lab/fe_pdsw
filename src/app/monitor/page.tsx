@@ -353,7 +353,7 @@ const MonitorPage = () => {
           tenant_id: tenant_id,
         });
       } else {
-        console.log('통합 모니터링 캠페인 발신 속도 수정 실패 :', data);
+        // console.log('통합 모니터링 캠페인 발신 속도 수정 실패 :', data);
 
       }
       
@@ -396,7 +396,7 @@ const MonitorPage = () => {
         });
       } // end of if result_code
       else {
-        console.log('통합 모니터링 캠페인 스킬 수정 실패 :', data);
+        // console.log('통합 모니터링 캠페인 스킬 수정 실패 :', data);
 
       }
     },
@@ -428,7 +428,7 @@ const MonitorPage = () => {
           if(data.result_code === 0){
             
           } else{
-            console.log('통합 모니터링 캠페인 마스터 수정 실패 :', data);
+            // console.log('통합 모니터링 캠페인 마스터 수정 실패 :', data);
           }
       },
       onError: (error) => {
@@ -566,7 +566,7 @@ const MonitorPage = () => {
   };
 
   const handleCallPacingApply = () => {
-    console.log('Applying call pacing:', callPacing);
+    // console.log('Applying call pacing:', callPacing);
     const tempCampaign = campaigns.find(c => c.campaign_id === Number(selectedCampaign));
     //캠페인 발신 속도 수정 api 호출
     fetchDialSpeedUpdate({

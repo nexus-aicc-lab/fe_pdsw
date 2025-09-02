@@ -131,7 +131,7 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
 
     // Validate tenant ID
     if (targetTenantId === undefined || targetTenantId === null) {
-      console.error("테넌트 ID가 없습니다.");
+      // console.error("테넌트 ID가 없습니다.");
       set({ error: new Error("테넌트 ID가 없습니다.") });
       return;
     }
@@ -146,13 +146,13 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
       // Check if we have the QueryClient instance
       if (queryClientInstance) {
         // Modern approach: Use React Query cache invalidation
-        console.log("Using React Query invalidation for refetch");
+        
         await queryClientInstance.invalidateQueries({
           queryKey: ['campaignTreeDataForCampaignGroupTab', targetTenantId]
         });
       } else {
         // Fallback approach: Use direct API call for backward compatibility
-        console.log("Fallback: Using direct API call for refetch");
+        
 
         try {
           const combinedData = await apiForCombinedTenantAndCampaignGroup(targetTenantId);
@@ -164,7 +164,7 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
             isLoading: false
           });
         } catch (error) {
-          console.error("트리 데이터 다시 가져오기 오류:", error);
+          // console.error("트리 데이터 다시 가져오기 오류:", error);
           set({
             error: error instanceof Error ? error : new Error('알 수 없는 오류가 발생했습니다'),
             isLoading: false
@@ -180,7 +180,7 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
         isLoading: false
       });
     } catch (error) {
-      console.error("캠페인 그룹 트리 데이터 캐시 무효화 오류:", error);
+      // console.error("캠페인 그룹 트리 데이터 캐시 무효화 오류:", error);
       set({
         error: error instanceof Error ? error : new Error('알 수 없는 오류가 발생했습니다'),
         isLoading: false
@@ -442,7 +442,7 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
 
   removeCampaignFromGroup: (campaignId: string) => {
     set(state => {
-      console.log(`캠페인 ID ${campaignId} 제거 시작`);
+      // console.log(`캠페인 ID ${campaignId} 제거 시작`);
 
       // 트리 데이터 복제
       const newTreeData = JSON.parse(JSON.stringify(state.treeData));
@@ -453,7 +453,7 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
         return nodes.reduce<TreeNode[]>((result, node) => {
           // 캠페인이고 campaign_id가 일치하면 제외 (중요: id가 아닌 campaign_id로 비교)
           if (node.type === 'campaign' && node.campaign_id?.toString() === campaignId) {
-            console.log(`캠페인 노드 찾음(제거): ID=${node.campaign_id}, name=${node.name}`);
+            // console.log(`캠페인 노드 찾음(제거): ID=${node.campaign_id}, name=${node.name}`);
             return result; // 이 노드는 제외
           }
 
@@ -464,7 +464,7 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
             const childrenAfter = filteredChildren.length;
 
             if (childrenBefore !== childrenAfter) {
-              console.log(`노드 ${node.name}에서 자식이 제거됨`);
+              // console.log(`노드 ${node.name}에서 자식이 제거됨`);
             }
 
             result.push({ ...node, children: filteredChildren });

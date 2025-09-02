@@ -262,7 +262,7 @@ const CampaignStartModal = ({
 
       setUpdateCompleted(true);
     } catch (error) {
-      console.error("업데이트 오류:", error);
+      // console.error("업데이트 오류:", error);
       setUpdateResult({
         success: false,
         message: error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.",

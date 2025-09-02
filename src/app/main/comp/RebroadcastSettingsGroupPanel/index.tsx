@@ -850,7 +850,7 @@ const RebroadcastSettingsGroupPanel = () => {
     const { mutate: fetchCampaignProgressInformation } = useApiForCampaignProgressInformation({
         onSuccess: (data) => {      
             if (data && data.progressInfoList && data.progressInfoList.length > 0 ) {
-                console.log(data.progressInfoList.length);
+                // console.log(data.progressInfoList.length);
                 const tempList = data.progressInfoList.sort((a, b) => a.reuseCnt - b.reuseCnt);
                 const campaignProgressInfo = tempList[tempList.length-1];
                 const waitlist = campaignProgressInfo.totLstCnt - campaignProgressInfo.scct

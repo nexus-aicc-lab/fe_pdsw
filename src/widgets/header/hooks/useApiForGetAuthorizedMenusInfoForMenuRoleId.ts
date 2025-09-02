@@ -196,7 +196,7 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
       setAvailableMenuIdsForCampaignGroupTabCampaign(campaignGroupTabCampaignIds);
       
     } catch (err) {
-      console.error('Error fetching authorized menus:', err);
+      // console.error('Error fetching authorized menus:', err);
       
       // 로컬 상태 업데이트
       setIsError(true);
