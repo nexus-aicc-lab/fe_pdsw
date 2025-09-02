@@ -178,7 +178,42 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
  const currentData = useMemo(() => {
   if (selectedCampaign === 'all') return allCampaignData;
   if (!selectedCampaign) return emptyData;
-  return _campaignData[selectedCampaign] || emptyData;
+    
+  // selectedCampaign이 특정 캠페인ID인 경우, 해당 캠페인의 모든 sequence 데이터를 합산
+  const campaignKeys = Object.keys(_campaignData).filter(key => 
+    key.startsWith(selectedCampaign + '-')
+  );
+  
+  if (campaignKeys.length === 0) return emptyData;
+  
+  // 해당 캠페인의 모든 시퀀스 데이터를 합산
+  const campaignData = campaignKeys.reduce<CampaignData>((acc, key) => {
+    const data = _campaignData[key];
+    return {
+      stats: {
+        waiting: acc.stats.waiting + data.stats.waiting,
+        firstCall: acc.stats.firstCall + data.stats.firstCall,
+        retryCall: acc.stats.retryCall + data.stats.retryCall,
+        distributing: acc.stats.distributing + data.stats.distributing
+      },
+      barData: [
+        { name: '최초 발신중', value: acc.barData[0].value + data.barData[0].value },
+        { name: '재시도 발신중', value: acc.barData[1].value + data.barData[1].value },
+        { name: '분배 대기', value: acc.barData[2].value + data.barData[2].value }
+      ],
+      gridData: [...acc.gridData, ...data.gridData]
+    };
+  }, {
+    stats: { waiting: 0, firstCall: 0, retryCall: 0, distributing: 0 },
+    barData: [
+      { name: '최초 발신중', value: 0 },
+      { name: '재시도 발신중', value: 0 },
+      { name: '분배 대기', value: 0 }
+    ],
+    gridData: []
+  });
+  
+  return campaignData;
 }, [selectedCampaign, allCampaignData, _campaignData]);
 
   // 데이터 업데이트 시 부모 컴포넌트에 알림
@@ -240,7 +275,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       setActiveTab(5, newTabKey);
     }, 50);
   };
-
+  //const testid = {campaignId : '39889'};
   // const testData = [
   //   {
   //           "campaignId": 39889,
@@ -334,7 +369,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       const tempList = data.sendingProgressStatusList;
       // const tempList = testData;
       const _campaignId = data.campaignId;
-      if( tempList.length > 0 && (_campaignId === selectedCampaign+'' || (selectedCampaign === 'all' && _campaignId === '0')) ){
+      // if( tempList.length > 0 && ((_campaignId.trim() +'' === selectedCampaign.trim() +'') || (selectedCampaign === 'all' && _campaignId === '0')) ){
+      if( tempList.length > 0 && ((_campaignId.trim() +'' === selectedCampaign.trim() +'') || (selectedCampaign === 'all' && _campaignId === '0')) ){
         setWaitingCounselorCnt( data.waitingCounselorCnt );
         const sumCallProgressStatus:SummaryCallProgressStatusDataType[] = [];
         for( let i=0;i<tempList.length;i++){
@@ -405,9 +441,12 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
           };
           Object.assign(tempCampaignData, _tempCampaignData);
         }
+        
         _setCampaignData(tempCampaignData);
+        
       }else if((_campaignId === selectedCampaign+'' || (selectedCampaign === 'all' && _campaignId === '0'))){ 
         setWaitingCounselorCnt( data.waitingCounselorCnt );
+        
         _setCampaignData({
               ' ': {
                 stats: {
@@ -523,6 +562,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       setSelectedCampaign( externalCampaignId );
       setShouldRenderSelect(false);
       setWaitingCounselorCnt( 0 );
+      debugger
       _setCampaignData({
             ' ': {
               stats: {
