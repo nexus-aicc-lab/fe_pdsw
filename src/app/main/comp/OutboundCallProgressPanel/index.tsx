@@ -143,24 +143,45 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     }), { waiting: 0, firstCall: 0, retryCall: 0, distributing: 0 });
 
     // 모든 캠페인의 바 차트 데이터 합계 계산
+    // const totalBarData = [
+    //   {
+    //     name: '최초 발신중',
+    //     value: Object.values(_campaignData).reduce((sum, campaign) =>
+    //       sum + (campaign.barData.find(item => item.name === '최초 발신중')?.value ?? 0), 0
+    //     )
+    //   },
+    //   {
+    //     name: '재시도 발신중',
+    //     value: Object.values(_campaignData).reduce((sum, campaign) =>
+    //       sum + (campaign.barData.find(item => item.name === '재시도 발신중')?.value ?? 0), 0
+    //     )
+    //   },
+    //   {
+    //     name: '분배 대기',
+    //     value: Object.values(_campaignData).reduce((sum, campaign) =>
+    //       sum + (campaign.barData.find(item => item.name === '분배 대기')?.value ?? 0), 0
+    //     )
+    //   }
+    // ];
+
+    // console.log("### _campaignData : ", _campaignData);
+
+    // currentData와 동일하게 index 기준으로 변경
     const totalBarData = [
       {
         name: '최초 발신중',
-        value: Object.values(_campaignData).reduce((sum, campaign) =>
-          sum + (campaign.barData.find(item => item.name === '최초 발신중')?.value ?? 0), 0
-        )
+        value: Object.values(_campaignData).reduce((sum, campaign) => 
+          sum + campaign.barData[0].value, 0)
       },
       {
-        name: '재시도 발신중',
-        value: Object.values(_campaignData).reduce((sum, campaign) =>
-          sum + (campaign.barData.find(item => item.name === '재시도 발신중')?.value ?? 0), 0
-        )
+        name: '재시도 발신중', 
+        value: Object.values(_campaignData).reduce((sum, campaign) => 
+          sum + campaign.barData[1].value, 0)
       },
       {
         name: '분배 대기',
-        value: Object.values(_campaignData).reduce((sum, campaign) =>
-          sum + (campaign.barData.find(item => item.name === '분배 대기')?.value ?? 0), 0
-        )
+        value: Object.values(_campaignData).reduce((sum, campaign) => 
+          sum + campaign.barData[2].value, 0)
       }
     ];
 
@@ -456,8 +477,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
                   distributing: 0
                 },
                 barData: [
-                  { name: '최초 발신용', value: 0 },
-                  { name: '재시도 발신용', value: 0 },
+                  { name: '최초 발신중', value: 0 },
+                  { name: '재시도 발신중', value: 0 },
                   { name: '분배 대기', value: 0 }
                 ],
                 gridData: [
@@ -572,8 +593,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
                 distributing: 0
               },
               barData: [
-                { name: '최초 발신용', value: 0 },
-                { name: '재시도 발신용', value: 0 },
+                { name: '최초 발신중', value: 0 },
+                { name: '재시도 발신중', value: 0 },
                 { name: '분배 대기', value: 0 }
               ],
               gridData: [
