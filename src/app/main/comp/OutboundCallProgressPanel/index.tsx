@@ -296,7 +296,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       setActiveTab(5, newTabKey);
     }, 50);
   };
-  //const testid = {campaignId : '39889'};
+  // const testid = {campaignId : '39889'};
   // const testData = [
   //   {
   //           "campaignId": 39889,
@@ -387,11 +387,13 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   // 발신 진행 정보 api 호출
   const { mutate: fetchCallProgressStatus } = useApiForCallProgressStatus({
     onSuccess: (data) => {  
+      
       const tempList = data.sendingProgressStatusList;
       // const tempList = testData;
       const _campaignId = data.campaignId;
+
       // if( tempList.length > 0 && ((_campaignId.trim() +'' === selectedCampaign.trim() +'') || (selectedCampaign === 'all' && _campaignId === '0')) ){
-      if( tempList.length > 0 && ((_campaignId.trim() +'' === selectedCampaign.trim() +'') || (selectedCampaign === 'all' && _campaignId === '0')) ){
+      if( tempList.length > 0 && ((_campaignId +'' === selectedCampaign +'') ||  (selectedCampaign === 'all' && _campaignId === '0')) ){
         setWaitingCounselorCnt( data.waitingCounselorCnt );
         const sumCallProgressStatus:SummaryCallProgressStatusDataType[] = [];
         for( let i=0;i<tempList.length;i++){
@@ -532,7 +534,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     }
     setIsRefreshing(true);
     setIsLoading(true);
-
+    
     if( selectedCampaign != 'all' && campaigns && campaigns.length > 0 ){
       const campaignInfo = campaigns.find(data => data.campaign_id === Number(selectedCampaign));
       const tenantId = campaignInfo?.tenant_id+'' || '1';
@@ -580,27 +582,29 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
 
   useEffect(() => {
     if( externalCampaignId ){
+
+      
       setSelectedCampaign( externalCampaignId );
       setShouldRenderSelect(false);
-      setWaitingCounselorCnt( 0 );
+      // setWaitingCounselorCnt( 0 );
       
-      _setCampaignData({
-            ' ': {
-              stats: {
-                waiting: 0,
-                firstCall: 0,
-                retryCall: 0,
-                distributing: 0
-              },
-              barData: [
-                { name: '최초 발신중', value: 0 },
-                { name: '재시도 발신중', value: 0 },
-                { name: '분배 대기', value: 0 }
-              ],
-              gridData: [
-              ]
-            }
-      });
+      // _setCampaignData({
+      //       ' ': {
+      //         stats: {
+      //           waiting: 0,
+      //           firstCall: 0,
+      //           retryCall: 0,
+      //           distributing: 0
+      //         },
+      //         barData: [
+      //           { name: '최초 발신중', value: 0 },
+      //           { name: '재시도 발신중', value: 0 },
+      //           { name: '분배 대기', value: 0 }
+      //         ],
+      //         gridData: [
+      //         ]
+      //       }
+      // });
     }else{
       setShouldRenderSelect(true);
     }

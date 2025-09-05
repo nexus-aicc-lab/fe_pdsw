@@ -200,9 +200,9 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
   }, [numericCampaignId, campaigns,statisticsUpdateCycle]);
 
   return (
-    <div className="flex gap-4 w-full limit-width">
+    <div className="flex gap-4 w-full limit-width h-full">
       {/* 왼쪽 설정 영역 */}
-      <div className="flex flex-col gap-5 w-[230px] min-w-[230px]">
+      <div className="flex flex-col gap-5 w-[230px] min-w-[230px] h-full">
         <div>
           <TitleWrap title="캠페인 정보" />
           <Table>
@@ -245,9 +245,9 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
           </CommonRadio>
         </div>
 
-        <div className="flex-1 h-full">
+        <div className="flex-1">
           <TitleWrap title="발신 구분" />
-          <div className="border rounded overflow-y-auto h-[calc(100%-20px)]">
+          <div className="border rounded overflow-y-scroll h-[calc(100%-20px)]">
             <table className="w-full text-sm border-collapse">
               <tbody>
                 {isPending ? (
