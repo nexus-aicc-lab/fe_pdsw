@@ -13,7 +13,6 @@ import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useA
 import { useEnvironmentStore } from '@/store/environmentStore';
 import CommonButton from '@/components/shared/CommonButton';
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
-import { FancyGraphLoader } from '@/shared/ui/loading/FancyGraphLoader';
 import { PulseBarsLoader } from '@/shared/ui/loading/PulseBarsLoader';
 
 // 타입 정의

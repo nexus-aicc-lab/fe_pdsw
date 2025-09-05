@@ -54,9 +54,6 @@ axiosRedisInstance.interceptors.request.use(
   }
 );
 
-export const externalAxiosInstance = axios.create({
-  withCredentials: true
-});
 // let sessionCheckYn = true;
 
 // 요청 인터셉터 추가

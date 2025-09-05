@@ -156,12 +156,6 @@ export interface AuthApiError {
   status: number;
 }
 
-// 로그인First 응답 데이터 타입
-export interface LoginResponseFirst {
-  id: string;
-  passwd: string;
-}
-
 // 캠페인정보 수정 요청 데이터 타입
 export interface CampaignInfoUpdateRequest {
   campaign_name: string;
