@@ -530,7 +530,7 @@ export default function Campaignprogress() {
   // 캠페인 스킬 조회
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
-      setCampaignSkills(data.result_data);
+      // setCampaignSkills(data.result_data); // 총 진행상황을 띄워놓고 캠페인관리를 재갱신해서 주석처리 09-05 - lab09
       // 여기에 나중에 발신 상태 API 연동
       processDataForGrid(data.result_data, selectedCampaign, selectedSkill, selectedStatus);
     },
