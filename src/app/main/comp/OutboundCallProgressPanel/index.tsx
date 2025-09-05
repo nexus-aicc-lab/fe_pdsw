@@ -510,7 +510,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   // 전화번호설명 템플릿 조회
   const { mutate: fetchPhoneDescriptions } = useApiForPhoneDescription({
     onSuccess: (data) => {
-      setPhoneDescriptions(data.result_data||[]);
+      // setPhoneDescriptions(data.result_data||[]); // 총 진행상황을 띄워놓고 캠페인관리를 재갱신해서 방지용 주석처리 09-05 - lab09
     },
     onError: (error) => {
       ServerErrorCheck('전화번호설명 템플릿 조회', error.message);
@@ -520,7 +520,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   // 캠페인스킬 조회
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
-      setCampaignSkills(data.result_data);
+      // setCampaignSkills(data.result_data); // 총 진행상황을 띄워놓고 캠페인관리를 재갱신해서 방지용 주석처리 09-05 - lab09
     },
     onError: (error) => {
       ServerErrorCheck('캠페인스킬 조회', error.message);
