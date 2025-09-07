@@ -12,7 +12,7 @@ import {
 } from "@dnd-kit/core";
 import { useTabStore } from "@/store/tabStore";
 import DraggableTab from "./comp/DraggableTab";
-import UnifiedTabView from "./comp/TabRow";
+import UnifiedTabView from "./comp/Tabmenu/UnifiedTabView";
 
 interface ActiveTabState {
   id: number;
