@@ -15,6 +15,7 @@ import CommonButton from '@/components/shared/CommonButton';
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 import { FancyGraphLoader } from '@/shared/ui/loading/FancyGraphLoader';
 import { PulseBarsLoader } from '@/shared/ui/loading/PulseBarsLoader';
+import { all } from 'axios';
 
 // 타입 정의
 interface Stats {
@@ -143,51 +144,29 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     }), { waiting: 0, firstCall: 0, retryCall: 0, distributing: 0 });
 
     // 모든 캠페인의 바 차트 데이터 합계 계산
-    // const totalBarData = [
-    //   {
-    //     name: '최초 발신중',
-    //     value: Object.values(_campaignData).reduce((sum, campaign) =>
-    //       sum + (campaign.barData.find(item => item.name === '최초 발신중')?.value ?? 0), 0
-    //     )
-    //   },
-    //   {
-    //     name: '재시도 발신중',
-    //     value: Object.values(_campaignData).reduce((sum, campaign) =>
-    //       sum + (campaign.barData.find(item => item.name === '재시도 발신중')?.value ?? 0), 0
-    //     )
-    //   },
-    //   {
-    //     name: '분배 대기',
-    //     value: Object.values(_campaignData).reduce((sum, campaign) =>
-    //       sum + (campaign.barData.find(item => item.name === '분배 대기')?.value ?? 0), 0
-    //     )
-    //   }
-    // ];
-
-    // console.log("### _campaignData : ", _campaignData);
-
-    // currentData와 동일하게 index 기준으로 변경
     const totalBarData = [
       {
         name: '최초 발신중',
-        value: Object.values(_campaignData).reduce((sum, campaign) => 
-          sum + campaign.barData[0].value, 0)
+        value: Object.values(_campaignData).reduce((sum, campaign) =>
+          sum + (campaign.barData.find(item => item.name === '최초 발신중')?.value ?? 0), 0
+        )
       },
       {
-        name: '재시도 발신중', 
-        value: Object.values(_campaignData).reduce((sum, campaign) => 
-          sum + campaign.barData[1].value, 0)
+        name: '재시도 발신중',
+        value: Object.values(_campaignData).reduce((sum, campaign) =>
+          sum + (campaign.barData.find(item => item.name === '재시도 발신중')?.value ?? 0), 0
+        )
       },
       {
         name: '분배 대기',
-        value: Object.values(_campaignData).reduce((sum, campaign) => 
-          sum + campaign.barData[2].value, 0)
+        value: Object.values(_campaignData).reduce((sum, campaign) =>
+          sum + (campaign.barData.find(item => item.name === '분배 대기')?.value ?? 0), 0
+        )
       }
     ];
 
     // 모든 캠페인의 그리드 데이터 통합
     const totalGridData = Object.values(_campaignData).flatMap(campaign => campaign.gridData);
-
     return {
       stats: totalStats,
       barData: totalBarData,
@@ -218,9 +197,21 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         distributing: acc.stats.distributing + data.stats.distributing
       },
       barData: [
-        { name: '최초 발신중', value: acc.barData[0].value + data.barData[0].value },
-        { name: '재시도 발신중', value: acc.barData[1].value + data.barData[1].value },
-        { name: '분배 대기', value: acc.barData[2].value + data.barData[2].value }
+        { 
+          name: '최초 발신중', 
+          value: (acc.barData.find(bar => bar.name === '최초 발신중')?.value ?? 0) + 
+                 (data.barData.find(bar => bar.name === '최초 발신중')?.value ?? 0)
+        },
+        { 
+          name: '재시도 발신중', 
+          value: (acc.barData.find(bar => bar.name === '재시도 발신중')?.value ?? 0) + 
+                 (data.barData.find(bar => bar.name === '재시도 발신중')?.value ?? 0)
+        },
+        { 
+          name: '분배 대기', 
+          value: (acc.barData.find(bar => bar.name === '분배 대기')?.value ?? 0) + 
+                 (data.barData.find(bar => bar.name === '분배 대기')?.value ?? 0)
+        }
       ],
       gridData: [...acc.gridData, ...data.gridData]
     };
@@ -236,6 +227,13 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   
   return campaignData;
 }, [selectedCampaign, allCampaignData, _campaignData]);
+
+// 디버깅용 useEffect
+// useEffect(() => {
+//   console.log('### useEffect _campaignData keys:', Object.keys(_campaignData));
+//   console.log('### useEffect currentData.barData:', currentData.barData);
+//   console.log('### useEffect allCampaignData.barData:', allCampaignData.barData);
+// }, [_campaignData, currentData, allCampaignData]);
 
   // 데이터 업데이트 시 부모 컴포넌트에 알림
   useEffect(() => {
@@ -406,7 +404,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
               waiting: 0,  //대기상담사
               firstCall: tempList[i].reuseCount === 1 ? 1 : 0, //최초 발신
               // _retryCall: tempList[i].reuseCount === 2 ? 1 : 0, //재시도발신 ??? _retryCall 사용되는곳 찾을수 없음
-              retryCall : tempList[i].reuseCount === 2 ? 1 : 0, // 재시도발신 으로 수정 2025-09-02 - lab09
+              retryCall : tempList[i].reuseCount > 1 ? 1 : 0, // 재시도발신 으로 수정 2025-09-02 - lab09
+              // 왜 reuseCount 가 2일때만 재시도 발신처리였는지 확인 필요!! 09/07 정의서에는 2~(재발신) 으로 되어있는데...; lab09
               distributing: tempList[i].waitingLstCnt, //분배 대기
               result: campaigns.find((campaign) => campaign.campaign_id === tempList[i].campaignId)?.end_flag === 1 ? '진행중' : '완료',
               phoneType: tempList[i].dialedPhone + '', // 발신번호 구분으로 예측되는 dialedPhone 컬럼으로 변경 (05/27)
@@ -414,7 +413,9 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
           }else{
             // sumCallProgressStatus[index].waiting += tempList[i].waiting;
             sumCallProgressStatus[index].firstCall += tempList[i].reuseCount === 1 ? 1 : 0;
-            sumCallProgressStatus[index].retryCall += tempList[i].reuseCount === 2 ? 1 : 0;
+            sumCallProgressStatus[index].retryCall += tempList[i].reuseCount > 1 ? 1 : 0;
+            // sumCallProgressStatus[index].retryCall += tempList[i].reuseCount === 2 ? 1 : 0;
+            // 왜 reuseCount 가 2일때만 재시도 발신처리였는지 확인 필요!! 09/07 정의서에는 2~(재발신) 으로 되어있는데...; lab09
             sumCallProgressStatus[index].distributing += tempList[i].waitingLstCnt;
           }
         }
@@ -432,7 +433,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
               },
               barData: [
                 { name: '최초 발신중', value: sumCallProgressStatus[i].firstCall },  //최초 발신용 --> 최초 발신중 변경 0526
-                { name: '재시도 발신중', value: sumCallProgressStatus[i].retryCall },  //재시도 발신용 --> 최초 발신중 변경 0526
+                { name: '재시도 발신중', value: sumCallProgressStatus[i].retryCall },  //재시도 발신용 --> 재시도 발신중 변경 0526
                 // { name: '분배 대기', value: sumCallProgressStatus[i].waiting - (sumCallProgressStatus[i].firstCall+sumCallProgressStatus[i].retryCall) }   //분배 대기
                 { name: '분배 대기', value: sumCallProgressStatus[i].distributing }   //분배 대기
               ],
@@ -464,29 +465,31 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
           };
           Object.assign(tempCampaignData, _tempCampaignData);
         }
-        
+        // console.log("##### tempCampaignData: ", tempCampaignData);
         _setCampaignData(tempCampaignData);
         
       }else if((_campaignId === selectedCampaign+'' || (selectedCampaign === 'all' && _campaignId === '0'))){ 
         setWaitingCounselorCnt( data.waitingCounselorCnt );
         
-        _setCampaignData({
-              ' ': {
-                stats: {
-                  waiting: data.waitingCounselorCnt,
-                  firstCall: 0,
-                  retryCall: 0,
-                  distributing: 0
-                },
-                barData: [
-                  { name: '최초 발신중', value: 0 },
-                  { name: '재시도 발신중', value: 0 },
-                  { name: '분배 대기', value: 0 }
-                ],
-                gridData: [
-                ]
-              }
-        });
+        _setCampaignData({});
+        // ' ' 키를 빈데이터로 수정 - 09/07 lab09
+        // _setCampaignData({
+        //       ' ': {
+        //         stats: {
+        //           waiting: data.waitingCounselorCnt,
+        //           firstCall: 0,
+        //           retryCall: 0,
+        //           distributing: 0
+        //         },
+        //         barData: [
+        //           { name: '최초 발신중', value: 0 },
+        //           { name: '재시도 발신중', value: 0 },
+        //           { name: '분배 대기', value: 0 }
+        //         ],
+        //         gridData: [
+        //         ]
+        //       }
+        // });
       }
       // setDataList(tempList);
       // setSelectedCall(tempList[0]);

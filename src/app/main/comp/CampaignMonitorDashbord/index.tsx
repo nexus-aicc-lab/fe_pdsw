@@ -91,6 +91,9 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
   const [viewType, setViewType] = useState<ViewType>("gridView");
   const [selectedCall, setSelectedCall] = useState<CampaignProgressInformationResponseDataType | null>(null);
   const { statisticsUpdateCycle } = useEnvironmentStore();
+
+  // 사용자가 선택한 발신차수 저장용 - 09/06 추가 lab09
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   
   // props로 전달받은 campaignId를 사용
   const numericCampaignId = campaignId ? Number(campaignId) : null;
@@ -131,13 +134,27 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         
         // 첫 번째 항목을 선택 (데이터가 있는 경우에만)
         // 마지막 항목 선택으로 변경 20250325
+        // 사용자가 선택한 발신차수 interval 마다 유지되어야함 -> selectIndex 상태관리 추가 (책임님께 의견 묻기)
         if (tempList.length > 0 && selectedCall == null ) {
+          // 최초 로딩시에 마지막 발신차수 선택
           setSelectedCall(tempList[tempList.length-1]);
-        }else if (tempList.length > 0 && selectedCall != null && selectedCall.campId != tempList[0].campId ) {
+        }else if (tempList.length > 0 && selectedCall != null && selectedCall.campId === tempList[0].campId && 
+          selectedIndex !== null && selectedIndex < tempList.length){ 
+          // campId !== 에서 === 으로 변경 09/06 - lab09
+          // 사용자가 선택한 발신차수가 있을때 (최초 로딩 제외- 갱신주기 마다 조회시 적용)
+          setSelectedCall(tempList[selectedIndex]);
+        }else if(tempList.length > 0 && selectedCall != null && selectedCall.campId === tempList[0].campId){
+          // 사용자가 선택한 발신차수가 없을때 (최초 로딩 제외- 갱신주기 마다 조회시 적용)
           setSelectedCall(tempList[tempList.length-1]);
-        }else if(tempList.length == 0){
-          setSelectedCall(null);
+        }else {
+           setSelectedCall(null); // 위 조건에 해당하지 않을때 null? initData?
         }
+        
+        // else if (temList.length === 0) << if (data && data.progressInfoList.length > 0) 이 조건으로 걸러냈는데 굳이?
+        // else if(tempList.length == 0){
+        //   setSelectedCall(null);
+        // }
+
       }else if (data && data.progressInfoList.length == 0) {
         setDataList([initData]);
         setSelectedCall(initData);
@@ -150,8 +167,19 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
   // console.log("progressData 확인 : ", progressData);
   
   // 데이터 갱신 함수
-  const refreshData = useCallback(() => {
-    if (numericCampaignId) {
+  // const refreshData = useCallback(() => {
+  //   if (numericCampaignId) {
+  //     fetchProgressData({
+  //       tenantId: campaigns.find(data => data.campaign_id === numericCampaignId)?.tenant_id || 1,
+  //       campaignId: numericCampaignId
+  //     });
+  //   } else {
+  //     // console.warn("캠페인 ID가 없어 API 호출이 비활성화됩니다.");
+  //   }
+  // }, [fetchProgressData, numericCampaignId]);
+
+  const refreshData = ()=>{
+      if (numericCampaignId) {
       fetchProgressData({
         tenantId: campaigns.find(data => data.campaign_id === numericCampaignId)?.tenant_id || 1,
         campaignId: numericCampaignId
@@ -159,6 +187,10 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
     } else {
       // console.warn("캠페인 ID가 없어 API 호출이 비활성화됩니다.");
     }
+  };
+
+  useEffect(()=>{
+    refreshData();
   }, [fetchProgressData, numericCampaignId]);
 
   useEffect(() => {   
@@ -245,7 +277,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
           </CommonRadio>
         </div>
 
-        <div className="flex-1">
+        <div className="flex-1 h-[250px]">
           <TitleWrap title="발신 구분" />
           <div className="border rounded overflow-y-scroll h-[calc(100%-20px)]">
             <table className="w-full text-sm border-collapse">
@@ -261,7 +293,11 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
                 ) : dataList ? dataList.map((item, index) => (
                   <tr
                     key={item.reuseCnt}
-                    onClick={() => setSelectedCall(item)}
+                    onClick={() => {
+                      setSelectedCall(item);
+                      setSelectedIndex(index); //  사용자 선택 차수 추가 - 09/06 lab09
+                    }
+                  }
                     className={`cursor-pointer hover:bg-[#FFFAEE] ${
                       selectedCall?.reuseCnt === item.reuseCnt ? "bg-[#FFFAEE]" : ""
                     }`}
