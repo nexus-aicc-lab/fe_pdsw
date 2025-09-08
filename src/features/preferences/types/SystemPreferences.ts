@@ -246,6 +246,15 @@ export interface CampaignAgentListDataResponse {
   agent_id: string[];
 }
 
+export interface AgentReadyCountDataResponse {
+  result_code: number;
+  result_msg: string;
+  result_data: {
+    campaign_id: number;
+    ready_count: number;
+  }
+}
+
 export interface CampaignAgentListResponse {
   result_code: number;
   result_msg: string;

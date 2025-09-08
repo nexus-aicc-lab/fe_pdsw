@@ -7,14 +7,12 @@ import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-c
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import DataGrid, { Column as DataGridColumn } from 'react-data-grid';
 import { useApiForCallProgressStatus } from '@/features/monitoring/hooks/useApiForCallProgressStatus';
-import { useMainStore, useCampainManagerStore, useAuthStore, useTabStore } from '@/store';
-import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
-import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
+import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 import { useEnvironmentStore } from '@/store/environmentStore';
 import CommonButton from '@/components/shared/CommonButton';
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 import { PulseBarsLoader } from '@/shared/ui/loading/PulseBarsLoader';
-import { all } from 'axios';
+import { useApiForAgentReadyCount } from '@/features/preferences/hooks/useApiForAgentReadyCount';
 
 // 타입 정의
 interface Stats {
@@ -99,9 +97,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   onDataUpdate
 }) => {
   // const [internalSelectedCampaign, setInternalSelectedCampaign] = useState<string>('all');
-  const { campaigns } = useMainStore();
-  const { tenant_id, session_key } = useAuthStore();
-  const { campaignSkills, setCampaignSkills,phoneDescriptions, setPhoneDescriptions } = useCampainManagerStore();
+  const { campaigns, tenants } = useMainStore();
+  const { campaignSkills } = useCampainManagerStore();
   const [ _campaignData, _setCampaignData ] = useState<CampaignDataMap>({});
   const [ waitingCounselorCnt, setWaitingCounselorCnt ] = useState<number>(0);
   const { statisticsUpdateCycle } = useEnvironmentStore();
@@ -110,10 +107,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const [isPopup, setIsPopup] = useState(false);
 
   // 실제 사용할 캠페인 ID 결정
-  // const selectedCampaign = externalCampaignId ?? internalSelectedCampaign;
   const [ selectedCampaign, setSelectedCampaign] = useState<string>('all');
-
-
 
   // 빈 데이터 정의
   const emptyData: CampaignData = {
@@ -227,13 +221,6 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   return campaignData;
 }, [selectedCampaign, allCampaignData, _campaignData]);
 
-// 디버깅용 useEffect
-// useEffect(() => {
-//   console.log('### useEffect _campaignData keys:', Object.keys(_campaignData));
-//   console.log('### useEffect currentData.barData:', currentData.barData);
-//   console.log('### useEffect allCampaignData.barData:', allCampaignData.barData);
-// }, [_campaignData, currentData, allCampaignData]);
-
   // 데이터 업데이트 시 부모 컴포넌트에 알림
   useEffect(() => {
     if (onDataUpdate) {
@@ -271,115 +258,23 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       setSelectedCampaign(value);
     }
 
-
-    // const existingTabs = openedTabs.filter(tab => tab.id === 5);
-    // existingTabs.forEach(tab => {
-    //   removeTab(tab.id, tab.uniqueKey);
-    // });
-    // const newTabKey = `5-${Date.now()}`;
-    // addTab({
-    //   id: 5,
-    //   campaignId: value,
-    //   campaignName: campaigns.find(data=>data.campaign_id === Number(value))?.campaign_name,
-    //   uniqueKey: '5',
-    //   title: '발신진행상태',
-    //   icon: '',
-    //   href: '',
-    //   content: null,
-    // });
-
     const newTabKey = `5-${Date.now()}`;
     setTimeout(function () {
       setActiveTab(5, newTabKey);
     }, 50);
   };
-  // const testid = {campaignId : '39889'};
-  // const testData = [
-  //   {
-  //           "campaignId": 39889,
-  //           "campaignName": "테스트34234#$",
-  //           "waitingLstCnt": 0,
-  //           "event": 2,
-  //           "dialSequence": 1,
-  //           "dialResult": 0,
-  //           "customerName": "이정수",
-  //           "customerKey": "이정수",
-  //           "phoneNumber": [
-  //               "234432234",
-  //               "",
-  //               "",
-  //               "",
-  //               ""
-  //           ],
-  //           "phoneDialCount": [
-  //               0,
-  //               0,
-  //               0,
-  //               0,
-  //               0
-  //           ],
-  //           "dialedPhone": 1,
-  //           "reuseCount": 2,
-  //           "retryCall": 0
-  //       },
-  //       {
-  //           "campaignId": 39889,
-  //           "campaignName": "테스트34234#$",
-  //           "waitingLstCnt": 0,
-  //           "event": 2,
-  //           "dialSequence": 2,
-  //           "dialResult": 0,
-  //           "customerName": "이정수",
-  //           "customerKey": "이정수",
-  //           "phoneNumber": [
-  //               "234432234",
-  //               "",
-  //               "",
-  //               "",
-  //               ""
-  //           ],
-  //           "phoneDialCount": [
-  //               0,
-  //               0,
-  //               0,
-  //               0,
-  //               0
-  //           ],
-  //           "dialedPhone": 1,
-  //           "reuseCount": 2,
-  //           "retryCall": 0
-  //       },
-  //       {
-  //           "campaignId": 39889,
-  //           "campaignName": "테스트34234#$",
-  //           "waitingLstCnt": 0,
-  //           "event": 2,
-  //           "dialSequence": 3,
-  //           "dialResult": 0,
-  //           "customerName": "이정수",
-  //           "customerKey": "1",
-  //           "phoneNumber": [
-  //               "234432234",
-  //               "",
-  //               "",
-  //               "",
-  //               ""
-  //           ],
-  //           "phoneDialCount": [
-  //               0,
-  //               0,
-  //               0,
-  //               0,
-  //               0
-  //           ],
-  //           "dialedPhone": 1,
-  //           "reuseCount": 1,
-  //           "retryCall": 0
-  //       }
-  // ]
-
   // Select 컴포넌트 렌더링 여부 결정
   const [ shouldRenderSelect , setShouldRenderSelect ] = useState<boolean>(false);
+
+  // 캠페인 대기 상담사 수 조회
+  const { mutate: fetchAgentReadyCount } = useApiForAgentReadyCount({
+    onSuccess: (data) => {
+      setWaitingCounselorCnt( data.result_data.ready_count || 0 );
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 대기 상담사 수 조회', error.message);
+    }
+  });
 
   // 발신 진행 정보 api 호출
   const { mutate: fetchCallProgressStatus } = useApiForCallProgressStatus({
@@ -389,9 +284,16 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       // const tempList = testData;
       const _campaignId = data.campaignId;
 
-      // if( tempList.length > 0 && ((_campaignId.trim() +'' === selectedCampaign.trim() +'') || (selectedCampaign === 'all' && _campaignId === '0')) ){
-      if( tempList.length > 0 && ((_campaignId +'' === selectedCampaign +'') ||  (selectedCampaign === 'all' && _campaignId === '0')) ){
+      // 캠페인 대기 상담사 수 조회
+      if( _campaignId && _campaignId.indexOf(',') > -1 ){
         setWaitingCounselorCnt( data.waitingCounselorCnt );
+      }else{
+        fetchAgentReadyCount({ campaign_id: [Number(_campaignId)] });
+      }
+
+      // if( tempList.length > 0 && ((_campaignId.trim() +'' === selectedCampaign.trim() +'') || (selectedCampaign === 'all' && _campaignId === '0')) ){
+      // setWaitingCounselorCnt( data.waitingCounselorCnt );
+      if( tempList.length > 0 && ((_campaignId +'' === selectedCampaign +'') ||  (selectedCampaign === 'all' && _campaignId === '0')) ){
         const sumCallProgressStatus:SummaryCallProgressStatusDataType[] = [];
         for( let i=0;i<tempList.length;i++){
           const uniqueKey = `${tempList[i].campaignId}-${tempList[i].dialSequence}`;
@@ -468,32 +370,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         _setCampaignData(tempCampaignData);
         
       }else if((_campaignId === selectedCampaign+'' || (selectedCampaign === 'all' && _campaignId === '0'))){ 
-        setWaitingCounselorCnt( data.waitingCounselorCnt );
-        
         _setCampaignData({});
-        // ' ' 키를 빈데이터로 수정 - 09/07 lab09
-        // _setCampaignData({
-        //       ' ': {
-        //         stats: {
-        //           waiting: data.waitingCounselorCnt,
-        //           firstCall: 0,
-        //           retryCall: 0,
-        //           distributing: 0
-        //         },
-        //         barData: [
-        //           { name: '최초 발신중', value: 0 },
-        //           { name: '재시도 발신중', value: 0 },
-        //           { name: '분배 대기', value: 0 }
-        //         ],
-        //         gridData: [
-        //         ]
-        //       }
-        // });
       }
-      // setDataList(tempList);
-      // setSelectedCall(tempList[0]);
-      // console.log("API 응답 데이터:", tempList); 
-
       setIsLoading(false);
       setIsRefreshing(false);
 
@@ -509,26 +387,6 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     }
   });
   
-  // 전화번호설명 템플릿 조회
-  const { mutate: fetchPhoneDescriptions } = useApiForPhoneDescription({
-    onSuccess: (data) => {
-      // setPhoneDescriptions(data.result_data||[]); // 총 진행상황을 띄워놓고 캠페인관리를 재갱신해서 방지용 주석처리 09-05 - lab09
-    },
-    onError: (error) => {
-      ServerErrorCheck('전화번호설명 템플릿 조회', error.message);
-    }
-  });
-
-  // 캠페인스킬 조회
-  const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
-    onSuccess: (data) => {
-      // setCampaignSkills(data.result_data); // 총 진행상황을 띄워놓고 캠페인관리를 재갱신해서 방지용 주석처리 09-05 - lab09
-    },
-    onError: (error) => {
-      ServerErrorCheck('캠페인스킬 조회', error.message);
-    }
-  });
-
   useEffect(() => {
     // 먼저 이전 interval 제거
     if (intervalRef.current) {
@@ -536,14 +394,11 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     }
     setIsRefreshing(true);
     setIsLoading(true);
-    
+    console.log("##### selectedCampaign: ", selectedCampaign, typeof selectedCampaign);
     if( selectedCampaign != 'all' && campaigns && campaigns.length > 0 ){
       const campaignInfo = campaigns.find(data => data.campaign_id === Number(selectedCampaign));
       const tenantId = campaignInfo?.tenant_id+'' || '1';
       const campaignId = campaignInfo?.campaign_id+'' || '0';
-
-      // 09/01 dial_sequence 추가
-      // const dial_sequence = campaignInfo?.dial_sequence || '0';
 
       fetchCallProgressStatus({ tenantId, campaignId });
       if( statisticsUpdateCycle > 0 ){  
@@ -552,16 +407,19 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         }, statisticsUpdateCycle * 1000);     
       }
     }else if(!isPopup){
+      const _tenantId = tenants && tenants.length > 0 ? tenants.map(data => data.tenant_id).join(',') : '0';
+      const _campaignId = campaigns && campaigns.length > 0 ? campaigns.map(data => data.campaign_id).join(',') : '0';
       fetchCallProgressStatus({
-        tenantId: tenant_id+'',
-        campaignId: '0'
+        tenantId: _tenantId,
+        campaignId: _campaignId
       });
       if( statisticsUpdateCycle > 0 ){  
         intervalRef.current = setInterval(() => {
-          const tenantId = tenant_id+'' || '1';
-          const campaignId =  '0';
-          fetchCallProgressStatus({ tenantId, campaignId });
-        }, statisticsUpdateCycle * 1000);     
+          fetchCallProgressStatus({
+            tenantId: _tenantId,
+            campaignId: _campaignId
+          });
+        }, statisticsUpdateCycle * 1000);
       }
     }
     return () => {
@@ -584,29 +442,10 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
 
   useEffect(() => {
     if( externalCampaignId ){
-
       
       setSelectedCampaign( externalCampaignId );
       setShouldRenderSelect(false);
-      // setWaitingCounselorCnt( 0 );
       
-      // _setCampaignData({
-      //       ' ': {
-      //         stats: {
-      //           waiting: 0,
-      //           firstCall: 0,
-      //           retryCall: 0,
-      //           distributing: 0
-      //         },
-      //         barData: [
-      //           { name: '최초 발신중', value: 0 },
-      //           { name: '재시도 발신중', value: 0 },
-      //           { name: '분배 대기', value: 0 }
-      //         ],
-      //         gridData: [
-      //         ]
-      //       }
-      // });
     }else{
       setShouldRenderSelect(true);
     }
@@ -615,21 +454,6 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsPopup(!!(window.opener && window.opener !== window));
-    }
-    let count = 0;
-    if( campaignSkills.length === 0){
-      fetchCampaignSkills({
-        session_key: session_key,
-        tenant_id: tenant_id,
-      });
-      count++;
-    }
-    if( phoneDescriptions.length === 0){
-      fetchPhoneDescriptions({
-        session_key: session_key,
-        tenant_id: tenant_id,
-      });
-      count++;
     }
   }, []);
 
@@ -642,7 +466,6 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const formattedLastRefreshTime = lastRefreshTime ?
     `${lastRefreshTime.toLocaleTimeString()}` :
     '아직 갱신되지 않음';
-
     
   // 새로고침해서 fetch 하는 함수
   const refreshData = () => {
@@ -653,16 +476,6 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     const tenantId = campaignInfo?.tenant_id+'' !== 'undefined' ? campaignInfo?.tenant_id+'' : '1';
     const campaignId = campaignInfo?.campaign_id+'' !== 'undefined' ? campaignInfo?.campaign_id+'' : '0';
     fetchCallProgressStatus({ tenantId, campaignId });
-
-    fetchCampaignSkills({
-      session_key: session_key,
-      tenant_id: tenant_id,
-    });
-
-    fetchPhoneDescriptions({
-      session_key: session_key,
-      tenant_id: tenant_id,
-    });  
 
   };
 
@@ -675,141 +488,6 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       return () => clearInterval(interval);
     }
   }, [statisticsUpdateCycle, refreshData]);
-
-
-  
-  // return (
-  //   <div className="flex flex-col gap-5 h-full out-wrap limit-700">
-  //     {shouldRenderSelect && (
-  //       <div className="flex justify-between items-center gap-2">
-  //         <div className='flex items-center gap-2'>
-  //           <Label className="w-20 min-w-20">캠페인</Label>
-  //         <Select onValueChange={handleCampaignChange} value={selectedCampaign}>
-  //           <SelectTrigger className="w-48">
-  //             <SelectValue placeholder="캠페인 전체" />
-  //           </SelectTrigger>
-  //           <SelectContent>
-  //             <SelectItem value="all">캠페인 전체</SelectItem>
-  //             {campaigns.map(option => (
-  //               <SelectItem key={option.campaign_id} value={option.campaign_id.toString()}>
-  //                 [{option.campaign_id}]{option.campaign_name}
-  //               </SelectItem>
-  //             ))}
-  //           </SelectContent>
-  //         </Select>
-
-  //         </div>
-          
-  //         {/* 새로고침 버튼 표시*/}
-  //         <div className="flex justify-end gap-2 text-xs text-gray-500 min-w-[260px]">
-  //           <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md">
-  //             <span className="w-2 h-2 rounded-full bg-green-500" />
-  //             <span>
-  //               갱신 주기: <span className="font-medium text-blue-600">{statisticsUpdateCycle}초</span>
-  //             </span>
-  //           </div>
-
-  //           <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md max-w[150px] min-w-[150px]">
-  //             <span>마지막 갱신:</span>
-  //             <span className="font-medium text-blue-600">{formattedLastRefreshTime}</span>
-  //           </div>
-  //           <CommonButton
-  //             variant="outline"
-  //             size="sm"
-  //             onClick={refreshData}
-  //             disabled={isLoading || isRefreshing}
-  //             className="flex items-center whitespace-nowrap mr-2"
-  //           >
-  //             <svg
-  //               className={`h-3 w-3 ${isRefreshing ? "animate-spin" : ""}`}
-  //               xmlns="http://www.w3.org/2000/svg"
-  //               fill="none"
-  //               viewBox="0 0 24 24"
-  //               stroke="currentColor"
-  //             >
-  //               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-  //             </svg>
-  //             {/* {isRefreshing ? "갱신중" : "새로고침"} */}
-  //             새로고침
-  //           </CommonButton>
-  //         </div>
-  //       </div>
-  //     )}
-
-  //     <div className="flex gap-5 h-[calc(100%-61px)] out-call-responsive-container">
-  //       <div className="flex-1 out-call-responsive-left gap-5">
-  //         <div className="">
-  //           <Table>
-  //             <thead>
-  //               <TableRow>
-  //                 <TableHeader className="!bg-[#DDF4F2] !text-center text-sm font-normal text-[#3A9D6C] !h-[30px]">
-  //                   대기 상담사
-  //                 </TableHeader>
-  //                 <TableHeader className="!bg-[#FEE9EC] !text-center text-sm font-normal text-[#C95E5E] !h-[30px]">
-  //                   최초 발신
-  //                 </TableHeader>
-  //                 <TableHeader className="!bg-[#E8EFFA] !text-center text-sm font-normal text-[#338BD3] !h-[30px]">
-  //                   재시도 발신
-  //                 </TableHeader>
-  //                 <TableHeader className="!bg-[#F6F0FA] !text-center text-sm font-normal text-[#9459BF] !h-[30px]">
-  //                   분배 대기
-  //                 </TableHeader>
-  //               </TableRow>
-  //             </thead>
-  //             <tbody>
-  //               <TableRow>
-  //                 <TableCell className="!text-center text-sm !h-[30px]">{waitingCounselorCnt}</TableCell>
-  //                 <TableCell className="!text-center text-sm !h-[30px]">{currentData.stats.firstCall}</TableCell>
-  //                 <TableCell className="!text-center text-sm !h-[30px]">{currentData.stats.retryCall}</TableCell>
-  //                 <TableCell className="!text-center text-sm !h-[30px]">{currentData.stats.distributing}</TableCell>
-  //               </TableRow>
-  //             </tbody>
-  //           </Table>
-  //         </div>
-
-  //         <div className="w-full h-[calc(100%-57px)]">
-  //           <ResponsiveContainer width="100%" height="100%" className="m-auto">
-  //             <BarChart
-  //               data={currentData.barData}
-  //               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-  //               layout="vertical"
-  //             >
-  //               <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={true} />
-  //               <XAxis
-  //                 type="number"
-  //                 tick={{ fontSize: 13 }}
-  //                 axisLine={{ stroke: '#999' }}
-  //               />
-  //               <YAxis
-  //                 type="category"
-  //                 dataKey="name"
-  //                 width={100}
-  //                 tick={{ fontSize: 13 }}
-  //                 axisLine={{ stroke: '#999' }}
-  //               />
-  //               <Tooltip />
-  //               <Bar
-  //                 dataKey="value"
-  //                 fill="#4FD1C5"
-  //                 barSize={20}
-  //               />
-  //             </BarChart>
-  //           </ResponsiveContainer>
-  //         </div>
-  //       </div>
-
-  //       <div className="grid-custom-wrap flex-1 out-call-responsive-right">
-  //         <DataGrid
-  //           columns={columns}
-  //           rows={currentData.gridData}
-  //           className="grid-custom"
-  //           rowHeight={30}
-  //           headerRowHeight={30}
-  //         />
-  //       </div>
-  //     </div>
-  //   </div>
-  // );
 
 return (
   isLoading ? (
