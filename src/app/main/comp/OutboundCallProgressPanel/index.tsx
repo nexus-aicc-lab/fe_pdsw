@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-custom";
@@ -125,10 +125,11 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     gridData: []
   };
 
-  // 전체 데이터 계산을 위한 useMemo 훅 사용
-  const allCampaignData = useMemo<CampaignData>(() => {
+  // allCampaignData를 매번 계산 (렌더링마다)
+  const allCampaignData: CampaignData = (() => {
     if (Object.keys(_campaignData).length === 0) return emptyData;
-    // 모든 캠페인의 통계 합계 계산
+
+    // 1. 통계 합계
     const totalStats = Object.values(_campaignData).reduce((acc, campaign) => ({
       waiting: acc.waiting + campaign.stats.waiting,
       firstCall: acc.firstCall + campaign.stats.firstCall,
@@ -136,7 +137,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       distributing: acc.distributing + campaign.stats.distributing
     }), { waiting: 0, firstCall: 0, retryCall: 0, distributing: 0 });
 
-    // 모든 캠페인의 바 차트 데이터 합계 계산
+    // 2. 바 차트 데이터 합계
     const totalBarData = [
       {
         name: '최초 발신중',
@@ -158,68 +159,72 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       }
     ];
 
-    // 모든 캠페인의 그리드 데이터 통합
+    // 3. 그리드 데이터 통합
     const totalGridData = Object.values(_campaignData).flatMap(campaign => campaign.gridData);
+
     return {
       stats: totalStats,
       barData: totalBarData,
       gridData: totalGridData
     };
-  }, [_campaignData]);
+  })();
 
- // 현재 선택된 캠페인의 데이터 (안전하게 처리)
- const currentData = useMemo(() => {
-  if (selectedCampaign === 'all') return allCampaignData;
-  if (!selectedCampaign) return emptyData;
-    
-  // selectedCampaign이 특정 캠페인ID인 경우, 해당 캠페인의 모든 sequence 데이터를 합산
-  const campaignKeys = Object.keys(_campaignData).filter(key => 
-    key.startsWith(selectedCampaign + '-')
-  );
-  
-  if (campaignKeys.length === 0) return emptyData;
-  
-  // 해당 캠페인의 모든 시퀀스 데이터를 합산
-  const campaignData = campaignKeys.reduce<CampaignData>((acc, key) => {
-    const data = _campaignData[key];
-    return {
-      stats: {
-        waiting: acc.stats.waiting + data.stats.waiting,
-        firstCall: acc.stats.firstCall + data.stats.firstCall,
-        retryCall: acc.stats.retryCall + data.stats.retryCall,
-        distributing: acc.stats.distributing + data.stats.distributing
-      },
+  // 현재 선택된 캠페인의 데이터 (렌더링마다 계산)
+  const currentData: CampaignData = (() => {
+    if (selectedCampaign === 'all') return allCampaignData;
+    if (!selectedCampaign) return emptyData;
+
+    // 선택된 캠페인에 해당하는 key 필터링 (예: "123-1", "123-2", ...)
+    const campaignKeys = Object.keys(_campaignData).filter(key =>
+      key.startsWith(selectedCampaign + '-')
+    );
+
+    if (campaignKeys.length === 0) return emptyData;
+
+    // 누적 계산
+    const campaignData = campaignKeys.reduce<CampaignData>((acc, key) => {
+      const data = _campaignData[key];
+      return {
+        stats: {
+          waiting: acc.stats.waiting + data.stats.waiting,
+          firstCall: acc.stats.firstCall + data.stats.firstCall,
+          retryCall: acc.stats.retryCall + data.stats.retryCall,
+          distributing: acc.stats.distributing + data.stats.distributing
+        },
+        barData: [
+          {
+            name: '최초 발신중',
+            value:
+              (acc.barData.find(bar => bar.name === '최초 발신중')?.value ?? 0) +
+              (data.barData.find(bar => bar.name === '최초 발신중')?.value ?? 0)
+          },
+          {
+            name: '재시도 발신중',
+            value:
+              (acc.barData.find(bar => bar.name === '재시도 발신중')?.value ?? 0) +
+              (data.barData.find(bar => bar.name === '재시도 발신중')?.value ?? 0)
+          },
+          {
+            name: '분배 대기',
+            value:
+              (acc.barData.find(bar => bar.name === '분배 대기')?.value ?? 0) +
+              (data.barData.find(bar => bar.name === '분배 대기')?.value ?? 0)
+          }
+        ],
+        gridData: [...acc.gridData, ...data.gridData]
+      };
+    }, {
+      stats: { waiting: 0, firstCall: 0, retryCall: 0, distributing: 0 },
       barData: [
-        { 
-          name: '최초 발신중', 
-          value: (acc.barData.find(bar => bar.name === '최초 발신중')?.value ?? 0) + 
-                 (data.barData.find(bar => bar.name === '최초 발신중')?.value ?? 0)
-        },
-        { 
-          name: '재시도 발신중', 
-          value: (acc.barData.find(bar => bar.name === '재시도 발신중')?.value ?? 0) + 
-                 (data.barData.find(bar => bar.name === '재시도 발신중')?.value ?? 0)
-        },
-        { 
-          name: '분배 대기', 
-          value: (acc.barData.find(bar => bar.name === '분배 대기')?.value ?? 0) + 
-                 (data.barData.find(bar => bar.name === '분배 대기')?.value ?? 0)
-        }
+        { name: '최초 발신중', value: 0 },
+        { name: '재시도 발신중', value: 0 },
+        { name: '분배 대기', value: 0 }
       ],
-      gridData: [...acc.gridData, ...data.gridData]
-    };
-  }, {
-    stats: { waiting: 0, firstCall: 0, retryCall: 0, distributing: 0 },
-    barData: [
-      { name: '최초 발신중', value: 0 },
-      { name: '재시도 발신중', value: 0 },
-      { name: '분배 대기', value: 0 }
-    ],
-    gridData: []
-  });
-  
-  return campaignData;
-}, [selectedCampaign, allCampaignData, _campaignData]);
+      gridData: []
+    });
+
+    return campaignData;
+  })();
 
   // 데이터 업데이트 시 부모 컴포넌트에 알림
   useEffect(() => {
@@ -389,12 +394,13 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   
   useEffect(() => {
     // 먼저 이전 interval 제거
+    if( selectedCampaign === '' ) return;
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
     setIsRefreshing(true);
     setIsLoading(true);
-    console.log("##### selectedCampaign: ", selectedCampaign, typeof selectedCampaign);
+    // console.log("##### selectedCampaign: ", selectedCampaign, typeof selectedCampaign);
     if( selectedCampaign != 'all' && campaigns && campaigns.length > 0 ){
       const campaignInfo = campaigns.find(data => data.campaign_id === Number(selectedCampaign));
       const tenantId = campaignInfo?.tenant_id+'' || '1';
@@ -437,6 +443,12 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       }else{
         setSelectedCampaign('all');
       }
+    }else{
+      clearInterval(intervalRef.current!);
+      intervalRef.current = null;
+      setIsLoading(false);
+      setIsRefreshing(false);
+      setSelectedCampaign('');
     }
   }, [activeTabId, openedTabs]);
 
@@ -473,21 +485,23 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     setIsLoading(true);
 
     const campaignInfo = campaigns.find(data => data.campaign_id === Number(selectedCampaign));
-    const tenantId = campaignInfo?.tenant_id+'' !== 'undefined' ? campaignInfo?.tenant_id+'' : '1';
-    const campaignId = campaignInfo?.campaign_id+'' !== 'undefined' ? campaignInfo?.campaign_id+'' : '0';
+    const tenantId = campaignInfo?.tenant_id+'' !== 'undefined' ? campaignInfo?.tenant_id+'' 
+      : campaigns && campaigns.length > 0 ? campaigns.map(data => data.tenant_id).join(',') : '1';
+    const campaignId = campaignInfo?.campaign_id+'' !== 'undefined' ? campaignInfo?.campaign_id+'' 
+      : tenants && tenants.length > 0 ? campaigns.map(data => data.campaign_id).join(',') : '0';
     fetchCallProgressStatus({ tenantId, campaignId });
 
   };
 
   // 갱신주기마다 refreshData 실행 useEffect
   useEffect(() => {
-    if (statisticsUpdateCycle > 0) {
-      const interval = setInterval(() => {
+    if (statisticsUpdateCycle > 0 && intervalRef.current === null) {
+      intervalRef.current = setInterval(() => {
         refreshData();
       }, statisticsUpdateCycle * 1000);
-      return () => clearInterval(interval);
+      return () => clearInterval(intervalRef.current!);
     }
-  }, [statisticsUpdateCycle, refreshData]);
+  }, [statisticsUpdateCycle]);
 
 return (
   isLoading ? (
