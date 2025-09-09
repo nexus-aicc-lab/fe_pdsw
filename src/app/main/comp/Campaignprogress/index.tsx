@@ -8,7 +8,7 @@ import TitleWrap from "@/components/shared/TitleWrap";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
-import { useMainStore, useCampainManagerStore } from '@/store';
+import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 import { useApiForCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForCampaignProgressInformation';
 import { CampaignProgressInformationResponseDataType } from '@/features/monitoring/types/monitoringIndex';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
@@ -138,16 +138,14 @@ export default function Campaignprogress() {
   const { campaignSkills, setCampaignSkills, campaignTotalProgressInfoColumn, setcampaignTotalProgressInfoColumn } = useCampainManagerStore();
   const [isColumnSetOpen, setIsColumnSetOpen] = useState(false);
   const [initData, setInitData] = useState<TreeRow[]>([]);
-  // const [columns, setColumns] = useState<Column<TreeRow>[]>(defaultColumnsData);
 
   const { statisticsUpdateCycle } = useEnvironmentStore();
   const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [tempCampaignList, setTempCampaignList] = useState<MainDataResponse[]>([]);
-  const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
+  const intervalCampaignprogressRef = React.useRef<NodeJS.Timeout | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  //campaigns: MainDataResponse[];
+  const { activeTabId, activeTabKey, openedTabs } = useTabStore();
 
   const transformToTreeData = (dataList: DispatchStatusDataType[]) => {
     const result: any[] = [];
@@ -262,19 +260,6 @@ export default function Campaignprogress() {
           .map(child => filterRow(child))
           .filter((child): child is TreeRow => child !== null);
       }
-
-      // 캠페인 필터
-      // const matchesCampaign = selectedCampaign === '전체보기' || 
-      //   (row.level === 2 && row.id.split('-')[1] === selectedCampaign);
-
-      // 스킬 필터 (level 3에만 적용)
-      // const matchesSkill = selectedSkill === '스킬전체보기' || 
-      //   (row.level !== 3) || 
-      //   (row.level === 3 && selectedSkill.includes(row.id.split('-')[1][0]));
-
-      // 상태 필터
-      // const matchesStatus = selectedStatus === '전체' || 
-      //   row.startFlag === selectedStatus;
 
       // 부모 노드는 항상 표시, 필터는 최하위 노드에만 적용
       if (row.level < 2 || filteredChildren.length > 0) {
@@ -626,21 +611,6 @@ export default function Campaignprogress() {
     return getSortedData(filteredData);
   }, [selectedCampaign, selectedSkill, selectedStatus, isSortAscending, initData]);
 
-  // useEffect(() => {
-  //   if (columns.length > 0) {
-  //     _setColumns([...headercolumns, ...columns]);
-  //   }
-  // }, [columns]);
-
-  // const searchCampaignProgressInformation = (_campaignId:number, _index:number) => {
-  //   if (_campaignId > 0 && tempCampaignList[_index]) {
-  //     fetchCampaignProgressInformation({
-  //       tenantId: tempCampaignList[_index].tenant_id,
-  //       campaignId: _campaignId
-  //     });
-  //   } 
-  // }
-
   useEffect(() => {
     if (selectedCampaignId > 0 && tempCampaignList[selectedCampaignIdIndex]) {
       fetchCampaignProgressInformation({
@@ -702,33 +672,39 @@ export default function Campaignprogress() {
   }, [campaignTotalProgressInfoColumn]);  
 
   useEffect(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
+    // console.log('activeTabId changed: ', activeTabId, activeTabKey, openedTabs);
+    if (activeTabId === 4 && statisticsUpdateCycle > 0) {
+      if (intervalCampaignprogressRef.current) {
+        clearInterval(intervalCampaignprogressRef.current);
+      }
+      intervalCampaignprogressRef.current = setInterval(() => {
+        setIsRefreshing(true);
+        setSelectedCampaignId(0);
+
+        setTimeout(function() {
+          // 기존 갱신 로직 실행
+          setSelectedCampaignId(tempCampaignList[0].campaign_id);
+          setSelectedCampaignIdIndex(0);
+          setTempCampaignInfoList([]);
+          setCampaignInfoList([]);
+          setIsLoading(true);
+        }, 50);
+
+        setLastRefreshTime(new Date());
+
+        setTimeout(() => setIsRefreshing(false), 1000); // 짧은 갱신 애니메이션 처리
+      }, statisticsUpdateCycle * 1000);
+    }else{
+      clearInterval(intervalCampaignprogressRef.current!);
+      intervalCampaignprogressRef.current = null;
+      setIsRefreshing(false);      
     }
-    intervalRef.current = setInterval(() => {
-      setIsRefreshing(true);
-      setSelectedCampaignId(0);
-
-      setTimeout(function() {
-        // 기존 갱신 로직 실행
-        setSelectedCampaignId(tempCampaignList[0].campaign_id);
-        setSelectedCampaignIdIndex(0);
-        setTempCampaignInfoList([]);
-        setCampaignInfoList([]);
-        setIsLoading(true);
-      }, 50);
-
-      setLastRefreshTime(new Date());
-
-      setTimeout(() => setIsRefreshing(false), 1000); // 짧은 갱신 애니메이션 처리
-    }, statisticsUpdateCycle * 1000);
-
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      if (intervalCampaignprogressRef.current) {
+        clearInterval(intervalCampaignprogressRef.current);
       }
     };
-  }, [statisticsUpdateCycle, tempCampaignList]);
+  }, [statisticsUpdateCycle, tempCampaignList,activeTabId]);
 
 
   return (

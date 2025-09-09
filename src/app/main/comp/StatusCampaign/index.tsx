@@ -54,7 +54,7 @@ type ProgressDataItem = {
 const StatusCampaign: React.FC = () => {
   const [selectedSkill, setSelectedSkill] = useState("total");
   const [selectedDispatch, setSelectedDispatch] = useState("0");
-  const { campaignSkills, setCampaignSkills } = useCampainManagerStore();
+  const { campaignSkills } = useCampainManagerStore();
   const [skills, setSkills] = useState<any[]>([]);
   const [chartData, setChartData] = useState<ChartDataItem[]>([]);
   const [campaignInfoList, setCampaignInfoList] = useState<DispatchStatusData[]>([]);
@@ -66,7 +66,7 @@ const StatusCampaign: React.FC = () => {
   const { statisticsUpdateCycle } = useEnvironmentStore();
   const [filteredCampaigns, setFilteredCampaigns] = useState(campaigns);
   const {tenant_id} = useAuthStore();
-  const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab} = useTabStore();
+  const { activeTabId, activeTabKey, openedTabs } = useTabStore();
 
   const [progressData, setProgressData] = useState<ProgressDataItem[]| null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -263,7 +263,6 @@ const StatusCampaign: React.FC = () => {
   };
 
   useEffect(() => {    
-    console.log('activeTabId changed: ', activeTabId, activeTabKey, openedTabs);
     if (activeTabId === 14 && statisticsUpdateCycle > 0) {
       if (statisticsUpdateCycle > 0) {
         intervalStatusCampaignRef.current = setInterval(() => {

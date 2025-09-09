@@ -104,7 +104,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const [ waitingCounselorCnt, setWaitingCounselorCnt ] = useState<number>(0);
   const { statisticsUpdateCycle } = useEnvironmentStore();
   const intervalOutboundCallProgressRef = React.useRef<NodeJS.Timeout | null>(null);
-  const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab} = useTabStore();
+  const { activeTabId, openedTabs, setActiveTab} = useTabStore();
   const [isPopup, setIsPopup] = useState(false);
 
   // 실제 사용할 캠페인 ID 결정
