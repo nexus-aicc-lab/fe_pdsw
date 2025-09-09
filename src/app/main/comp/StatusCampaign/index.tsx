@@ -1,7 +1,6 @@
-
 "use client";
 
-import React, { useState, useEffect, useCallback, use } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Select,
   SelectContent,
@@ -21,15 +20,11 @@ import {
 } from "recharts";
 import { useApiForCampaignSkill } from "@/features/campaignManager/hooks/useApiForCampaignSkill";
 import { useApiForSkills } from "@/features/campaignManager/hooks/useApiForSkills";
-import { useAuthStore, useCampainManagerStore, useMainStore } from "@/store";
+import { useAuthStore, useCampainManagerStore, useMainStore, useTabStore } from "@/store";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { useEnvironmentStore } from "@/store/environmentStore";
-import { useMultiCampaignProgressQuery } from "./hook/useMultiCampaignProgressQuery";
-import { toast } from "react-toastify";
-import { CampaignProgressInformationResponse, CampaignProgressInformationResponseDataType } from "@/features/monitoring/types/monitoringIndex";
+import { CampaignProgressInformationResponseDataType } from "@/features/monitoring/types/monitoringIndex";
 import { useCampaignProgressMutation } from "./hook/useMultiCampaignProgressMutaion";
-
-
 
 interface ChartDataItem {
   name: string;
@@ -71,17 +66,12 @@ const StatusCampaign: React.FC = () => {
   const { statisticsUpdateCycle } = useEnvironmentStore();
   const [filteredCampaigns, setFilteredCampaigns] = useState(campaigns);
   const {tenant_id} = useAuthStore();
-
-
-  // const { data: progressData, isLoading, isError, refetch } = useMultiCampaignProgressQuery(campaigns);
-  // 필터링된 캠페인만 사용하도록 쿼리 수정
-  // const { data: progressData, isLoading, isError, refetch } =
-  //   useMultiCampaignProgressQuery(filteredCampaigns);
-    // filteredCampaigns
+  const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab} = useTabStore();
 
   const [progressData, setProgressData] = useState<ProgressDataItem[]| null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const intervalStatusCampaignRef = React.useRef<NodeJS.Timeout | null>(null);
   
 
   const { mutate: fetchSkills } = useApiForSkills({
@@ -93,45 +83,9 @@ const StatusCampaign: React.FC = () => {
 
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
-      // setCampaignSkills(data.result_data); // 총 진행상황을 띄워놓고 캠페인관리를 재갱신해서 방지용 주석처리 09-05 - lab09
       processDataForChart(data.result_data, selectedSkill, selectedDispatch);
     },
   });
-
-  // const refreshData = useCallback(() => {
-  //   setIsRefreshing(true);
-  //   const startTime = new Date();
-
-  //   // Show toast message when starting refresh
-  //   // const toastId = toast.loading('데이터를 새로고침 중입니다...', {
-  //   //   position: 'top-right',
-  //   // });
-
-  //   refetch()
-  //     .then(() => {
-  //       const endTime = new Date();
-  //       const refreshDuration = (endTime.getTime() - startTime.getTime()) / 1000; // in seconds
-
-  //       // Update success toast with refresh time
-  //       // toast.success(`데이터가 갱신되었습니다!`, {
-  //       //   autoClose: 2000,
-  //       //   position: 'top-center',
-  //       // });
-
-  //       setLastRefreshTime(endTime);
-  //     })
-  //     .catch((error) => {
-  //       // Show error toast if refresh fails
-  //       // toast.error('데이터 갱신에 실패했습니다.', {
-  //       //   id: toastId,
-  //       //   duration: 3000,
-  //       //   position: 'top-right',
-  //       // });
-  //     })
-  //     .finally(() => {
-  //       setTimeout(() => setIsRefreshing(false), 1000);
-  //     });
-  // }, [refetch]);
 
     // 캠페인 진행 정보 api 호출
   const { mutate: fetchCampaignProgressInformation } = useCampaignProgressMutation({
@@ -195,7 +149,6 @@ const StatusCampaign: React.FC = () => {
 
   useEffect(() => {
     if (progressData) {
-      // console.log("%%%%%%%%%% useEffect progressData: ", progressData);
       const flat: DispatchStatusData[] = [];
       let maxReuse = 0;
 
@@ -211,11 +164,8 @@ const StatusCampaign: React.FC = () => {
         });
         if (progressInfoList.length > maxReuse) maxReuse = progressInfoList.length;
       });
-
       setCampaignInfoList(flat);
-
     }
-
     
   }, [progressData]);
 
@@ -284,13 +234,6 @@ const StatusCampaign: React.FC = () => {
 
   };
 
-  // const handleSkillChange = (value: string) => {
-  //   setSelectedSkill(value);
-  //   if (campaignSkills.length > 0) {
-  //     processDataForChart(campaignSkills, value, selectedDispatch);
-  //   }
-  // };
-
   // 스킬 선택 핸들러 수정
   const handleSkillChange = (value: string) => {
     setSelectedSkill(value);
@@ -319,14 +262,21 @@ const StatusCampaign: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    if (statisticsUpdateCycle > 0) {
-      const interval = setInterval(() => {
-        refreshData();
-      }, statisticsUpdateCycle * 1000);
-      return () => clearInterval(interval);
+  useEffect(() => {    
+    console.log('activeTabId changed: ', activeTabId, activeTabKey, openedTabs);
+    if (activeTabId === 14 && statisticsUpdateCycle > 0) {
+      if (statisticsUpdateCycle > 0) {
+        intervalStatusCampaignRef.current = setInterval(() => {
+          refreshData();
+        }, statisticsUpdateCycle * 1000);
+        return () => clearInterval(intervalStatusCampaignRef.current!);
+      }
+    }else{
+      clearInterval(intervalStatusCampaignRef.current!);
+      intervalStatusCampaignRef.current = null;
+      setIsLoading(false);
     }
-  }, [statisticsUpdateCycle, refreshData]);
+  }, [statisticsUpdateCycle, activeTabId]);
 
   useEffect(() => {
     fetchCampaignProgressInformation(campaigns);
@@ -343,8 +293,6 @@ const StatusCampaign: React.FC = () => {
   const formattedLastRefreshTime = lastRefreshTime ?
     `${lastRefreshTime.toLocaleTimeString()}` :
     '아직 갱신되지 않음';
-
-
 
   return (
     <div className="space-y-6">

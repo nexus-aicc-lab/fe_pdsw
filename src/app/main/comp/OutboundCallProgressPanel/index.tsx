@@ -103,7 +103,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const [ _campaignData, _setCampaignData ] = useState<CampaignDataMap>({});
   const [ waitingCounselorCnt, setWaitingCounselorCnt ] = useState<number>(0);
   const { statisticsUpdateCycle } = useEnvironmentStore();
-  const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
+  const intervalOutboundCallProgressRef = React.useRef<NodeJS.Timeout | null>(null);
   const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab} = useTabStore();
   const [isPopup, setIsPopup] = useState(false);
 
@@ -294,9 +294,9 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         uniqueAgentIds = Array.from(new Set(allAgentIds));
       }
       // 기존 interval 제거
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
+      if (intervalOutboundCallProgressRef.current) {
+        clearInterval(intervalOutboundCallProgressRef.current);
+        intervalOutboundCallProgressRef.current = null;
       }
       const _tenantId = tenants && tenants.length > 0 ? tenants.map(data => data.tenant_id).join(',') : '0';
       const _campaignId = campaigns && campaigns.length > 0 ? campaigns.map(data => data.campaign_id).join(',') : '0';
@@ -306,7 +306,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         agentIds: uniqueAgentIds
       });
       if( statisticsUpdateCycle > 0 ){  
-        intervalRef.current = setInterval(() => {
+        intervalOutboundCallProgressRef.current = setInterval(() => {
           fetchCallProgressStatus({
             tenantId: _tenantId,
             campaignId: _campaignId,
@@ -434,8 +434,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   useEffect(() => {
     // 먼저 이전 interval 제거
     if( selectedCampaign === '' ) return;
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
+    if (intervalOutboundCallProgressRef.current) {
+      clearInterval(intervalOutboundCallProgressRef.current);
     }
     setIsRefreshing(true);
     setIsLoading(true);
@@ -447,7 +447,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
 
       fetchCallProgressStatus({ tenantId, campaignId });
       if( statisticsUpdateCycle > 0 ){  
-        intervalRef.current = setInterval(() => {
+        intervalOutboundCallProgressRef.current = setInterval(() => {
           fetchCallProgressStatus({ tenantId, campaignId });
         }, statisticsUpdateCycle * 1000);     
       }
@@ -458,8 +458,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       })
     }
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      if (intervalOutboundCallProgressRef.current) {
+        clearInterval(intervalOutboundCallProgressRef.current);
       }
     };
   }, [selectedCampaign,statisticsUpdateCycle,campaigns]);
@@ -473,8 +473,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         setSelectedCampaign('all');
       }
     }else{
-      clearInterval(intervalRef.current!);
-      intervalRef.current = null;
+      clearInterval(intervalOutboundCallProgressRef.current!);
+      intervalOutboundCallProgressRef.current = null;
       setIsLoading(false);
       setIsRefreshing(false);
       setSelectedCampaign('');
@@ -524,11 +524,11 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
 
   // 갱신주기마다 refreshData 실행 useEffect
   useEffect(() => {
-    if (statisticsUpdateCycle > 0 && intervalRef.current === null) {
-      intervalRef.current = setInterval(() => {
+    if (statisticsUpdateCycle > 0 && intervalOutboundCallProgressRef.current === null) {
+      intervalOutboundCallProgressRef.current = setInterval(() => {
         refreshData();
       }, statisticsUpdateCycle * 1000);
-      return () => clearInterval(intervalRef.current!);
+      return () => clearInterval(intervalOutboundCallProgressRef.current!);
     }
   }, [statisticsUpdateCycle]);
 
