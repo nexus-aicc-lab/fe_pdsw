@@ -163,6 +163,7 @@ export interface ChannelStatusMonitoringRequest {
 export interface CallProgressStatusRequest {
   tenantId: string;
   campaignId: string;
+  agentIds?: string[];
 }
 
 // 발신진행상태 응답

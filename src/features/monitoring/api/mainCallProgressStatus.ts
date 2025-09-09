@@ -8,6 +8,7 @@ export const fetchCallProgressStatus = async (credentials: CallProgressStatusReq
   const callProgressStatusRequestData = {
     tenantId: credentials.tenantId,
     campaignId: credentials.campaignId,
+    agentIds: credentials.agentIds || [],
     sessionKey: getCookie('session_key')
   };
 

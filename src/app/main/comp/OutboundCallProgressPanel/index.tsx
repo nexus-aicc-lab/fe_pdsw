@@ -13,6 +13,7 @@ import CommonButton from '@/components/shared/CommonButton';
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 import { PulseBarsLoader } from '@/shared/ui/loading/PulseBarsLoader';
 import { useApiForAgentReadyCount } from '@/features/preferences/hooks/useApiForAgentReadyCount';
+import { useApiForCampaignAgentList } from '@/features/preferences/hooks/useApiForCampaignAgent';
 
 // 타입 정의
 interface Stats {
@@ -281,6 +282,44 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     }
   });
 
+  // 캠페인별 상담사 목록 조회
+  const { mutate: fetchCampaignAgentList } = useApiForCampaignAgentList({
+    onSuccess: (response) => {
+      // console.log("#### response : ",response);
+      let uniqueAgentIds: string[] = [];
+      if (response?.result_data && response.result_data.length > 0) {
+        // 1. 모든 agent_id를 하나의 배열로 합치기
+        const allAgentIds = response.result_data.flatMap(item => item.agent_id);
+        // 2. 중복 제거 (Set 사용)
+        uniqueAgentIds = Array.from(new Set(allAgentIds));
+      }
+      // 기존 interval 제거
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      const _tenantId = tenants && tenants.length > 0 ? tenants.map(data => data.tenant_id).join(',') : '0';
+      const _campaignId = campaigns && campaigns.length > 0 ? campaigns.map(data => data.campaign_id).join(',') : '0';
+      fetchCallProgressStatus({
+        tenantId: _tenantId,
+        campaignId: _campaignId,
+        agentIds: uniqueAgentIds
+      });
+      if( statisticsUpdateCycle > 0 ){  
+        intervalRef.current = setInterval(() => {
+          fetchCallProgressStatus({
+            tenantId: _tenantId,
+            campaignId: _campaignId,
+            agentIds: uniqueAgentIds
+          });
+        }, statisticsUpdateCycle * 1000);
+      }
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인별 상담사 목록 조회', error.message);
+    }
+  });
+
   // 발신 진행 정보 api 호출
   const { mutate: fetchCallProgressStatus } = useApiForCallProgressStatus({
     onSuccess: (data) => {  
@@ -413,20 +452,10 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         }, statisticsUpdateCycle * 1000);     
       }
     }else if(!isPopup){
-      const _tenantId = tenants && tenants.length > 0 ? tenants.map(data => data.tenant_id).join(',') : '0';
       const _campaignId = campaigns && campaigns.length > 0 ? campaigns.map(data => data.campaign_id).join(',') : '0';
-      fetchCallProgressStatus({
-        tenantId: _tenantId,
-        campaignId: _campaignId
-      });
-      if( statisticsUpdateCycle > 0 ){  
-        intervalRef.current = setInterval(() => {
-          fetchCallProgressStatus({
-            tenantId: _tenantId,
-            campaignId: _campaignId
-          });
-        }, statisticsUpdateCycle * 1000);
-      }
+      fetchCampaignAgentList({
+        campaign_id: [Number(_campaignId)]
+      })
     }
     return () => {
       if (intervalRef.current) {
