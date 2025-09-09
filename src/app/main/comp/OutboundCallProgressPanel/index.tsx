@@ -287,7 +287,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       // 캠페인 대기 상담사 수 조회
       if( _campaignId && _campaignId.indexOf(',') > -1 ){
         setWaitingCounselorCnt( data.waitingCounselorCnt );
-      }else{
+      }else if( _campaignId && _campaignId.trim() +'' !== '' && _campaignId.trim() +'' !== '0' ){
         fetchAgentReadyCount({ campaign_id: [Number(_campaignId)] });
       }
 
