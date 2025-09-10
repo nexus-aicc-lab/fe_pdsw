@@ -9,9 +9,9 @@ import { useApiForDialingDevice } from '@/features/preferences/hooks/useApiForDi
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 import { logoutChannel } from '@/lib/broadcastChannel';
 import { ChannelGroupListDataResponse, useApiForChannelGroupList } from '@/features/preferences/hooks/useApiForChannelGroup';
-import { set } from 'lodash';
 import CommonButton from '@/components/shared/CommonButton';
 import { useEnvironmentStore } from '@/store/environmentStore';
+import { useTabStore } from '@/store/tabStore';
 
 type ChannelStatus = 'IDLE' | 'BUSY' | 'NONE';
 
@@ -77,6 +77,8 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
   const [ secondModeEquipment, setSecondModeEquipment ] = useState<ItemType[]>([]);
   const [ secondModeCampaign, setSecondModeCampaign ] = useState<ItemType[]>([]);
   const [ secondModeCampaignGroup, setSecondModeCampaignGroup ] = useState<ItemType[]>([]);
+  const { activeTabId } = useTabStore();
+  const intervalChannelMonitorRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // 첫 번째 Select의 옵션
   const firstSelectOptions = ['전체', '장비번호', '캠페인 모드', '발신 모드', '채널 그룹 모드'];
@@ -364,14 +366,21 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
   };
 
   // 갱신주기마다 refreshData 실행 useEffect
-  useEffect(() => {
-    if (statisticsUpdateCycle > 0) {
-      const interval = setInterval(() => {
-        refreshData();
-      }, statisticsUpdateCycle * 1000);
-      return () => clearInterval(interval);
+  useEffect(() => {    
+    // console.log('activeTabId changed: ', activeTabId, openedTabs);
+    if (activeTabId === 6) {
+      if (statisticsUpdateCycle > 0) {
+        intervalChannelMonitorRef.current = setInterval(() => {
+          refreshData();
+        }, statisticsUpdateCycle * 1000);
+        return () => clearInterval(intervalChannelMonitorRef.current!);
+      }
+    }else{
+      clearInterval(intervalChannelMonitorRef.current!);
+      intervalChannelMonitorRef.current = null;
+      setIsRefreshing(false);
     }
-  }, [statisticsUpdateCycle, refreshData]);
+  }, [statisticsUpdateCycle, activeTabId]);
 
   return (
     <div className="h-full limit-700">

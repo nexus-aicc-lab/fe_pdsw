@@ -3,6 +3,7 @@ import TitleWrap from "@/components/shared/TitleWrap";
 import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-custom";
 import { useApiForSystemMonitoring } from "@/features/monitoring/hooks/useApiForSystemMonitoring";
 import { useEnvironmentStore } from '@/store/environmentStore';
+import { useTabStore } from '@/store/tabStore';
 
 // 시스템 상태에 따른 타입 정의
 type SystemStatus = "normal" | "abnormal";
@@ -82,6 +83,8 @@ const SystemMonitoring: React.FC = () => {
   // 상태 관리 추가
   const [systemsData, setSystemsData] = useState<SystemData[]>([]);
   const { statisticsUpdateCycle } = useEnvironmentStore();
+  const { activeTabId } = useTabStore();
+  const intervalSystemMonitoringRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // API 호출 및 응답 처리
   const { mutate: systemMonitoring } = useApiForSystemMonitoring({
@@ -133,14 +136,20 @@ const SystemMonitoring: React.FC = () => {
   });
 
   useEffect(() => {
-    systemMonitoring({}); // 시스템 모니터링 API 호출
-    if( statisticsUpdateCycle > 0 ){        
-      const interval = setInterval(() => {  
-        systemMonitoring({}); // 시스템 모니터링 API 호출
-      }, statisticsUpdateCycle * 1000);  
-      return () => clearInterval(interval);
+    if (activeTabId === 23) {
+      systemMonitoring({}); // 시스템 모니터링 API 호출
+      if( statisticsUpdateCycle > 0 ){        
+        intervalSystemMonitoringRef.current = setInterval(() => {  
+          systemMonitoring({}); // 시스템 모니터링 API 호출
+        }, statisticsUpdateCycle * 1000);  
+        return () => clearInterval(intervalSystemMonitoringRef.current!);
+      }
+    }else{
+      clearInterval(intervalSystemMonitoringRef.current!);
+      intervalSystemMonitoringRef.current = null;
+    //   setIsRefreshing(false);
     }
-  }, [systemMonitoring,statisticsUpdateCycle]);
+  }, [activeTabId,statisticsUpdateCycle]);
 
   return (
     <div className="w-full limit-width">
