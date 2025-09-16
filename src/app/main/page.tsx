@@ -11,7 +11,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { useTabStore } from "@/store/tabStore";
-import DraggableTab from "./comp/DraggableTab";
+import DraggableTab from "./comp/Tabmenu/DraggableTab";
 import UnifiedTabView from "./comp/Tabmenu/UnifiedTabView";
 
 interface ActiveTabState {

@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { useTabStore } from "@/store/tabStore";
-import DraggableTab from "./DraggableTab";
+import DraggableTab from "./Tabmenu/DraggableTab";
 import Image from "next/image";
 
 interface TabSectionProps {

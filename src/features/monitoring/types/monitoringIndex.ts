@@ -6,6 +6,11 @@ export interface CampaignProgressInformationRequest {
   campaignId: number;
 }
 
+// 전체캠페인진행정보 요청 
+export interface AllCampaignProgressInformationRequest {
+  campaignList: CampaignProgressInformationRequest[];
+}
+
 // 상담사 상태 모니터링 요청 
 export interface AgentStatusMonitoringRequest {
   tenantId: string;
