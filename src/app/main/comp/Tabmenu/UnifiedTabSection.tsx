@@ -1,7 +1,7 @@
 import React from "react";
 import { useTabStore } from "@/store/tabStore";
 import TabHeader from "./TabHeader";
-import SectionContent from "./SectionContent";
+import SectionContent from "../SectionContent";
 
 // Tab 타입 정의
 interface Tab {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -24,7 +24,7 @@ import { useAuthStore, useCampainManagerStore, useMainStore, useTabStore } from 
 import { CommonButton } from "@/components/shared/CommonButton";
 import { useEnvironmentStore } from "@/store/environmentStore";
 import { CampaignProgressInformationResponseDataType } from "@/features/monitoring/types/monitoringIndex";
-import { useCampaignProgressMutation } from "./hook/useMultiCampaignProgressMutaion";
+import { useApiForAllCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForAllCampaignProgressInformation';
 
 interface ChartDataItem {
   name: string;
@@ -43,6 +43,11 @@ interface DispatchStatusData {
 interface DispatchDataType {
   dispatch_id: number;
   dispatch_name: string;
+}
+
+interface CampaignProgessStatusType {
+  campaignId: number;
+  tenantId: number;
 }
 
 type ProgressDataItem = {
@@ -72,6 +77,7 @@ const StatusCampaign: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const intervalStatusCampaignRef = React.useRef<NodeJS.Timeout | null>(null);
+  const [allcampaignReq, setAllCampaignReq] = useState<CampaignProgessStatusType[]>([]);
   
 
   const { mutate: fetchSkills } = useApiForSkills({
@@ -87,65 +93,60 @@ const StatusCampaign: React.FC = () => {
     },
   });
 
-    // 캠페인 진행 정보 api 호출
-  const { mutate: fetchCampaignProgressInformation } = useCampaignProgressMutation({
-    onSuccess: (data, variables) => {  
-      // console.log("fetchCampaignProgressInformation data: ", data);
-      if(data.length > 0){
-        setProgressData(
-          data.map((item) => ({
-            campaign_id: item.campaign_id,
-            campaign_name: item.campaign_name,
-            progressInfoList: item.progressInfoList, // Assuming you want the first item in the array
-          }))
-        );
-        setIsLoading(false);
-        setIsError(false);
-        const endTime = new Date();
-        setLastRefreshTime(endTime);
-
-      }
-      else if(variables.length === 0 && data.length === 0){
-        setProgressData([]);
-        setIsLoading(false); 
-      }   
-    }
-  });
-
-  // 새로고침 기능도 필터링된 캠페인만 사용하도록 수정
-  const refreshData = useCallback(() => {
-    setIsRefreshing(true);
-    
-    fetchCampaignProgressInformation( campaigns, {
-      onSuccess: (data, variables) => {
-        // console.log('variables: ', variables);
-        if(data.length > 0){
+  const { mutate: fetchAllCampaignProgressInformation} = useApiForAllCampaignProgressInformation({
+    onSuccess: (data) => {
+        if(data.progressInfoList.length > 0){
+          const uniqueCampIds = [...new Set(data.progressInfoList.map(item => item.campId))];
+                    
           setProgressData(
-            data.map((item) => ({
-              campaign_id: item.campaign_id,
-              campaign_name: item.campaign_name,
-              progressInfoList: item.progressInfoList, // Assuming you want the first item in the array
+            uniqueCampIds.map(campId => ({
+              campaign_id: campId,
+              campaign_name: campaigns.find(c => c.campaign_id === campId)?.campaign_name || 'Unknown',
+              progressInfoList: data.progressInfoList.filter(d => d.campId === campId),
             }))
           );
           setIsLoading(false);
           setIsError(false);
           const endTime = new Date();
           setLastRefreshTime(endTime);
-        }
-        else if(variables.length > 0 && data.length === 0){
+        } else {
           setProgressData([]);
           setIsLoading(false); 
         }
-      },
-      onError: () => {
-        setIsError(true);
-        setIsLoading(false);
-      },
-      onSettled: () => {
-        setTimeout(() => setIsRefreshing(false), 1000);
-      }
-    });
-  }, [campaigns, filteredCampaigns]); // refetch는 filteredCampaigns가 변경될 때마다 변경됨
+    },
+  });
+
+  useEffect(() => {
+    if (allcampaignReq.length > 0) {
+      fetchAllCampaignProgressInformation({
+        campaignList: allcampaignReq
+      });
+    }
+  }, [allcampaignReq]);
+
+  useEffect(() => {
+    setIsRefreshing(true);
+    setAllCampaignReq(
+      campaigns.map(data => ({
+        campaignId: data.campaign_id,
+        tenantId: data.tenant_id
+      }))
+    );
+    if (campaigns.length > 0) {
+      refreshData();
+      fetchSkills({ tenant_id_array: [] });
+      setFilteredCampaigns(campaigns);
+    }    
+  }, [campaigns]);
+
+  const refreshData = function(){    
+    setAllCampaignReq(
+      campaigns.map(data => ({
+        campaignId: data.campaign_id,
+        tenantId: data.tenant_id
+      }))
+    );
+  }
 
   useEffect(() => {
     if (progressData) {
@@ -276,15 +277,6 @@ const StatusCampaign: React.FC = () => {
       setIsLoading(false);
     }
   }, [statisticsUpdateCycle, activeTabId]);
-
-  useEffect(() => {
-    fetchCampaignProgressInformation(campaigns);
-    if (campaigns.length > 0) {
-      refreshData();
-      fetchSkills({ tenant_id_array: [] });
-      setFilteredCampaigns(campaigns);
-    }
-  }, [campaigns]);
 
   const chartHeight = Math.max(chartData.length * 50 + 100, 300);
 

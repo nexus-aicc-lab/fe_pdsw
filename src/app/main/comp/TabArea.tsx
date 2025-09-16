@@ -5,7 +5,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTabStore } from '@/store/tabStore';
-import DraggableTab from './DraggableTab';
+import DraggableTab from './Tabmenu/DraggableTab';
 import { TabItem } from '@/store/tabStore';
 
 interface TabAreaProps {
