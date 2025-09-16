@@ -22,6 +22,11 @@ export const loginApi = {
         throw new Error(data.result_msg || '로그인 실패');
       }
 
+      // BQSQ-126 menu_role_id null 체크
+      if (data.menu_role_id === null){
+        throw new Error('메뉴 권한이 없습니다. 관리자에게 문의하세요.');
+      }
+
       const { data : ipdata } = await axiosRedisInstance.post(`/auth/getIp`);
       // console.log(" 클라이언트 IP:", ipdata);
 

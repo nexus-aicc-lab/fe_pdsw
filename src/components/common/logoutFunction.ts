@@ -7,6 +7,7 @@ import { logoutChannel } from '@/lib/broadcastChannel';
 import { useEnvironmentStore } from '@/store/environmentStore';
 import { useCampainManagerStore, useMainStore } from '@/store';
 import { useSystemDeviceStore } from '@/store/systemDeviceStore';
+import { useAvailableMenuStore } from '@/store/useAvailableMenuStore';
 
 type PortCheck = {
     portcheck?: boolean;
@@ -47,6 +48,11 @@ const logoutFunction = ({ portcheck = true }: PortCheck = {}) => {
     useCampainManagerStore.getState().setResetCampaignManagerStore();
 
     useSystemDeviceStore.getState().setSaveSelectDevice('');
+
+    // BQSQ-126 사용자계정 상담 메뉴 표출되지 않음, 2025-09-16 lab09 available-menu-storage 초기화 추가 
+    useAvailableMenuStore.getState().clearMenus();
+
+    
 
     if(portcheck){
         logoutChannel.postMessage({

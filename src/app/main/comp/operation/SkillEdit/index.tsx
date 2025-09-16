@@ -860,7 +860,15 @@ const SkillEdit = () => {
           consultMode: getBlendKindText(counselor.blendKind)
         }));
         // 소속 상담사목록 팀아이디 기준 오름차순 정렬
-        setFilteredAgents(mappedAgents.sort((a,b)=> Number(a.teamId) - Number(b.teamId)));
+        setFilteredAgents(
+          mappedAgents.sort((a, b) => {
+            const teamDiff = Number(a.teamId) - Number(b.teamId);
+            if (teamDiff !== 0) return teamDiff;
+            return a.agentId.localeCompare(b.agentId); // 문자열 비교
+          })
+        );
+        // BQSQ-122 1차정렬 팀아이디, 2차정렬 상담사아이디 오름차순 정렬
+        // setFilteredAgents(mappedAgents.sort((a,b)=> Number(a.teamId) - Number(b.teamId)));
       }
     },
     onError: (error) => {
