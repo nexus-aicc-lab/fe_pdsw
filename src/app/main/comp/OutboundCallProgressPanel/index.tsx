@@ -299,7 +299,9 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
 
       // if( tempList.length > 0 && ((_campaignId.trim() +'' === selectedCampaign.trim() +'') || (selectedCampaign === 'all' && _campaignId === '0')) ){
       // setWaitingCounselorCnt( data.waitingCounselorCnt );
-      if( tempList.length > 0 && ((_campaignId +'' === selectedCampaign +'') ||  (selectedCampaign === 'all' && _campaignId === '0')) ){
+      // if( tempList.length > 0 && ((_campaignId +'' === selectedCampaign +'') ||  (selectedCampaign === 'all' && _campaignId === '0')) ){
+      // BQSQ-38 캠페인 전체 선택 시 변경된 _campaignId 검사 조건 변경 2025-09-17 - lab09
+      if( tempList.length > 0 && ((_campaignId +'' === selectedCampaign +'') ||  (selectedCampaign === 'all' && _campaignId.indexOf(',') !== -1 )) ){
         const sumCallProgressStatus:SummaryCallProgressStatusDataType[] = [];
         for( let i=0;i<tempList.length;i++){
           const uniqueKey = `${tempList[i].campaignId}-${tempList[i].dialSequence}`;
@@ -375,7 +377,9 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         // console.log("##### tempCampaignData: ", tempCampaignData);
         _setCampaignData(tempCampaignData);
         
-      }else if((_campaignId === selectedCampaign+'' || (selectedCampaign === 'all' && _campaignId === '0'))){ 
+      // }else if((_campaignId === selectedCampaign+'' || (selectedCampaign === 'all' && _campaignId === '0')){ 
+      }else if((_campaignId === selectedCampaign+'' || (selectedCampaign === 'all' && _campaignId.indexOf(',') !== -1))){   
+        // BQSQ-38 캠페인 전체 선택 시 변경된 _campaignId 검사 조건 변경 2025-09-17 - lab09
         _setCampaignData({});
       }
       setIsLoading(false);
