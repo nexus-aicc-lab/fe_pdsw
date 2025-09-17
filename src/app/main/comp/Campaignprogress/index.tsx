@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 import { useApiForCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForCampaignProgressInformation';
+import { useApiForAllCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForAllCampaignProgressInformation';
 import { CampaignProgressInformationResponseDataType } from '@/features/monitoring/types/monitoringIndex';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
@@ -28,6 +29,11 @@ export interface TreeRow extends DispatchStatusDataType {
   hasChildren?: boolean;
   children?: TreeRow[];
   [key: string]: any;
+}
+
+interface CampaignProgessStatusType {
+  campaignId: number;
+  tenantId: number;
 }
 
 // 실제 API 연동 시 사용할 데이터 타입
@@ -448,8 +454,14 @@ export default function Campaignprogress() {
     }
     setTempCampaignList(_tempCampaignList);
     if( _tempCampaignList.length > 0){
-      setSelectedCampaignId(_tempCampaignList[0].campaign_id);
-      setSelectedCampaignIdIndex(0);
+      // setSelectedCampaignId(_tempCampaignList[0].campaign_id);
+      // setSelectedCampaignIdIndex(0);
+      fetchAllCampaignProgressInformation({
+        campaignList: _tempCampaignList.map(data => ({
+          campaignId: data.campaign_id,
+          tenantId: data.tenant_id
+        }))
+      });
       setTempCampaignInfoList([]);
       setCampaignInfoList([]);
       setIsLoading(true);
@@ -521,6 +533,51 @@ export default function Campaignprogress() {
     },
     onError: (error) => {
       ServerErrorCheck('캠페인 스킬 조회', error.message);
+    }
+  });
+
+  const { mutate: fetchAllCampaignProgressInformation } = useApiForAllCampaignProgressInformation({
+    onSuccess: (data) => {
+      const tempList = data.progressInfoList.sort((a, b) => a.reuseCnt - b.reuseCnt);
+      if (tempList.length > 0) {
+        const tempDataList: DispatchStatusDataType[] = tempList.map((item, i) => ({
+          ...item
+          , strFlag: i === 0 ? '최초 발신' : `${i}번째 재발신`
+          , senderId: i
+          , startFlag: tempCampaignList[selectedCampaignIdIndex].start_flag === 1 ? '시작' : tempCampaignList[selectedCampaignIdIndex].start_flag === 2 ? '멈춤' : '중지'
+          , endFlag: tempCampaignList[selectedCampaignIdIndex].end_flag === 1 ? '진행중' : '완료'
+          , id: 'campaign-' + item.campId
+          , centerId: 'center-1'
+          , campaignName: tempCampaignList[selectedCampaignIdIndex].campaign_name
+          , progressRate: item.totLstCnt === 0 ? 0 : parseFloat(((item.nonTTCT / item.totLstCnt) * 100).toFixed(1))
+          , successRateList: item.totLstCnt === 0 ? 0 : parseFloat(((item.scct / item.totLstCnt) * 100).toFixed(1))
+          , nonSendCount: item.totLstCnt - item.nonTTCT - item.nogdeleteGL //미발신 건수.
+          , successRateSend: item.scct === 0 ? 0 : parseFloat(((item.scct / item.totDialCnt) * 100).toFixed(1))
+          , dialAttemptCnt: item.firstCall
+          , failSendCount: item.buct + item.fact + item.tect + item.customerOnHookCnt + item.dialToneSilence + item.nact
+            + item.etct + item.lineStopCnt + item.detectSilenceCnt + item.acct
+        }));
+        setTempCampaignInfoList(prev => [...prev, ...tempDataList]);
+        if (maxDispatchCount < tempList.length) {
+          setMaxDispatchCount(tempList.length);
+        }
+      } else {
+        const tempData: DispatchStatusDataType = {
+          ...initDispatchStatusData
+          , strFlag: '최초 발신'
+          , tenantId: tempCampaignList[selectedCampaignIdIndex].tenant_id
+          , campId: tempCampaignList[selectedCampaignIdIndex].campaign_id
+          , startFlag: tempCampaignList[selectedCampaignIdIndex].start_flag === 1 ? '시작' : tempCampaignList[selectedCampaignIdIndex].start_flag === 2 ? '멈춤' : '중지'
+          , endFlag: tempCampaignList[selectedCampaignIdIndex].end_flag === 1 ? '진행중' : '완료'
+          , id: 'campaign-' + tempCampaignList[selectedCampaignIdIndex].campaign_id
+          , campaignName: tempCampaignList[selectedCampaignIdIndex].campaign_name
+        };
+        setTempCampaignInfoList(prev => [...prev, tempData]);
+      }
+      fetchSkills({
+        tenant_id_array: []
+      });
+      setIsLoading(false);
     }
   });
 
@@ -637,8 +694,14 @@ export default function Campaignprogress() {
       // setCampaignInfoList([]);
     }
     if( tempCampaignList.length > 0){
-      setSelectedCampaignId(tempCampaignList[0].campaign_id);
-      setSelectedCampaignIdIndex(0);
+      // setSelectedCampaignId(tempCampaignList[0].campaign_id);
+      // setSelectedCampaignIdIndex(0);
+      fetchAllCampaignProgressInformation({
+        campaignList: tempCampaignList.map(data => ({
+          campaignId: data.campaign_id,
+          tenantId: data.tenant_id
+        }))
+      });
       setTempCampaignInfoList([]);
       setCampaignInfoList([]);
       setIsLoading(true);
@@ -679,12 +742,18 @@ export default function Campaignprogress() {
       }
       intervalCampaignprogressRef.current = setInterval(() => {
         setIsRefreshing(true);
-        setSelectedCampaignId(0);
+        // setSelectedCampaignId(0);
 
         setTimeout(function() {
           // 기존 갱신 로직 실행
-          setSelectedCampaignId(tempCampaignList[0].campaign_id);
-          setSelectedCampaignIdIndex(0);
+          // setSelectedCampaignId(tempCampaignList[0].campaign_id);
+          // setSelectedCampaignIdIndex(0);
+          fetchAllCampaignProgressInformation({
+            campaignList: tempCampaignList.map(data => ({
+              campaignId: data.campaign_id,
+              tenantId: data.tenant_id
+            }))
+          });
           setTempCampaignInfoList([]);
           setCampaignInfoList([]);
           setIsLoading(true);
@@ -720,8 +789,14 @@ export default function Campaignprogress() {
         title="상담사 상태"
         buttons={[
           { label: "새로고침", onClick: () => {
-            setSelectedCampaignId(tempCampaignList[0].campaign_id);
-            setSelectedCampaignIdIndex(0);
+            // setSelectedCampaignId(tempCampaignList[0].campaign_id);
+            // setSelectedCampaignIdIndex(0);            
+            fetchAllCampaignProgressInformation({
+              campaignList: tempCampaignList.map(data => ({
+                campaignId: data.campaign_id,
+                tenantId: data.tenant_id
+              }))
+            });
             setTempCampaignInfoList([]);
             setCampaignInfoList([]);
             setIsLoading(true);

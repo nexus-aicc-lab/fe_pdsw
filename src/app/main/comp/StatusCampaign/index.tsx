@@ -77,7 +77,6 @@ const StatusCampaign: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const intervalStatusCampaignRef = React.useRef<NodeJS.Timeout | null>(null);
-  const [allcampaignReq, setAllCampaignReq] = useState<CampaignProgessStatusType[]>([]);
   
 
   const { mutate: fetchSkills } = useApiForSkills({
@@ -117,21 +116,13 @@ const StatusCampaign: React.FC = () => {
   });
 
   useEffect(() => {
-    if (allcampaignReq.length > 0) {
-      fetchAllCampaignProgressInformation({
-        campaignList: allcampaignReq
-      });
-    }
-  }, [allcampaignReq]);
-
-  useEffect(() => {
     setIsRefreshing(true);
-    setAllCampaignReq(
-      campaigns.map(data => ({
+    fetchAllCampaignProgressInformation({
+      campaignList: campaigns.map(data => ({
         campaignId: data.campaign_id,
         tenantId: data.tenant_id
       }))
-    );
+    });
     if (campaigns.length > 0) {
       refreshData();
       fetchSkills({ tenant_id_array: [] });
@@ -139,13 +130,13 @@ const StatusCampaign: React.FC = () => {
     }    
   }, [campaigns]);
 
-  const refreshData = function(){    
-    setAllCampaignReq(
-      campaigns.map(data => ({
+  const refreshData = function(){   
+    fetchAllCampaignProgressInformation({
+      campaignList: campaigns.map(data => ({
         campaignId: data.campaign_id,
         tenantId: data.tenant_id
       }))
-    );
+    });
   }
 
   useEffect(() => {
