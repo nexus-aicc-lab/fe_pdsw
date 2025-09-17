@@ -21,6 +21,7 @@ import logoutFunction from "@/components/common/logoutFunction";
 import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 import { useEnvironmentStore } from "@/store/environmentStore";
 import { useApiForCenterInfo } from "@/features/auth/hooks/useApiForCenterInfo";
+import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 
 
 const errorMessage = {
@@ -39,7 +40,7 @@ export default function Header() {
 
   const [alertState, setAlertState] = useState(errorMessage);
   const [shouldFetchCounselors, setShouldFetchCounselors] = useState(false);
-  const { setSkills } = useCampainManagerStore();
+  const { setSkills, setCampaignSkills } = useCampainManagerStore();
 
   const { environmentData, setEnvironment, centerId, centerName} = useEnvironmentStore();
 
@@ -174,6 +175,7 @@ export default function Header() {
 
   const {
     tenants,
+    campaigns,
     setCampaigns,
     setTenants,
   } = useMainStore();
@@ -309,15 +311,8 @@ export default function Header() {
       // 테넌트 로딩 상태 설정
       const store = useMainStore.getState();
 
-      // 데이터가 이미 로드되었으면 건너뛰기
-      // if (store.tenantsLoaded && store.tenants.length > 0) {
-      //   console.log("Tenants already loaded, skipping API call");
-      //   return;
-      // }
-
       // 로딩 중이면 중복 호출 방지
       if (store.tenantsLoading) {
-        
         return;
       }
 
@@ -330,7 +325,7 @@ export default function Header() {
         tenant_id: _tenantId,
       });
     }
-  }, [fetchTenants, _sessionKey, _tenantId]);
+  }, [_sessionKey, _tenantId]);
 
 
   useEffect(() => {
@@ -338,21 +333,13 @@ export default function Header() {
       // 캠페인 데이터 로딩 상태 확인
       const store = useMainStore.getState();
 
-      // 데이터가 이미 로드되었으면 건너뛰기
-      // if (store.campaignsLoaded && store.campaigns.length > 0) {
-      //   console.log("Campaigns already loaded, skipping API call");
-      //   return;
-      // }
-
       // 로딩 중이면 중복 호출 방지
       if (store.campaignsLoading) {
-        // console.log("Ca mpaigns loading in progress, skipping duplicate call");
         return;
       }
 
       // 로딩 시작
       store.setCampaignsLoading(true);
-      // console.log("Starting campaign data fetch from header");
 
       fetchMain({
         session_key: _sessionKey,
@@ -361,11 +348,32 @@ export default function Header() {
     }
   }, [tenants]);
 
-  // 캠페인 데이터가 변경될 때마다 로그 추가
   useEffect(() => {
-    const { campaigns } = useMainStore.getState();
-    // console.log("Campaigns updated in header component:", campaigns);
-  }, [useMainStore.getState().campaigns]);
+    if (campaigns.length > 0 && _sessionKey !== "") {       
+      fetchCampaignSkills({
+        session_key: _sessionKey,
+        tenant_id: tenant_id,
+      });
+      if (tenant_id === 0) {
+        //스킬 마스터 조회.
+        const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
+        fetchSkills({ tenant_id_array: tempTenantIdArray });  
+      } else {
+        //스킬 마스터 조회.
+        fetchSkills({ tenant_id_array: [tenant_id] });     
+      }
+    }
+  }, [campaigns]);
+
+  //캠페인 스킬 조회 api 호출
+  const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
+    onSuccess: (data) => {
+      setCampaignSkills(data.result_data);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 스킬 조회', error.message);
+    }
+  });
 
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
@@ -373,11 +381,11 @@ export default function Header() {
         setCampaigns(data.result_data);
         //스킬 마스터 조회.
         const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
-        fetchSkills({ tenant_id_array: tempTenantIdArray });
+        // fetchSkills({ tenant_id_array: tempTenantIdArray });
       } else {
         setCampaigns(data.result_data.filter(data => data.tenant_id === tenant_id));
         //스킬 마스터 조회.
-        fetchSkills({ tenant_id_array: [tenant_id] });
+        // fetchSkills({ tenant_id_array: [tenant_id] });
       }
       // console.log("Campaign data loaded in header, updated store");
       setShouldFetchCounselors(true);  // 이 시점에 상담사 목록 조회 활성화

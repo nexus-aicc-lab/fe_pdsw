@@ -151,7 +151,11 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
       setCallingNumbers(data.result_data||[]);
-      fetchCampaignSkills({
+      // fetchCampaignSkills({
+      //   session_key: session_key,
+      //   tenant_id: tenant_id,
+      // });
+      fetchPhoneDescriptions({
         session_key: session_key,
         tenant_id: tenant_id,
       });
@@ -161,18 +165,18 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
     } 
   });
   // 캠페인스킬 조회
-  const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
-    onSuccess: (data) => {
-      setCampaignSkills(data.result_data);
-      fetchPhoneDescriptions({
-        session_key: session_key,
-        tenant_id: tenant_id,
-      });
-    },
-    onError: (error) => {
-      ServerErrorCheck('캠페인스킬 조회', error.message);
-    }
-  });
+  // const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
+  //   onSuccess: (data) => {
+  //     setCampaignSkills(data.result_data);
+  //     fetchPhoneDescriptions({
+  //       session_key: session_key,
+  //       tenant_id: tenant_id,
+  //     });
+  //   },
+  //   onError: (error) => {
+  //     ServerErrorCheck('캠페인스킬 조회', error.message);
+  //   }
+  // });
   // 전화번호설명 템플릿 조회
   const { mutate: fetchPhoneDescriptions } = useApiForPhoneDescription({
     onSuccess: (data) => {
