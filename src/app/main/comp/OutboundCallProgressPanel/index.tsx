@@ -106,6 +106,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const intervalOutboundCallProgressRef = React.useRef<NodeJS.Timeout | null>(null);
   const { activeTabId, openedTabs, setActiveTab} = useTabStore();
   const [isPopup, setIsPopup] = useState(false);
+  const [campaignAgents, setCampaignAgents] = useState<string[]>([]);
 
   // 실제 사용할 캠페인 ID 결정
   const [ selectedCampaign, setSelectedCampaign] = useState<string>('all');
@@ -397,6 +398,79 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     }
   });
   
+  // 캠페인별 상담사 목록 조회
+  
+  // 캠페인별 상담사 목록 조회
+  const { mutate: fetchCampaignAgentList } = useApiForCampaignAgentList({
+    onSuccess: (response) => {
+      let uniqueAgentIds: string[] = [];
+      if (response?.result_data && response.result_data.length > 0) {
+        // 중복 제거된 agent_id 목록 추출
+        uniqueAgentIds = extractUniqueAgentIds(response.result_data);
+        // 상태에 저장 (필요 시 주석 해제)
+      }
+      setCampaignAgents(uniqueAgentIds);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인별 상담사 목록 조회', error.message);
+    }
+  });
+  function extractUniqueAgentIds(data: { agent_id: string[] }[]): string[] {
+    const agentIdSet = new Set<string>();
+
+    data.forEach(item => {
+      item.agent_id.forEach(agentId => {
+        agentIdSet.add(agentId);
+      });
+    });
+
+    return Array.from(agentIdSet);
+  }
+  
+  useEffect(() => {
+    if (campaignAgents.length === 0) return;
+
+    // 기존 interval 제거
+    if (intervalOutboundCallProgressRef.current) {
+      clearInterval(intervalOutboundCallProgressRef.current);
+      intervalOutboundCallProgressRef.current = null;
+    }
+
+    const _tenantId = tenants?.length > 0
+      ? tenants.map(t => t.tenant_id).join(',')
+      : '1';
+
+    const _campaignId = campaigns?.length > 0
+      ? campaigns.map(c => c.campaign_id).join(',')
+      : '0';
+
+    // 즉시 fetch
+    fetchCallProgressStatus({
+      tenantId: _tenantId,
+      campaignId: _campaignId,
+      agentIds: campaignAgents
+    });
+
+    // 주기적 fetch
+    if (statisticsUpdateCycle > 0) {
+      intervalOutboundCallProgressRef.current = setInterval(() => {
+        fetchCallProgressStatus({
+          tenantId: _tenantId,
+          campaignId: _campaignId,
+          agentIds: campaignAgents
+        });
+      }, statisticsUpdateCycle * 1000);
+    }
+
+    // 클린업 함수
+    return () => {
+      if (intervalOutboundCallProgressRef.current) {
+        clearInterval(intervalOutboundCallProgressRef.current);
+        intervalOutboundCallProgressRef.current = null;
+      }
+    };
+  }, [campaignAgents, tenants, campaigns, statisticsUpdateCycle]);
+  
   useEffect(() => {
     // 먼저 이전 interval 제거
     if( selectedCampaign === '' ) return;
@@ -418,14 +492,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         }, statisticsUpdateCycle * 1000);     
       }
     }else if(!isPopup){
-      const _tenantId = tenants && tenants.length > 0 ? tenants.map(data => data.tenant_id).join(',') : '1';
-      const _campaignId = campaigns && campaigns.length > 0 ? campaigns.map(data => data.campaign_id).join(',') : '0';
-      fetchCallProgressStatus({ tenantId: _tenantId,campaignId: _campaignId });
-      if( statisticsUpdateCycle > 0 ){  
-        intervalOutboundCallProgressRef.current = setInterval(() => {
-          fetchCallProgressStatus({ tenantId: _tenantId,campaignId: _campaignId });
-        }, statisticsUpdateCycle * 1000);     
-      }
+      fetchCampaignAgentList({ campaign_id: campaigns.map(data => data.campaign_id) });
     }
     return () => {
       if (intervalOutboundCallProgressRef.current) {
