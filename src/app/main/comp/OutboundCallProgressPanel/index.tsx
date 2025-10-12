@@ -104,7 +104,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const [ waitingCounselorCnt, setWaitingCounselorCnt ] = useState<number>(0);
   const { statisticsUpdateCycle } = useEnvironmentStore();
   const intervalOutboundCallProgressRef = React.useRef<NodeJS.Timeout | null>(null);
-  const { activeTabId, openedTabs, setActiveTab} = useTabStore();
+  const { activeTabId, openedTabs, setActiveTab, secondActiveTabId } = useTabStore();
   const [isPopup, setIsPopup] = useState(false);
   const [campaignAgents, setCampaignAgents] = useState<string[]>([]);
 
@@ -502,7 +502,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   }, [selectedCampaign,statisticsUpdateCycle,campaigns]);
   
   useEffect(() => {
-    if (activeTabId === 5) {
+    console.log( "##### activeTabId, secondActiveTabId: ", activeTabId, secondActiveTabId ); 
+    if (activeTabId === 5 || secondActiveTabId === 5) {
       const tempData = openedTabs.filter(tab => tab.id === 5);
       if (tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
         setSelectedCampaign(tempData[0].campaignId);
@@ -516,7 +517,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       setIsRefreshing(false);
       setSelectedCampaign('');
     }
-  }, [activeTabId, openedTabs]);
+  }, [activeTabId, openedTabs, secondActiveTabId]);
 
   useEffect(() => {
     if( externalCampaignId ){

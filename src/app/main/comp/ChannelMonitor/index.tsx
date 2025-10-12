@@ -77,7 +77,7 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
   const [ secondModeEquipment, setSecondModeEquipment ] = useState<ItemType[]>([]);
   const [ secondModeCampaign, setSecondModeCampaign ] = useState<ItemType[]>([]);
   const [ secondModeCampaignGroup, setSecondModeCampaignGroup ] = useState<ItemType[]>([]);
-  const { activeTabId } = useTabStore();
+  const { activeTabId, secondActiveTabId } = useTabStore();
   const intervalChannelMonitorRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // 첫 번째 Select의 옵션
@@ -368,7 +368,7 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
   // 갱신주기마다 refreshData 실행 useEffect
   useEffect(() => {    
     // console.log('activeTabId changed: ', activeTabId, openedTabs);
-    if (activeTabId === 6) {
+    if (activeTabId === 6 || secondActiveTabId === 6) {
       if (statisticsUpdateCycle > 0) {
         intervalChannelMonitorRef.current = setInterval(() => {
           refreshData();
@@ -380,7 +380,7 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
       intervalChannelMonitorRef.current = null;
       setIsRefreshing(false);
     }
-  }, [statisticsUpdateCycle, activeTabId]);
+  }, [statisticsUpdateCycle, activeTabId, secondActiveTabId]);
 
   return (
     <div className="h-full limit-700">

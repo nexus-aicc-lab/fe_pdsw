@@ -27,6 +27,7 @@ export interface TabItem {
   campaignId?: string;
   campaignName?: string;
   params?: any;
+  secondActiveTabKey?: string | null; // 분할 모드용 두번째 활성 탭 (현재는 미사용)
 }
 
 export interface TabSection {
@@ -35,6 +36,7 @@ export interface TabSection {
   width: number;
   // 섹션 단위 활성 탭
   activeTabKey: string | null;
+  secondActiveTabKey?: string | null; // 분할 모드용 두번째 활성 탭 (현재는 미사용)
 }
 
 export interface TabRow {
@@ -60,6 +62,7 @@ export interface TabLayoutStore {
 
   // 전역 단일 activeTabId/activeTabKey (드래그 중 Overlay 표시 등에 활용)
   activeTabId: number | null;
+  secondActiveTabId: number | null;
   activeTabKey: string | null;
 
   // 스킬 할당에 사용하던 부가 정보들
@@ -139,6 +142,7 @@ export interface TabLayoutStore {
   // 추가: 전역 activeTab을 설정하는 함수
   // ─────────────────────────────
   setActiveTab: (tabId: number, uniqueKey: string) => void;
+  setSecondActiveTab: (tabId: number, uniqueKey: string) => void;
   simulateHeaderMenuClick: (menuId: number) => void;
 
   // 화면 분할 관련 상태 추가
@@ -237,6 +241,7 @@ export const useTabStore = create<TabLayoutStore>()(
         // 전역 activeTabID/key (드래그 중 Overlay 표시 등에 사용)
         activeTabId: null,
         activeTabKey: null,
+        secondActiveTabId: null,
 
         counselorSkillAssignmentInfo: {
           tenantId: null,
@@ -357,6 +362,7 @@ export const useTabStore = create<TabLayoutStore>()(
         setSectionActiveTab: (rowId, sectionId, tabUniqueKey) =>
           set((state) => {
             // 새로운 활성 탭 찾기: 타입 안전성을 위해 find 메서드 결과 타입을 명시
+            let _secondActiveTabId = null;
             const activeTab = state.rows
               .find(row => row.id === rowId)
               ?.sections
@@ -370,11 +376,16 @@ export const useTabStore = create<TabLayoutStore>()(
               return {
                 ...row,
                 sections: row.sections.map((section) => {
-                  if (section.id !== sectionId) return section;
-                  return {
-                    ...section,
-                    activeTabKey: tabUniqueKey,
-                  };
+                  if (section.id !== sectionId){
+                    _secondActiveTabId = section.activeTabKey !== null
+                      ? Number(section.activeTabKey?.split('-')[0]) : null;
+                    return section;
+                  }else{                    
+                    return {
+                      ...section,
+                      activeTabKey: tabUniqueKey,
+                    };
+                  } 
                 }),
               };
             });
@@ -384,7 +395,7 @@ export const useTabStore = create<TabLayoutStore>()(
               ...state,
               rows: newRows,
               activeTabId: activeTab ? activeTab.id : state.activeTabId,
-              activeTabKey: activeTab ? activeTab.uniqueKey : state.activeTabKey
+              secondActiveTabId: _secondActiveTabId
             };
           }),
 
@@ -805,12 +816,14 @@ export const useTabStore = create<TabLayoutStore>()(
             if (activeTab && state.activeTabKey === sectionToRemove.activeTabKey) {
               newState.activeTabId = activeTab.id;
               newState.activeTabKey = activeTab.uniqueKey;
+              newState.secondActiveTabId = null;
             } else if (lastMovedTabKey && !state.activeTabKey) {
               // 전역 활성 탭이 없었던 경우, 이동된 탭 중 마지막 탭을 활성화
               const lastTab = sectionToRemove.tabs.find(tab => tab.uniqueKey === lastMovedTabKey);
               if (lastTab) {
                 newState.activeTabId = lastTab.id;
                 newState.activeTabKey = lastTab.uniqueKey;
+                newState.secondActiveTabId = null;
               }
             }
 
@@ -834,6 +847,7 @@ export const useTabStore = create<TabLayoutStore>()(
             let sourceSectionId = "";
             let sourceSection = null;
             let sourceRow = null;
+            let _secondActiveTabId = null;
 
             for (const row of state.rows) {
               for (const section of row.sections) {
@@ -876,6 +890,10 @@ export const useTabStore = create<TabLayoutStore>()(
                       const remainingTabs = section.tabs.filter(
                         (t) => !(t.id === tabId && t.uniqueKey === draggedTabKey)
                       );
+                      debugger;
+                      _secondActiveTabId = remainingTabs.length > 0
+                        ? Number(remainingTabs[remainingTabs.length - 1].id)
+                        : null;
                       return {
                         ...section,
                         tabs: remainingTabs,
@@ -956,6 +974,7 @@ export const useTabStore = create<TabLayoutStore>()(
               rows: updatedRows,
               tabGroups: updatedGroups,
               activeTabId: movedTab.id,
+              secondActiveTabId: _secondActiveTabId,
               activeTabKey: movedTab.uniqueKey,
             };
           }),
@@ -1055,6 +1074,7 @@ export const useTabStore = create<TabLayoutStore>()(
               ...state,
               rows: newRows,
               tabGroups: state.tabGroups.filter((g) => g.id !== groupId),
+              secondActiveTabId: null,
             };
           }),
 
@@ -1203,6 +1223,15 @@ export const useTabStore = create<TabLayoutStore>()(
         // 추가: 전역 activeTab을 설정하는 함수
         // ─────────────────────────────
         setActiveTab: (tabId, uniqueKey) => {
+          set({
+            activeTabId: tabId,
+            activeTabKey: uniqueKey,
+          });
+        },
+        // ─────────────────────────────
+        // 추가: 전역 secondActiveTab을 설정하는 함수
+        // ─────────────────────────────
+        setSecondActiveTab: (tabId, uniqueKey) => {
           set({
             activeTabId: tabId,
             activeTabKey: uniqueKey,
@@ -1440,11 +1469,9 @@ export const useTabStore = create<TabLayoutStore>()(
             const newSectionId = generateUniqueId("section", existingIds);
 
             // 3. 기존 섹션의 너비 저장
-            const originalWidth = row.sections[0].width;
-            // 두 섹션의 기본 너비 (첫 번째 섹션: 50%, 두 번째 섹션: 50%)
             const newSectionWidths = [50, 50];
 
-            // 3. 행 업데이트와 함께 새 섹션 추가 (너비 균등 적용 대신 명시적 너비 설정)
+            // 4. 행 업데이트와 함께 새 섹션 추가 (너비 균등 적용 대신 명시적 너비 설정)
             const updatedRows = state.rows.map(r => {
               if (r.id !== rowId) return r;
               return {
@@ -1460,19 +1487,19 @@ export const useTabStore = create<TabLayoutStore>()(
                     id: newSectionId,
                     tabs: [],
                     width: newSectionWidths[1],
-                    activeTabKey: null,
+                    activeTabKey: null
                   },
                 ],
               };
             });
 
-            // 4. 기존 섹션에서 탭 찾기
+            // 5. 기존 섹션에서 탭 찾기
             const tab = state.openedTabs.find(
               t => t.id === tabId && t.uniqueKey === tabKey
             );
             if (!tab) return { ...state, rows: updatedRows }; // 탭을 찾지 못하면 섹션만 추가
 
-            // 5. 기존 섹션에서 탭 제거하고 새 섹션에 추가하는 로직
+            // 6. 기존 섹션에서 탭 제거하고 새 섹션에 추가하는 로직
             const updatedRowsWithTabMoved = updatedRows.map(r => {
               if (r.id !== rowId) return r;
 
@@ -1483,19 +1510,24 @@ export const useTabStore = create<TabLayoutStore>()(
                   if (index === 0) {
                     // 다음 활성 탭 키 결정 (undefined 방지)
                     let nextActiveKey: string | null = null;
+                    let nextSecondActiveId: number | null = null;
                     if (sec.activeTabKey === tabKey) {
                       const remainingTabs = sec.tabs.filter(t => !(t.id === tabId && t.uniqueKey === tabKey));
                       nextActiveKey = remainingTabs.length > 0
                         ? remainingTabs[remainingTabs.length - 1].uniqueKey
                         : null;
+                      nextSecondActiveId = remainingTabs.length > 0
+                        ? remainingTabs[remainingTabs.length - 1].id
+                        : null;
                     } else {
                       nextActiveKey = sec.activeTabKey;
                     }
-
+                    
                     return {
                       ...sec,
                       tabs: sec.tabs.filter(t => !(t.id === tabId && t.uniqueKey === tabKey)),
                       activeTabKey: nextActiveKey,
+                      nextSecondActiveId: nextSecondActiveId, // 두 번째 활성 탭 키도 동일하게 설정
                       width: newSectionWidths[0]
                     };
                   }
@@ -1506,6 +1538,7 @@ export const useTabStore = create<TabLayoutStore>()(
                       ...sec,
                       tabs: [tab],
                       activeTabKey: tab.uniqueKey,
+                      secondActiveTabKey: null,
                       width: newSectionWidths[1]
                     };
                   }
@@ -1520,7 +1553,11 @@ export const useTabStore = create<TabLayoutStore>()(
               ...state,
               rows: updatedRowsWithTabMoved,
               activeTabId: tab.id,
-              activeTabKey: tab.uniqueKey
+              activeTabKey: tab.uniqueKey,
+              secondActiveTabKey: tab.secondActiveTabKey || null,
+              secondActiveTabId: updatedRowsWithTabMoved[0].sections[0].tabs.length > 0
+                ? updatedRowsWithTabMoved[0].sections[0].tabs[updatedRowsWithTabMoved[0].sections[0].tabs.length - 1].id
+                : null
             };
           }),
 

@@ -71,7 +71,7 @@ const StatusCampaign: React.FC = () => {
   const { statisticsUpdateCycle } = useEnvironmentStore();
   const [filteredCampaigns, setFilteredCampaigns] = useState(campaigns);
   const {tenant_id} = useAuthStore();
-  const { activeTabId, activeTabKey, openedTabs } = useTabStore();
+  const { activeTabId, secondActiveTabId, openedTabs } = useTabStore();
 
   const [progressData, setProgressData] = useState<ProgressDataItem[]| null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -255,7 +255,7 @@ const StatusCampaign: React.FC = () => {
   };
 
   useEffect(() => {    
-    if (activeTabId === 14 && statisticsUpdateCycle > 0) {
+    if ((activeTabId === 14 || secondActiveTabId === 14) && statisticsUpdateCycle > 0) {
       if (statisticsUpdateCycle > 0) {
         intervalStatusCampaignRef.current = setInterval(() => {
           refreshData();
@@ -267,7 +267,7 @@ const StatusCampaign: React.FC = () => {
       intervalStatusCampaignRef.current = null;
       setIsLoading(false);
     }
-  }, [statisticsUpdateCycle, activeTabId]);
+  }, [statisticsUpdateCycle, activeTabId, secondActiveTabId]);
 
   const chartHeight = Math.max(chartData.length * 50 + 100, 300);
 

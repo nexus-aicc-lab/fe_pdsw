@@ -151,7 +151,7 @@ export default function Campaignprogress() {
   const [tempCampaignList, setTempCampaignList] = useState<MainDataResponse[]>([]);
   const intervalCampaignprogressRef = React.useRef<NodeJS.Timeout | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { activeTabId, activeTabKey, openedTabs } = useTabStore();
+  const { activeTabId, secondActiveTabId, openedTabs } = useTabStore();
 
   const transformToTreeData = (dataList: DispatchStatusDataType[]) => {
     const result: any[] = [];
@@ -736,7 +736,7 @@ export default function Campaignprogress() {
 
   useEffect(() => {
     // console.log('activeTabId changed: ', activeTabId, activeTabKey, openedTabs);
-    if (activeTabId === 4 && statisticsUpdateCycle > 0) {
+    if ((activeTabId === 4 || secondActiveTabId === 4) && statisticsUpdateCycle > 0) {
       if (intervalCampaignprogressRef.current) {
         clearInterval(intervalCampaignprogressRef.current);
       }
@@ -773,7 +773,7 @@ export default function Campaignprogress() {
         clearInterval(intervalCampaignprogressRef.current);
       }
     };
-  }, [statisticsUpdateCycle, tempCampaignList,activeTabId]);
+  }, [statisticsUpdateCycle, tempCampaignList,activeTabId, secondActiveTabId]);
 
 
   return (
