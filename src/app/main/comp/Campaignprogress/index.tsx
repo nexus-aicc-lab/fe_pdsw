@@ -464,7 +464,7 @@ export default function Campaignprogress() {
       });
       setTempCampaignInfoList([]);
       setCampaignInfoList([]);
-      setIsLoading(true);
+      // setIsLoading(true);
     }
   };
 
@@ -577,7 +577,7 @@ export default function Campaignprogress() {
       fetchSkills({
         tenant_id_array: []
       });
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   });
 
@@ -632,7 +632,7 @@ export default function Campaignprogress() {
         });
         setSelectedCampaignId(0);
         setSelectedCampaignIdIndex(0);
-        setIsLoading(false);
+        // setIsLoading(false);
       }
     },
     onError: (error) => {
@@ -704,7 +704,7 @@ export default function Campaignprogress() {
       });
       setTempCampaignInfoList([]);
       setCampaignInfoList([]);
-      setIsLoading(true);
+      // setIsLoading(true);
     }
   }, [campaigns,tempCampaignList]);
 
@@ -756,7 +756,7 @@ export default function Campaignprogress() {
           });
           setTempCampaignInfoList([]);
           setCampaignInfoList([]);
-          setIsLoading(true);
+          // setIsLoading(true);
         }, 50);
 
         setLastRefreshTime(new Date());
@@ -799,7 +799,7 @@ export default function Campaignprogress() {
             });
             setTempCampaignInfoList([]);
             setCampaignInfoList([]);
-            setIsLoading(true);
+            // setIsLoading(true);
           } },
           { label: "엑셀로 저장", onClick: () => handleExcelDownload() },
           { label: "컬럼 설정", onClick: () => setIsColumnSetOpen(true) },
