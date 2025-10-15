@@ -7,7 +7,8 @@ export const fetchAgentStateMonitoringList = async (credentials: AgentStatusMoni
   const agentStateMonitoringListRequestData = {
     tenantId: credentials.tenantId,
     campaignId: credentials.campaignId,
-    sessionKey: getCookie('session_key')
+    sessionKey: getCookie('session_key'),
+    agentIds: credentials.agentIds || []
   };
 
   try {
