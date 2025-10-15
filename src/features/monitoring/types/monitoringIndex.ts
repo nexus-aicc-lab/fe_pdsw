@@ -15,6 +15,7 @@ export interface AllCampaignProgressInformationRequest {
 export interface AgentStatusMonitoringRequest {
   tenantId: string;
   campaignId: number;
+  agentIds?: string[];  
 }
 
 export interface IRequestTypeForFetchConsultantStatusMonitorData {

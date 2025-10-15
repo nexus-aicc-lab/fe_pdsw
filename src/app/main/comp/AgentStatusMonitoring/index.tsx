@@ -6,11 +6,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { Label } from "@/components/ui/label";
 import { useApiForAgentStateMonitoringList } from '@/features/monitoring/hooks/useApiForAgentStateMonitoringList';
-import { useMainStore } from '@/store';
+import { useMainStore, useTabStore } from '@/store';
 import { useEnvironmentStore } from '@/store/environmentStore';
 import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 import { logoutChannel } from "@/lib/broadcastChannel";
 import CustomAlert from "@/components/shared/layout/CustomAlert";
+import { useApiForCampaignAgentList } from '@/features/preferences/hooks/useApiForCampaignAgent';
 
 
 // 타입 정의
@@ -58,12 +59,15 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   // 정렬 관련 상태
   const [sortField, setSortField] = useState<SortField>('time');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
-  const { campaigns } = useMainStore();
+  const { campaigns, tenants } = useMainStore();
   const [counter, setCounter] = useState(0);
 
   const [agentData, setAgentData] = useState<AgentData[]>([]);
   const [_agentData, _setAgentData] = useState<AgentData[]>([]);
+  const [campaignAgents, setCampaignAgents] = useState<string[]>([]);
   const { statisticsUpdateCycle } = useEnvironmentStore();
+  const { activeTabId, openedTabs, secondActiveTabId } = useTabStore();
+  const intervalAgentStatusMonitoringRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const handleStatusChange = (status: keyof AgentStatus): void => {
     setSelectedStatuses(prev => ({
@@ -165,6 +169,33 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
     type:"1",
   });
 
+  // 캠페인별 상담사 목록 조회
+  const { mutate: fetchCampaignAgentList } = useApiForCampaignAgentList({
+    onSuccess: (response) => {
+      let uniqueAgentIds: string[] = [];
+      if (response?.result_data && response.result_data.length > 0) {
+        // 중복 제거된 agent_id 목록 추출
+        uniqueAgentIds = extractUniqueAgentIds(response.result_data);
+        // 상태에 저장 (필요 시 주석 해제)
+      }
+      setCampaignAgents(uniqueAgentIds);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인별 상담사 목록 조회', error.message);
+    }
+  });
+  function extractUniqueAgentIds(data: { agent_id: string[] }[]): string[] {
+    const agentIdSet = new Set<string>();
+
+    data.forEach(item => {
+      item.agent_id.forEach(agentId => {
+        agentIdSet.add(agentId);
+      });
+    });
+
+    return Array.from(agentIdSet);
+  }
+
   // 할당 상담사 정보 조회 (campaignId를 props로 받아 사용)
   const { mutate: fetchAgentStateMonitoringList } = useApiForAgentStateMonitoringList({
     onSuccess: (data) => {
@@ -249,22 +280,22 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
       }
     }
     // 최초 로딩이나 새로고침시 BadRequest 방지를 위한 주석처리
-    // else if( tenantId && campaigns.length > 0) {
-    //   fetchAgentStateMonitoringList({
-    //     tenantId: tenantId,
-    //     campaignId: 0
-    //   });
-    //   if( statisticsUpdateCycle > 0 ){        
-    //     const tenantInterval = setInterval(() => {  
-    //       fetchAgentStateMonitoringList({
-    //         tenantId: tenantId,
-    //         campaignId: 0
-    //       });
-    //     }, statisticsUpdateCycle * 1000);  
-    //     return () => clearInterval(tenantInterval);
-    //   }
-    // }
-    else if( campaignId === 0 && Number(tenantId) === 0 && campaigns.length > 0) {
+    else if( tenantId !== 'undefined' && tenantId !== 'A' && campaigns.length > 0) {
+      fetchAgentStateMonitoringList({
+        tenantId: tenantId+'',
+        campaignId: 0
+      });
+      if( statisticsUpdateCycle > 0 ){        
+        const tenantInterval = setInterval(() => {  
+          fetchAgentStateMonitoringList({
+            tenantId: tenantId+'',
+            campaignId: 0
+          });
+        }, statisticsUpdateCycle * 1000);  
+        return () => clearInterval(tenantInterval);
+      }
+    }
+    else if( tenantId !== 'undefined' && campaignId === 0 && tenantId === 'A' && campaigns.length > 0) {
       fetchAgentStateMonitoringList({
         tenantId: '0',
         campaignId: 0
@@ -280,6 +311,98 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
       }
     }
   }, [campaignId,tenantId,campaigns,statisticsUpdateCycle]);
+
+  // useEffect(() => {
+  //   if (campaignAgents.length === 0) return;
+
+  //   setAgentData([]);
+  //   if (campaignId && campaigns.length > 0) {
+  //     const _tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
+  //     if (_tenantId) {
+  //       fetchAgentStateMonitoringList({
+  //         tenantId: _tenantId+'',
+  //         campaignId: Number(campaignId),
+  //         agentIds: campaignAgents
+  //       });
+  //       if( statisticsUpdateCycle > 0 ){        
+  //         const campaignInterval = setInterval(() => {  
+  //           fetchAgentStateMonitoringList({
+  //             tenantId: _tenantId+'',
+  //             campaignId: Number(campaignId),
+  //             agentIds: campaignAgents
+  //           });
+  //         }, statisticsUpdateCycle * 1000);  
+  //         return () => clearInterval(campaignInterval);
+  //       }
+  //     }
+  //   }
+  //   // 최초 로딩이나 새로고침시 BadRequest 방지를 위한 주석처리
+  //   else if( tenantId !== 'undefined' && tenantId !== 'A' && campaigns.length > 0) {
+  //     fetchAgentStateMonitoringList({
+  //       tenantId: tenantId+'',
+  //       campaignId: 0,
+  //       agentIds: campaignAgents
+  //     });
+  //     if( statisticsUpdateCycle > 0 ){        
+  //       const tenantInterval = setInterval(() => {  
+  //         fetchAgentStateMonitoringList({
+  //           tenantId: tenantId+'',
+  //           campaignId: 0,
+  //           agentIds: campaignAgents
+  //         });
+  //       }, statisticsUpdateCycle * 1000);  
+  //       return () => clearInterval(tenantInterval);
+  //     }
+  //   }
+  //   else if( tenantId !== 'undefined' && campaignId === 0 && tenantId === 'A' && campaigns.length > 0) {
+  //     fetchAgentStateMonitoringList({
+  //       tenantId: '0',
+  //       campaignId: 0,
+  //       agentIds: campaignAgents
+  //     });
+  //     if( statisticsUpdateCycle > 0 ){        
+  //       const centerInterval = setInterval(() => {  
+  //         fetchAgentStateMonitoringList({
+  //           tenantId: '0',
+  //           campaignId: 0,
+  //           agentIds: campaignAgents
+  //         });
+  //       }, statisticsUpdateCycle * 1000);  
+  //       return () => clearInterval(centerInterval);
+  //     }
+  //   }
+  // }, [campaignAgents, campaignId,tenantId,campaigns, tenants,statisticsUpdateCycle]);
+  
+  useEffect(() => {
+    console.log( "##### activeTabId, secondActiveTabId,openedTabs: ", activeTabId, secondActiveTabId, openedTabs ); 
+    if (activeTabId === 12 || secondActiveTabId === 12) {
+      fetchCampaignAgentList({
+        campaign_id: [Number(campaignId) as number]
+      });
+    }else if (activeTabId === 22 || secondActiveTabId === 22) {
+      if( tenantId === 'A' && campaigns.length > 0 ){
+        fetchCampaignAgentList({
+          campaign_id: [...new Set(campaigns.map(c => c.campaign_id))].filter((id): id is number => typeof id === 'number') as number[] 
+        });
+      }else if( campaignId === 0 && campaigns.length > 0 ){
+        fetchCampaignAgentList({
+          campaign_id: campaigns
+            .filter(c => c.tenant_id === Number(tenantId))        // tenantId 일치하는 캠페인만 선택
+            .map(c => c.campaign_id) as number[]                  // 캠페인 아이디만 추출하여 number[]로 변환
+        });
+      }else{
+        fetchCampaignAgentList({
+          campaign_id: [Number(campaignId) as number]
+        });
+      }
+    }else{
+      clearInterval(intervalAgentStatusMonitoringRef.current!);
+      intervalAgentStatusMonitoringRef.current = null;
+      // setIsLoading(false);
+      // setIsRefreshing(false);
+      // setSelectedCampaign('');
+    }
+  }, [activeTabId, openedTabs, secondActiveTabId]);
 
   return (
     <div className="w-full h-full flex flex-col gap-4 limit-700">

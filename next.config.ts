@@ -22,8 +22,8 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api_upds/v1/:path*',
-        destination: 'http://10.10.30.228:4000/api_upds/v1/:path*'
-        //destination: 'http://localhost:4000/api_upds/v1/:path*'
+        // destination: 'http://10.10.30.228:4000/api_upds/v1/:path*'
+        destination: 'http://localhost:4000/api_upds/v1/:path*'
       },
       {
         source: '/pds/:path*',

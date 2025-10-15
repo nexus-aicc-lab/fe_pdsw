@@ -102,7 +102,7 @@ export function ContextMenuForCampaignForCampaignTab({
   onHandleCampaignCopy,
 }: ContextMenuForTreeNodeProps) {
   const isFolder = item.type === "folder";
-  const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, addTab, addMultiTab, addOnlyTab } = useTabStore.getState();
+  const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, addTab, addMultiTab, setActiveTab } = useTabStore.getState();
   const [isBlacklistPopupOpen, setIsBlacklistPopupOpen] = useState(false);
   const [blackListCount, setBlackListCount] = useState<number>(0);
   const [maxBlacklistCount, setMaxBlacklistCount] = useState<number>(1000000);
@@ -344,11 +344,11 @@ export function ContextMenuForCampaignForCampaignTab({
 
   const handleMonitorClick = (tenantIdForCampaignTab: any, campaignId: any, campaignName: string) => {
     // console.log("tenantId 확인 at 캠페인탭 : ", tenantIdForCampaignTab);
-
-    const uniqueKey = `monitor-${Date.now()}`;
+    const _uniqueKey = `monitor-${Date.now()}`;
+    setActiveTab(22, _uniqueKey);
     addMultiTab({
       id: 22,
-      uniqueKey: uniqueKey,
+      uniqueKey: _uniqueKey,
       title: `상담사 상태 모니터 - ${campaignName}`,
       icon: '',
       href: '',

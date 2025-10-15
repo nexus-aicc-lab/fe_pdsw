@@ -76,7 +76,7 @@ export function IContextMenuForCampaignForCampaignGroup({
   const menuRef = useRef<HTMLDivElement>(null);
   const subMenuRef = useRef<HTMLDivElement>(null);
   const isFolder = item.type === "folder";
-  const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, setCampaignIdForCopyCampaign, addTab, addMultiTab } = useTabStore();
+  const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, setCampaignIdForCopyCampaign, addTab, addMultiTab, setActiveTab } = useTabStore();
 
   // Zustand 스토어에서 updateCampaignStatus 함수 가져오기
   const { updateCampaignStatus, refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
@@ -270,12 +270,13 @@ export function IContextMenuForCampaignForCampaignGroup({
   }, [setCampaignIdForUpdateFromSideMenu, addTab]);
 
   const handleMonitorClick = useCallback((tenantIdForCampaignTab: any, campaignId: any, campaignName: string) => {
+    debugger;
     
-    const uniqueKey = `monitor-${Date.now()}`;
-
+    const _uniqueKey = `monitor-${Date.now()}`;
+    setActiveTab(22, _uniqueKey);
     addMultiTab({
       id: 22,
-      uniqueKey: uniqueKey,
+      uniqueKey: _uniqueKey,
       title: `상담사 상태 모니터 - ${campaignName}`,
       icon: '',
       href: '',

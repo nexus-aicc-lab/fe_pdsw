@@ -547,11 +547,12 @@ export function TreeNodeForSideBarCampaignGroupTab({
   }, [node.campaign_id]);
 
   const handleMonitorCampaign = useCallback(() => {
-    const { addMultiTab } = useTabStore.getState();
-    const uniqueKey = `monitor-${Date.now()}`;
+    const { addMultiTab, setActiveTab } = useTabStore.getState();
+    const _uniqueKey = `monitor-${Date.now()}`;
+    setActiveTab(22, _uniqueKey);
     addMultiTab({
       id: 22,
-      uniqueKey: uniqueKey,
+      uniqueKey: _uniqueKey,
       title: `상담사 상태 모니터 - ${node.name}`,
       icon: '',
       href: '',

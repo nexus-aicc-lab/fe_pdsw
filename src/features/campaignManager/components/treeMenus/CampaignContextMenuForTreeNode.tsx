@@ -60,7 +60,7 @@ export const CampaignContextMenu = ({
   const [isBlacklistPopupOpen, setIsBlacklistPopupOpen] = useState(false);
 
   const {
-    openCampaignManagerForUpdate,
+    setActiveTab,
     setCampaignIdForUpdateFromSideMenu,
     simulateHeaderMenuClick,
     addTab
@@ -107,9 +107,12 @@ export const CampaignContextMenu = ({
   };
 
   const handleMonitorClick = () => {
+    debugger;
+    const _uniqueKey = TabIds.AGENT_MONITOR+'-'+Date.now();
+    setActiveTab(12, _uniqueKey);
     addTab({
       id: TabIds.AGENT_MONITOR,
-      uniqueKey: `${TabIds.AGENT_MONITOR}-${Date.now()}`,
+      uniqueKey: _uniqueKey,
       title: '상담사 상태 모니터링',
       icon: '',
       href: '',

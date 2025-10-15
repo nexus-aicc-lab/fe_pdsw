@@ -890,7 +890,6 @@ export const useTabStore = create<TabLayoutStore>()(
                       const remainingTabs = section.tabs.filter(
                         (t) => !(t.id === tabId && t.uniqueKey === draggedTabKey)
                       );
-                      debugger;
                       _secondActiveTabId = remainingTabs.length > 0
                         ? Number(remainingTabs[remainingTabs.length - 1].id)
                         : null;

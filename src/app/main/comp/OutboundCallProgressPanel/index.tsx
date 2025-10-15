@@ -399,8 +399,6 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   });
   
   // 캠페인별 상담사 목록 조회
-  
-  // 캠페인별 상담사 목록 조회
   const { mutate: fetchCampaignAgentList } = useApiForCampaignAgentList({
     onSuccess: (response) => {
       let uniqueAgentIds: string[] = [];
@@ -436,8 +434,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       intervalOutboundCallProgressRef.current = null;
     }
 
-    const _tenantId = tenants?.length > 0
-      ? tenants.map(t => t.tenant_id).join(',')
+    const _tenantId = campaigns?.length > 0
+      ? [...new Set(campaigns.map(data => data.tenant_id))].join(',')
       : '1';
 
     const _campaignId = campaigns?.length > 0
@@ -551,12 +549,26 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     setIsRefreshing(true);
     setIsLoading(true);
 
-    const campaignInfo = campaigns.find(data => data.campaign_id === Number(selectedCampaign));
-    const tenantId = campaignInfo?.tenant_id+'' !== 'undefined' ? campaignInfo?.tenant_id+'' 
-      : campaigns && campaigns.length > 0 ? campaigns.map(data => data.tenant_id).join(',') : '1';
-    const campaignId = campaignInfo?.campaign_id+'' !== 'undefined' ? campaignInfo?.campaign_id+'' 
-      : tenants && tenants.length > 0 ? campaigns.map(data => data.campaign_id).join(',') : '0';
-    fetchCallProgressStatus({ tenantId, campaignId });
+    if( selectedCampaign === 'all' ){
+      const tenantId = campaigns && campaigns.length > 0 ? [...new Set(campaigns.map(data => data.tenant_id))].join(',') : '1';
+      const campaignId = tenants && tenants.length > 0 ? campaigns.map(data => data.campaign_id).join(',') : '0';
+      fetchCallProgressStatus({
+        tenantId: tenantId,
+        campaignId: campaignId,
+        agentIds: campaignAgents
+      });
+    }else{
+      const campaignInfo = campaigns.find(data => data.campaign_id === Number(selectedCampaign));
+      const tenantId = campaignInfo?.tenant_id+'' !== 'undefined' ? campaignInfo?.tenant_id+'' 
+        : campaigns && campaigns.length > 0 ? campaigns.map(data => data.tenant_id).join(',') : '1';
+      const campaignId = campaignInfo?.campaign_id+'' !== 'undefined' ? campaignInfo?.campaign_id+'' 
+        : tenants && tenants.length > 0 ? campaigns.map(data => data.campaign_id).join(',') : '0';
+      fetchCallProgressStatus({
+        tenantId: tenantId,
+        campaignId: campaignId,
+        agentIds: campaignAgents
+      });
+    }
 
   };
 
