@@ -61,6 +61,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const { campaigns, tenants } = useMainStore();
   const [counter, setCounter] = useState(0);
+  const [ searchAgentState, setSearchAgentState ] = useState<boolean>(false);
 
   const [agentData, setAgentData] = useState<AgentData[]>([]);
   const [_agentData, _setAgentData] = useState<AgentData[]>([]);
@@ -173,6 +174,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   const { mutate: fetchCampaignAgentList } = useApiForCampaignAgentList({
     onSuccess: (response) => {
       let uniqueAgentIds: string[] = [];
+      setSearchAgentState(true);
       if (response?.result_data && response.result_data.length > 0) {
         // 중복 제거된 agent_id 목록 추출
         uniqueAgentIds = extractUniqueAgentIds(response.result_data);
@@ -259,77 +261,20 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
     }
   }, [_agentData]);
 
-  useEffect(() => {
-    setAgentData([]);
-    if (campaignId && campaigns.length > 0) {
-      const _tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
-      if (_tenantId) {
-        fetchAgentStateMonitoringList({
-          tenantId: _tenantId+'',
-          campaignId: Number(campaignId)
-        });
-        if( statisticsUpdateCycle > 0 ){        
-          const campaignInterval = setInterval(() => {  
-            fetchAgentStateMonitoringList({
-              tenantId: _tenantId+'',
-              campaignId: Number(campaignId)
-            });
-          }, statisticsUpdateCycle * 1000);  
-          return () => clearInterval(campaignInterval);
-        }
-      }
-    }
-    // 최초 로딩이나 새로고침시 BadRequest 방지를 위한 주석처리
-    else if( tenantId !== 'undefined' && tenantId !== 'A' && campaigns.length > 0) {
-      fetchAgentStateMonitoringList({
-        tenantId: tenantId+'',
-        campaignId: 0
-      });
-      if( statisticsUpdateCycle > 0 ){        
-        const tenantInterval = setInterval(() => {  
-          fetchAgentStateMonitoringList({
-            tenantId: tenantId+'',
-            campaignId: 0
-          });
-        }, statisticsUpdateCycle * 1000);  
-        return () => clearInterval(tenantInterval);
-      }
-    }
-    else if( tenantId !== 'undefined' && campaignId === 0 && tenantId === 'A' && campaigns.length > 0) {
-      fetchAgentStateMonitoringList({
-        tenantId: '0',
-        campaignId: 0
-      });
-      if( statisticsUpdateCycle > 0 ){        
-        const centerInterval = setInterval(() => {  
-          fetchAgentStateMonitoringList({
-            tenantId: '0',
-            campaignId: 0
-          });
-        }, statisticsUpdateCycle * 1000);  
-        return () => clearInterval(centerInterval);
-      }
-    }
-  }, [campaignId,tenantId,campaigns,statisticsUpdateCycle]);
-
   // useEffect(() => {
-  //   if (campaignAgents.length === 0) return;
-
   //   setAgentData([]);
   //   if (campaignId && campaigns.length > 0) {
   //     const _tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
   //     if (_tenantId) {
   //       fetchAgentStateMonitoringList({
   //         tenantId: _tenantId+'',
-  //         campaignId: Number(campaignId),
-  //         agentIds: campaignAgents
+  //         campaignId: Number(campaignId)
   //       });
   //       if( statisticsUpdateCycle > 0 ){        
   //         const campaignInterval = setInterval(() => {  
   //           fetchAgentStateMonitoringList({
   //             tenantId: _tenantId+'',
-  //             campaignId: Number(campaignId),
-  //             agentIds: campaignAgents
+  //             campaignId: Number(campaignId)
   //           });
   //         }, statisticsUpdateCycle * 1000);  
   //         return () => clearInterval(campaignInterval);
@@ -340,15 +285,13 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   //   else if( tenantId !== 'undefined' && tenantId !== 'A' && campaigns.length > 0) {
   //     fetchAgentStateMonitoringList({
   //       tenantId: tenantId+'',
-  //       campaignId: 0,
-  //       agentIds: campaignAgents
+  //       campaignId: 0
   //     });
   //     if( statisticsUpdateCycle > 0 ){        
   //       const tenantInterval = setInterval(() => {  
   //         fetchAgentStateMonitoringList({
   //           tenantId: tenantId+'',
-  //           campaignId: 0,
-  //           agentIds: campaignAgents
+  //           campaignId: 0
   //         });
   //       }, statisticsUpdateCycle * 1000);  
   //       return () => clearInterval(tenantInterval);
@@ -357,29 +300,85 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   //   else if( tenantId !== 'undefined' && campaignId === 0 && tenantId === 'A' && campaigns.length > 0) {
   //     fetchAgentStateMonitoringList({
   //       tenantId: '0',
-  //       campaignId: 0,
-  //       agentIds: campaignAgents
+  //       campaignId: 0
   //     });
   //     if( statisticsUpdateCycle > 0 ){        
   //       const centerInterval = setInterval(() => {  
   //         fetchAgentStateMonitoringList({
   //           tenantId: '0',
-  //           campaignId: 0,
-  //           agentIds: campaignAgents
+  //           campaignId: 0
   //         });
   //       }, statisticsUpdateCycle * 1000);  
   //       return () => clearInterval(centerInterval);
   //     }
   //   }
-  // }, [campaignAgents, campaignId,tenantId,campaigns, tenants,statisticsUpdateCycle]);
+  // }, [campaignId,tenantId,campaigns,statisticsUpdateCycle]);
+
+  useEffect(() => {
+    if (campaignAgents.length === 0) return;
+
+    setAgentData([]);
+    if (campaignId && campaigns.length > 0) {
+      const _tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
+      if (_tenantId) {
+        fetchAgentStateMonitoringList({
+          tenantId: _tenantId+'',
+          campaignId: Number(campaignId),
+          agentIds: campaignAgents
+        });
+        if( statisticsUpdateCycle > 0 ){        
+          const campaignInterval = setInterval(() => {  
+            fetchAgentStateMonitoringList({
+              tenantId: _tenantId+'',
+              campaignId: Number(campaignId),
+              agentIds: campaignAgents
+            });
+          }, statisticsUpdateCycle * 1000);  
+          return () => clearInterval(campaignInterval);
+        }
+      }
+    }
+    // 최초 로딩이나 새로고침시 BadRequest 방지를 위한 주석처리
+    else if( tenantId !== 'undefined' && tenantId !== 'A' && campaigns.length > 0) {
+      fetchAgentStateMonitoringList({
+        tenantId: tenantId+'',
+        campaignId: 0,
+        agentIds: campaignAgents
+      });
+      if( statisticsUpdateCycle > 0 ){        
+        const tenantInterval = setInterval(() => {  
+          fetchAgentStateMonitoringList({
+            tenantId: tenantId+'',
+            campaignId: 0,
+            agentIds: campaignAgents
+          });
+        }, statisticsUpdateCycle * 1000);  
+        return () => clearInterval(tenantInterval);
+      }
+    }
+    else if( tenantId !== 'undefined' && campaignId === 0 && tenantId === 'A' && campaigns.length > 0) {
+      const _tenantId = campaigns && campaigns.length > 0 ? [...new Set(campaigns.map(data => data.tenant_id))].join(',') : 'A';
+      fetchAgentStateMonitoringList({
+        tenantId: _tenantId,
+        campaignId: 0,
+        agentIds: campaignAgents
+      });
+      if( statisticsUpdateCycle > 0 ){        
+        const centerInterval = setInterval(() => {  
+          fetchAgentStateMonitoringList({
+            tenantId: _tenantId,
+            campaignId: 0,
+            agentIds: campaignAgents
+          });
+        }, statisticsUpdateCycle * 1000);  
+        return () => clearInterval(centerInterval);
+      }
+    }
+  }, [campaignAgents, campaignId,tenantId,campaigns, tenants,statisticsUpdateCycle]);
   
   useEffect(() => {
     console.log( "##### activeTabId, secondActiveTabId,openedTabs: ", activeTabId, secondActiveTabId, openedTabs ); 
-    if (activeTabId === 12 || secondActiveTabId === 12) {
-      fetchCampaignAgentList({
-        campaign_id: [Number(campaignId) as number]
-      });
-    }else if (activeTabId === 22 || secondActiveTabId === 22) {
+    if ((activeTabId === 22 || secondActiveTabId === 22) && searchAgentState === false) {
       if( tenantId === 'A' && campaigns.length > 0 ){
         fetchCampaignAgentList({
           campaign_id: [...new Set(campaigns.map(c => c.campaign_id))].filter((id): id is number => typeof id === 'number') as number[] 
@@ -395,14 +394,14 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
           campaign_id: [Number(campaignId) as number]
         });
       }
-    }else{
+    }else if(!(activeTabId === 22 || secondActiveTabId === 22) ){
       clearInterval(intervalAgentStatusMonitoringRef.current!);
       intervalAgentStatusMonitoringRef.current = null;
       // setIsLoading(false);
       // setIsRefreshing(false);
       // setSelectedCampaign('');
     }
-  }, [activeTabId, openedTabs, secondActiveTabId]);
+  }, [searchAgentState,activeTabId, openedTabs, secondActiveTabId]);
 
   return (
     <div className="w-full h-full flex flex-col gap-4 limit-700">
