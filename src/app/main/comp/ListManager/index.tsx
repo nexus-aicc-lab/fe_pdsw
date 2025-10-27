@@ -36,6 +36,7 @@ import LoadingModal from './LoadingModal';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import logoutFunction from "@/components/common/logoutFunction";
+import { isNumber } from "lodash";
 
 
 // 인터페이스
@@ -370,7 +371,11 @@ const ListManager: React.FC = () => {
       });
     }
   };
-
+  
+  const isNumber = (value: any): boolean => {
+    if (value === null || value === '' || value === undefined) return false;
+    return !isNaN(value) && !isNaN(parseFloat(value));
+  }
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {   
     setCampaignIdDisabled(true);
     setWorkTargetDisableYn(true);
@@ -466,16 +471,43 @@ const ListManager: React.FC = () => {
                       if( _length > sendColumns.length){
                         _length = sendColumns.length;
                       }
+                      // for (let j = 0; j < _length; j++) {
+                      //   const key = sendColumns[j].key as keyof SendRow;
+                      //   if (key in tempData) {
+                      //     if (typeof key === 'string' && key in tempData) {
+                      //       if (typeof key === 'string' && key in tempData) {
+                      //         (tempData as any)[key] = row[j] as string || '';
+                      //       }
+                      //     }
+                      //   }
+                      // }
+
                       for (let j = 0; j < _length; j++) {
                         const key = sendColumns[j].key as keyof SendRow;
-                        if (key in tempData) {
-                          if (typeof key === 'string' && key in tempData) {
-                            if (typeof key === 'string' && key in tempData) {
-                              (tempData as any)[key] = row[j] as string || '';
-                            }
-                          }
+
+                        // tempData에 key가 없으면 건너뛰기
+                        if (!(key in tempData)) continue;
+
+                        const value = row[j];
+
+                        // CSKE 필드가 숫자가 아닐 경우 → 경고 후 중단
+                        if (key === 'CSKE' && !isNumber(value)) {
+                          //  업로드된 마지막 파일 삭제
+                          setUploadedFiles((prev) => prev.slice(0, -1));                          
+                          setAlertState({
+                            ...errorMessage,
+                            isOpen: true,
+                            message: "파일 포맷 형식과 다른 형식의 파일입니다. 파일 또는 포맷 형식을 확인해 주세요.",
+                            type: '2',
+                            onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+                          });
+                          return; // 함수 중단
                         }
+
+                        // 정상적인 경우 데이터 세팅
+                        (tempData as any)[key] = (value ?? '') as string;
                       }
+
                       tempSendList.push(tempData);
                     }
                     
