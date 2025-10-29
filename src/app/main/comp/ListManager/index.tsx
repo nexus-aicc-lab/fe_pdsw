@@ -655,14 +655,39 @@ const ListManager: React.FC = () => {
       { 고객키: "2", 이름: "김철수", 전화번호: "0234584260", 토큰: "연체고객2" },
     ];
 
+    // 워크북 생성 및 시트 추가
+    const workbook = XLSX.utils.book_new();
+
     // 헤더 정의
     const headers = ["고객키(CSKE)", "고객이름(CSNA)", "고객전화번호(TNO1)", "토큰데이타(TKDA)"];
 
     // 데이터 객체 배열을 2차원 배열로 변환 (헤더 아래에 값들)
-    const rows = data.map(item => [item.고객키, item.이름, item.전화번호, item.토큰]);
+    const rows = data.map(item => [String(item.고객키), String(item.이름), String(item.전화번호), String(item.토큰)]);
 
     // 시트 생성 (헤더 + 데이터)
     const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+
+    // 박소연 부장님 요청으로 모든 셀 텍스트로 서식 지정(늘리거나 줄이려면 maxRows, maxCols 값 수정) 2025.10.30 - lab09
+    // 확장된 범위 설정 (1000행까지 미리 텍스트 서식 적용)
+    const maxRows = 1000;
+    const maxCols = 10; // 컬럼 개수 (고객키, 이름, 전화번호, 토큰) = 4, 임시로 10개  -> 동적으로 변경할건지?
+    
+    // 모든 셀에 텍스트 서식 적용 (데이터 영역 + 빈 영역)
+    for (let R = 0; R < maxRows; ++R) {
+      for (let C = 0; C < maxCols; ++C) {
+        const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+        
+        if (!worksheet[cellAddress]) {
+          worksheet[cellAddress] = { t: 's', v: '' };
+        }
+        
+        // 텍스트 서식 지정 (@는 텍스트 형식)
+        worksheet[cellAddress].z = '@';
+      }
+    }
+    
+    // 워크시트 범위 재설정
+    worksheet['!ref'] = `A1:${XLSX.utils.encode_col(maxCols - 1)}${maxRows}`;
 
     // 컬럼 너비 설정 (단위: 문자 수)
     worksheet['!cols'] = [
@@ -672,8 +697,6 @@ const ListManager: React.FC = () => {
       { wch: 20 },  // 토큰
     ];
 
-    // 워크북 생성 및 시트 추가
-    const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
     // 엑셀 파일 다운로드
