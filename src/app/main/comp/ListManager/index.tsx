@@ -700,9 +700,9 @@ const ListManager: React.FC = () => {
     const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
 
     // 박소연 부장님 요청으로 모든 셀 텍스트로 서식 지정(늘리거나 줄이려면 maxRows, maxCols 값 수정) 2025.10.30 - lab09
-    // 확장된 범위 설정 (1000행까지 미리 텍스트 서식 적용)
-    const maxRows = 1000;
-    const maxCols = 10; // 컬럼 개수 (고객키, 이름, 전화번호, 토큰) = 4, 임시로 10개  -> 동적으로 변경할건지?
+    // 확장된 범위 설정 (10000행까지 미리 텍스트 서식 적용)
+    const maxRows = 10000;
+    const maxCols = 20; // 컬럼 개수 (고객키, 이름, 전화번호, 토큰) = 4, 임시로 20개  -> 동적으로 변경할건지?
     
     // 모든 셀에 텍스트 서식 적용 (데이터 영역 + 빈 영역)
     for (let R = 0; R < maxRows; ++R) {
