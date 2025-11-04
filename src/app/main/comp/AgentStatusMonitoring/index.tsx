@@ -315,7 +315,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   // }, [campaignId,tenantId,campaigns,statisticsUpdateCycle]);
 
   useEffect(() => {
-    if (campaignAgents.length === 0) return;
+    if (campaignAgents.length === 0 && campaignId === 0) return;
 
     setAgentData([]);
     if (campaignId && campaigns.length > 0) {
