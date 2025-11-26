@@ -144,12 +144,13 @@ export function TreeMenusForCampaigns() {
         })) || []
       }));
 
+      // BOSQ-34	[태광그룹IPCC 콜봇연동] PDS web 트리 최소화 기능 수정 centerId -> '&&'+centerId 변경
       // 최종 트리 데이터 형태 구성
       return [[{
         id: 'campaign',
         label: '캠페인',
         items: [{
-          id: centerId || 'nexus',
+          id: '&&'+centerId || 'nexus',
           label: centerName || 'Nexus',
           type: 'folder',
           children: items
