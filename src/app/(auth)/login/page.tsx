@@ -289,7 +289,7 @@ export default function LoginPage() {
       // store나 쿠키에 session_key가 존재하면서 세션 만료가 아닌 경우 login 페이지 접근시 main 페이지로 이동
       router.replace('/main');
     }
-  }, []);
+  }, [isLoggedIn, cookiescheck, isSessionTimeCheck]); // 로그아웃이 안되는 현상 발생하여 수정 20251127
 
   // store 의 session_key가 있으면서, 쿠키에 session_key가 존재하면 main 페이지로 이동하기전에 보여지는 빈 페이지
   if (isLoggedIn && cookiescheck) return (null);
