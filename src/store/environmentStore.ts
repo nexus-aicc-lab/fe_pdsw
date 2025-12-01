@@ -1,38 +1,3 @@
-// import { create } from "zustand";
-// import { devtools, persist } from "zustand/middleware";
-// import { EnvironmentListResponse } from "@/features/auth/types/environmentIndex";
-
-// type EnvironmentStore = {
-//   // State
-//   environmentData: EnvironmentListResponse | null;
-  
-//   // Actions
-//   setEnvironment: (data: EnvironmentListResponse) => void;
-//   clearEnvironment: () => void;
-// };
-
-// export const useEnvironmentStore = create<EnvironmentStore>()(
-//   devtools(
-//     persist(
-//       (set) => ({
-//         // Initial state
-//         environmentData: null,
-        
-//         // Actions
-//         setEnvironment: (data) => 
-//           set({ environmentData: data }, false, "setEnvironment"),
-          
-//         clearEnvironment: () => 
-//           set({ environmentData: null }, false, "clearEnvironment"),
-//       }),
-//       {
-//         name: "environment-storage", // localStorage에 저장될 키 이름
-//       }
-//     ),
-//     { name: "EnvironmentStore" } // Redux DevTools에 표시될 스토어 이름
-//   )
-// );
-
 // environmentStore.ts 수정
 // tofix 0409 통계 갱신 주기와 상담원 상태 모니터 api 연동 with statisticsUpdateCycle
 import { create } from "zustand";

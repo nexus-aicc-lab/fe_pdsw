@@ -12,6 +12,7 @@ import { useApiForSidebarCounselor } from "@/features/campaignManager/hooks/useA
 import { WindowStateUtils } from "@/features/campaignManager/hooks/useApiDeleteCounselorsFromSkills";
 
 import { useAuthStore } from "@/store/authStore";
+import { useEnvironmentStore } from "@/store/environmentStore";
 import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
 import { SkeletonForTreeMenuForCounselor } from "../Skeleton/SkeletonForTreeMenuForCounselor";
 
@@ -23,6 +24,7 @@ interface ISkill {
 
 export function TreeMenusForAgentTab() {
   const { tenant_id, role_id } = useAuthStore();
+  const { centerId, centerName } = useEnvironmentStore();
   const { data, isLoading } = useApiForSidebarCounselor(
     tenant_id.toString(),
   );
@@ -289,7 +291,7 @@ export function TreeMenusForAgentTab() {
       applyDefaultExpansion();
 
       // 필터링 및 정렬 적용한 데이터
-      const sorted = applySorting([...data.organizationList]);
+      const sorted = applySorting([...data.organizationList.filter( d => d.centerId === centerId.toString())]);
 
       // 모든 상담사 정보 추출
       const counselors = getAllCounselorsFromFilteredData(sorted);
@@ -333,7 +335,7 @@ export function TreeMenusForAgentTab() {
   useEffect(() => {
     if (data?.organizationList) {
       // console.log('🔄 정렬 옵션 변경, 데이터 재정렬');
-      const sorted = applySorting([...data.organizationList]);
+      const sorted = applySorting([...data.organizationList.filter( d => d.centerId === centerId.toString())]);
       setSortedData(sorted);
 
       // Window 상태도 업데이트 (스킬 정보 보존)

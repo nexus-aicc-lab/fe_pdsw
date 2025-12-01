@@ -19,6 +19,7 @@ import { CampaignScheDuleListDataResponse, CampaignSkillUpdateRequest } from '@/
 import { CampaignInfoInsertRequest } from '@/features/campaignManager/hooks/useApiForCampaignManagerInsert';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useCampaignDialStatusStore } from "@/store/campaignDialStatusStore";
+import { useEnvironmentStore } from "@/store/environmentStore";
 
 export function TreeNodeForCampaignTab({
   item,
@@ -60,6 +61,7 @@ export function TreeNodeForCampaignTab({
   const { setCopyCampaignManagerInfo, setCopyCampaignInfo, setCopyTenantId, setCopyCampaignSchedule, setCopyCampaignSkills } = useCampainManagerStore();
 
   const { campaigns } = useMainStore();
+  const { centerId } = useEnvironmentStore();
   const nodeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -265,7 +267,7 @@ export function TreeNodeForCampaignTab({
       )}
       {getNodeIcon()}
       <span className={textStyle}>
-        {(item.type === "folder" && !isTenantFolder) && `[1]`} 
+        {(item.type === "folder" && !isTenantFolder) && `[${centerId}]`} 
         {(isTenantFolder || item.type === "campaign") && ` [${item.id}]`}
         {item.label} 
       </span>
