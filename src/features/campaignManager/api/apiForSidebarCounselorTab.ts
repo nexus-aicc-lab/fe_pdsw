@@ -1,18 +1,8 @@
-
-
 // C:\Users\terec\fe_pdsw\src\features\campaignManager\api\apiForSidebarCounselorTab.ts
-import { MainCredentials2 } from "@/features/auth/types/mainIndex";
-import { axiosInstance, axiosRedisInstance } from "@/lib/axios";
-import {
-  Counselor,
-  CounselorNode,
-  GroupNode,
-  TabData,
-  TeamNode,
-  TenantNode
-} from "../types/typeForSideBarCounselorTab";
+import { axiosRedisInstance } from "@/lib/axios";
 import { getCookie } from "@/lib/cookies";
 
+// 상담사 리스트를 사이드바에서 사용하기 위해 가져오는 API 함수
 // campaignId는 항상 "0"으로 고정되므로 별도 인자로 받지 않음
 export async function apiToFetchCounselorListForSideBar(tenantId: string) {
     const sessionKey = getCookie('session_key');
@@ -31,8 +21,6 @@ export async function apiToFetchCounselorListForSideBar(tenantId: string) {
       }
     }
   );
-
-  // console.log("response.data at 상담사 api 함수 (POST, 고정 campaignId) : ", response.data);
 
   return response.data;
 }

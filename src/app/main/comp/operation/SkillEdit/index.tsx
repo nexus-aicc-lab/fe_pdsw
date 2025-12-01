@@ -195,7 +195,6 @@ const SkillEdit = () => {
 
     if(agentSkillStatus === true){
       
-      // fetchCounselorList({ tenantId: tenant_id, roleId: role_id });
       fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
       fetchSkillCampaignList();
       fetchSkillAgentList();
@@ -1072,7 +1071,6 @@ const SkillEdit = () => {
 
 
   useEffect(() => {
-    // fetchCounselorList({ tenantId: tenant_id, roleId: role_id });
     fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
     fetchSkillCampaignList();
     fetchSkillAgentList();

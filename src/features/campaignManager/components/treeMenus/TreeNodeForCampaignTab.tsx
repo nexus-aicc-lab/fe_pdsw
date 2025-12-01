@@ -4,7 +4,7 @@ import { TreeNodeProps } from "@/components/shared/layout/SidebarPresenter";
 import { ContextMenuForCampaignForCampaignTab } from "./ContextMenuForCampaignForCampaignTab";
 import { FileText } from "lucide-react";
 import { useTabStore } from "@/store/tabStore";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { ContextMenu, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { FolderContextMenu } from "./FolderContextMenuForTreeNode";
 import Image from "next/image";
@@ -31,20 +31,9 @@ export function TreeNodeForCampaignTab({
   onNodeSelect,
   compact = false,
 }: TreeNodeProps) {
-  // const { skilIdsForCampaignTreeMenu, viewMode, selectedNodeType, setSelectedNodeType } = useTreeMenuStore();
-  // const {
-  //   simulateHeaderMenuClick,
-  //   setCampaignIdForUpdateFromSideMenu,
-  //   setCampaignIdForCopyCampaign,
-  //   addTab,
-  //   addTabCurrentOnly,
-  //   campaignIdForUpdateFromSideMenu
-  // } = useTabStore();
 
   // ----- After -----
   // useTreeMenuStore: selector 로 읽기 전용 값만, 액션은 getState()로
-  const skilIdsForCampaignTreeMenu = useTreeMenuStore(state => state.skilIdsForCampaignTreeMenu);
-  const viewMode = useTreeMenuStore(state => state.viewMode);
   const selectedNodeType = useTreeMenuStore(state => state.selectedNodeType);
   const setSelectedNodeType = useTreeMenuStore.getState().setSelectedNodeType;
 
@@ -54,8 +43,7 @@ export function TreeNodeForCampaignTab({
   const {
     setCampaignIdForUpdateFromSideMenu,
     setCampaignIdForCopyCampaign,
-    addTab,
-    addTabCurrentOnly
+    addTab
   } = useTabStore.getState();
 
   const { setCopyCampaignManagerInfo, setCopyCampaignInfo, setCopyTenantId, setCopyCampaignSchedule, setCopyCampaignSkills } = useCampainManagerStore();
@@ -83,38 +71,6 @@ export function TreeNodeForCampaignTab({
       }
     }
   }, [campaignIdForUpdateFromSideMenu, item.id, item.type, onNodeSelect, setSelectedNodeType]);
-
-  // const currentCampaign = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
-  // const isTenantFolder = item.type === "folder" && level === 1;
-  // const isRootNode = item.label.toLowerCase() === "nexus";
-
-  // const currentStatus = currentCampaign
-  //   ? (() => {
-  //     switch (currentCampaign.campaign_status) {
-  //       case 1: return "started";
-  //       case 2: return "pending";
-  //       case 3: return "stopped";
-  //       default: return item.status;
-  //     }
-  //   })()
-  //   : item.status;
-
-  // const updatedItem = { ...item, status: currentStatus };
-
-  // 캠페인 ID → 상태 맵 생성
-  // const campaignStatusMap = useMemo(() => {
-  //   const map = new Map<string, "started" | "pending" | "stopped">();
-  //   campaigns?.forEach(campaign => {
-  //     let status: "started" | "pending" | "stopped" = 'stopped';
-  //     switch (campaign.campaign_status) {
-  //       case 1: status = 'started'; break;
-  //       case 2: status = 'pending'; break;
-  //       case 3: status = 'stopped'; break;
-  //     }
-  //     map.set(campaign.campaign_id.toString(), status);
-  //   });
-  //   return map;
-  // }, [campaigns]);
 
   // 현재 캠페인의 상태 확인
   const currentCampaign = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
@@ -205,9 +161,6 @@ export function TreeNodeForCampaignTab({
   }, [item.id, item.type, setCampaignIdForUpdateFromSideMenu, setCampaignIdForCopyCampaign, addTab, setSelectedNodeType]);
 
   if (item.visible === false) return null;
-
-  const iconSize = compact ? 10 : 14;
-  const expandIconSize = compact ? 10 : 12;
 
   const getNodeIcon = () => {
     if (item.type === "folder") {

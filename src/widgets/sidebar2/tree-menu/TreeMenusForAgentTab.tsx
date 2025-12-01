@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { toast } from "react-toastify";
 
-import { TreeNodeForCounselorListForSideBar } from "../../../features/campaignManager/components/treeMenus/TreeNodeForCounselorListForSideBar";
-import { SearchBarForSideMenuForCounselorTab } from "../../../features/campaignManager/components/treeMenus/searchbar/SearchBarForSideMenuForCounselorTab";
-import { CounselorTreeLevelSelector } from "../../../features/campaignManager/components/treeMenus/option/CounselorTreeLevelSelector";
+import { TreeNodeForCounselorListForSideBar } from "@/features/campaignManager/components/treeMenus/TreeNodeForCounselorListForSideBar";
+import { SearchBarForSideMenuForCounselorTab } from "@/features/campaignManager/components/treeMenus/searchbar/SearchBarForSideMenuForCounselorTab";
+import { CounselorTreeLevelSelector } from "@/features/campaignManager/components/treeMenus/option/CounselorTreeLevelSelector";
 import { IOrganization } from "@/features/campaignManager/types/typeForSideBarCounselorTab2";
 
 import { useApiForSidebarCounselor } from "@/features/campaignManager/hooks/useApiForGetDataForSidebarCounselorTab";
@@ -23,13 +23,13 @@ interface ISkill {
 }
 
 export function TreeMenusForAgentTab() {
-  const { tenant_id, role_id } = useAuthStore();
-  const { centerId, centerName } = useEnvironmentStore();
+  const { tenant_id } = useAuthStore();
+  const { centerId } = useEnvironmentStore();
   const { data, isLoading } = useApiForSidebarCounselor(
     tenant_id.toString(),
   );
 
-  // console.log("🌟 treeData in TreeMenusForAgentTab (Window 버전 - 스킬 포함) !!!!!!!!!!!!! ", data);
+  // console.log(" treeData in TreeMenusForAgentTab (Window 버전 - 스킬 포함) !!!!!!!!!!!!! ", data);
 
   const [searchTerm, setSearchTerm] = useState("");
   const {
@@ -62,7 +62,7 @@ export function TreeMenusForAgentTab() {
   const isInitializedRef = useRef(false);
   const dataVersionRef = useRef(0);
 
-  // 🌟 정렬 로직 구현 (tenant_id 필터링 적용) - 스킬 정보 보존
+  //  정렬 로직 구현 (tenant_id 필터링 적용) - 스킬 정보 보존
   const applySorting = useCallback((dataArray: IOrganization[]) => {
     if (!dataArray || dataArray.length === 0) return [];
 
@@ -70,13 +70,6 @@ export function TreeMenusForAgentTab() {
 
     // 깊은 복사를 통해 원본 데이터 보존 (스킬 정보 포함)
     const clonedData: IOrganization[] = JSON.parse(JSON.stringify(dataArray));
-
-    /*
-    console.log('🔍 정렬 전 데이터 확인:', {
-      orgCount: clonedData.length,
-      firstOrgHasSkills: clonedData[0]?.tenantInfo?.[0]?.groupInfo?.[0]?.teamInfo?.[0]?.counselorInfo?.[0]?.assignedSkills?.length || 0
-    });
-    */
 
     // tenant_id가 0이 아닌 경우에만 필터링 적용
     if (tenant_id !== 0) {
@@ -192,24 +185,14 @@ export function TreeMenusForAgentTab() {
         });
       }
     });
-    /*
-    console.log('🔍 정렬 후 데이터 확인:', {
-      orgCount: clonedData.length,
-      firstOrgHasSkills: clonedData[0]?.tenantInfo?.[0]?.groupInfo?.[0]?.teamInfo?.[0]?.counselorInfo?.[0]?.assignedSkills?.length || 0
-    });
-    */
 
     return clonedData;
   }, [sortOption, tenant_id]);
 
-  // 🌟 Window 상태 업데이트 콜백 함수들 - 스킬 정보 보존
+  //  Window 상태 업데이트 콜백 함수들 - 스킬 정보 보존
   const updateSidebarCallback = useCallback((updatedData: any) => {
     
     if (updatedData?.organizationList) {
-      // console.log('🔍 업데이트된 데이터의 스킬 정보 확인:', {
-      //   orgCount: updatedData.organizationList.length,
-      //   firstOrgHasSkills: updatedData.organizationList[0]?.tenantInfo?.[0]?.groupInfo?.[0]?.teamInfo?.[0]?.counselorInfo?.[0]?.assignedSkills?.length || 0
-      // });
 
       // 정렬 적용 후 상태 업데이트 (스킬 정보 보존)
       const sorted = applySorting([...updatedData.organizationList]);
@@ -220,27 +203,27 @@ export function TreeMenusForAgentTab() {
       setAllCounselors(counselors);
 
       dataVersionRef.current += 1;
-      // console.log(`✅ UI 업데이트 완료 (버전: ${dataVersionRef.current})`);
+      // console.log(` UI 업데이트 완료 (버전: ${dataVersionRef.current})`);
     } else {
-      // console.warn('⚠️ 업데이트된 데이터에 organizationList가 없습니다:', updatedData);
+      // console.warn(' 업데이트된 데이터에 organizationList가 없습니다:', updatedData);
     }
   }, [applySorting]);
 
   const setExpandedNodesCallback = useCallback((nodes: Set<string>) => {
-    // console.log('🔄 Window 콜백으로 확장 노드 상태 업데이트:', nodes.size);
+    // console.log(' Window 콜백으로 확장 노드 상태 업데이트:', nodes.size);
     setExpandedNodes(nodes);
   }, []);
 
   const setSelectedNodeCallback = useCallback((nodeId?: string) => {
-    // console.log('🔄 Window 콜백으로 선택된 노드 상태 업데이트:', nodeId);
+    // console.log(' Window 콜백으로 선택된 노드 상태 업데이트:', nodeId);
     setSelectedNodeId(nodeId);
   }, []);
 
-  // 🌟 컴포넌트 마운트 시 Window 상태 초기화
+  //  컴포넌트 마운트 시 Window 상태 초기화
   useEffect(() => {
     if (data?.organizationList && !isInitializedRef.current) {
-      // console.log('🌟 Window 상태 초기화 시작');
-      /* console.log('🔍 초기 데이터의 스킬 정보 확인:', {
+      // console.log(' Window 상태 초기화 시작');
+      /* console.log(' 초기 데이터의 스킬 정보 확인:', {
         orgCount: data.organizationList.length,
         firstOrgHasSkills: data.organizationList[0]?.tenantInfo?.[0]?.groupInfo?.[0]?.teamInfo?.[0]?.counselorInfo?.[0]?.assignedSkills?.length || 0
       });
@@ -257,34 +240,28 @@ export function TreeMenusForAgentTab() {
       });
 
       isInitializedRef.current = true;
-      // console.log('✅ Window 상태 초기화 완료');
+      // console.log(' Window 상태 초기화 완료');
     }
 
     return () => {
       // 컴포넌트 언마운트 시 정리
       if (isInitializedRef.current) {
-        // console.log('🧹 Window 상태 정리');
+        // console.log(' Window 상태 정리');
         WindowStateUtils.cleanup();
         isInitializedRef.current = false;
       }
     };
   }, [data, tenant_id, updateSidebarCallback, setExpandedNodesCallback, setSelectedNodeCallback]);
 
-  // 🌟 데이터 로드 시 초기화 작업 + Window 상태 업데이트
+  //  데이터 로드 시 초기화 작업 + Window 상태 업데이트
   useEffect(() => {
     if (data?.organizationList) {
-      // console.log('📊 데이터 로드됨, 초기화 작업 시작');
-      /* console.log('🔍 로드된 데이터의 스킬 정보 확인:', {
-        orgCount: data.organizationList.length,
-        firstOrgHasSkills: data.organizationList[0]?.tenantInfo?.[0]?.groupInfo?.[0]?.teamInfo?.[0]?.counselorInfo?.[0]?.assignedSkills?.length || 0
-      });
-      */
 
       // Window 상태 업데이트
       const currentState = WindowStateUtils.getCurrentState();
       if (currentState) {
         currentState.sidebarData = data;
-        // console.log('🔄 Window 사이드바 데이터 업데이트');
+        // console.log(' Window 사이드바 데이터 업데이트');
       }
 
       // 기본 확장 상태 적용
@@ -300,7 +277,7 @@ export function TreeMenusForAgentTab() {
       setSortedData(sorted);
       dataVersionRef.current += 1;
 
-      // console.log(`✅ 초기화 작업 완료 (버전: ${dataVersionRef.current})`);
+      // console.log(` 초기화 작업 완료 (버전: ${dataVersionRef.current})`);
     }
   }, [data, tenant_id, applySorting]);
 
@@ -331,10 +308,10 @@ export function TreeMenusForAgentTab() {
     return counselors;
   };
 
-  // 🌟 정렬 옵션 변경 시 데이터 재정렬 + Window 상태 업데이트
+  //  정렬 옵션 변경 시 데이터 재정렬 + Window 상태 업데이트
   useEffect(() => {
     if (data?.organizationList) {
-      // console.log('🔄 정렬 옵션 변경, 데이터 재정렬');
+      // console.log(' 정렬 옵션 변경, 데이터 재정렬');
       const sorted = applySorting([...data.organizationList.filter( d => d.centerId === centerId.toString())]);
       setSortedData(sorted);
 
@@ -342,7 +319,7 @@ export function TreeMenusForAgentTab() {
       const currentState = WindowStateUtils.getCurrentState();
       if (currentState) {
         currentState.sidebarData = { ...data, organizationList: sorted };
-        // console.log('🔄 Window 상태 업데이트 (정렬 반영)');
+        // console.log(' Window 상태 업데이트 (정렬 반영)');
       }
     }
   }, [sortOption, data, tenant_id, applySorting]);
@@ -625,12 +602,12 @@ export function TreeMenusForAgentTab() {
     }
   };
 
-  // 🌟 로딩 상태일 때 스켈레톤 표시
+  //  로딩 상태일 때 스켈레톤 표시
   if (isLoading) {
     return <SkeletonForTreeMenuForCounselor type="full" />;
   }
 
-  // 🌟 데이터가 없거나 빈 경우에도 스켈레톤 표시
+  //  데이터가 없거나 빈 경우에도 스켈레톤 표시
   if (!data?.organizationList || data.organizationList.length === 0) {
     return <SkeletonForTreeMenuForCounselor type="partial" />;
   }
@@ -681,7 +658,7 @@ export function TreeMenusForAgentTab() {
         </div>
       </div>
 
-      {/* 🌟 개발용 디버그 정보 */}
+      {/*  개발용 디버그 정보 */}
       {/* {process.env.NODE_ENV === 'development' && (
         <div className="text-xs text-gray-500 p-2 border-t">
           데이터 버전: {dataVersionRef.current} | 

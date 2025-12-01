@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { create } from "zustand";
 import { TreeItem } from "@/features/campaignManager/types/typeForSidebar2";
-import { TreeNodeForCampaignTab } from "../../../features/campaignManager/components/treeMenus/TreeNodeForCampaignTab";
+import { TreeNodeForCampaignTab } from "@/features/campaignManager/components/treeMenus/TreeNodeForCampaignTab";
 import { getStatusIcon } from "@/components/shared/layout/utils/utils";
 import { useSidebarWidthStore } from "@/widgets/sidebar2/store/useSidebarWidthStore";
 import { useAuthStore, useMainStore } from "@/store";
