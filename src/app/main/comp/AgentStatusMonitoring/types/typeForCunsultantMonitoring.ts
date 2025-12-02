@@ -16,12 +16,6 @@ export interface AgentStateMonitoringListDataResponse {
     counselorStatusList: AgentStateMonitoringListDataResponse[];
   }
   
-  export interface IRequestTypeForFetchConsultantStatusMonitorData {
-    tenantId: number;
-    campaignId: number;
-    sessionKey?: string;
-  }
-  
   // 컴포넌트 내부 타입
   export interface AgentStatus {
     waiting: boolean;

@@ -2,7 +2,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { fetchAgentStateMonitoringList } from '../api/mainAgentStateMonitoringList';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { AgentStatusMonitoringRequest, AgentStateMonitoringListResponse, MonitoringApiError } from '../types/monitoringIndex';
+import { MonitoringApiError } from '../types/monitoringIndex';
+import { AgentStatusMonitoringRequest,AgentStateMonitoringListResponse } from '../api/mainAgentStateMonitoringList';
 
 // 상담 모니터 목록
 export function useApiForAgentStateMonitoringList(

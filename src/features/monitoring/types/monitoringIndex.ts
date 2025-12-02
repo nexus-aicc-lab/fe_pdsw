@@ -11,19 +11,6 @@ export interface AllCampaignProgressInformationRequest {
   campaignList: CampaignProgressInformationRequest[];
 }
 
-// 상담사 상태 모니터링 요청 
-export interface AgentStatusMonitoringRequest {
-  tenantId: string;
-  campaignId: number;
-  agentIds?: string[];  
-}
-
-export interface IRequestTypeForFetchConsultantStatusMonitorData {
-  tenantId: number;
-  campaignId: number;
-  sessionKey: string;
-}
-
 // 캠페인진행정보 응답 데이터 타입
 export interface CampaignProgressInformationResponseDataType {
   tenantId: number;                   //테넌트ID
@@ -124,21 +111,6 @@ export interface CampaignHistoryResponse {
   result_count: number;
   total_count: number;
   result_data: CampaignHistoryResponseDataType[];
-}
-
-// 상담사 상태 모니터링 데이터 타입
-export interface AgentStateMonitoringListDataResponse {
-  counselorId: string;
-  counselorName: string;
-  statusCode: string;
-  statusTime: string;
-}
-
-// 상담사 상태 모니터링 응답 
-export interface AgentStateMonitoringListResponse {
-  code: number;
-  message: string;
-  counselorStatusList: AgentStateMonitoringListDataResponse[];
 }
 
 // 채널 모니터링 데이터 타입
