@@ -26,7 +26,7 @@ export function TreeMenusForAgentTab() {
   const { tenant_id } = useAuthStore();
   const { centerId } = useEnvironmentStore();
   const { data, isLoading } = useApiForSidebarCounselor(
-    tenant_id.toString(),
+    centerId+'', tenant_id.toString(),
   );
 
   // console.log(" treeData in TreeMenusForAgentTab (Window 버전 - 스킬 포함) !!!!!!!!!!!!! ", data);

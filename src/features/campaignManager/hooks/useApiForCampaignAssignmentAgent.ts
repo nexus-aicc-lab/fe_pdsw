@@ -2,7 +2,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { fetchCampaignAssignmentAgents } from '../api/apiForCampaignAssignmentAgentList';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { CampaignAssignmentAgentCredentials, CampaignAssignmentAgentListResponse, CampaignApiError } from '../types/campaignManagerIndex';
+import { CampaignApiError } from '../types/campaignManagerIndex';
+import { CampaignAssignmentAgentCredentials, CampaignAssignmentAgentListResponse } from '../api/apiForCampaignAssignmentAgentList';
 
 export function useApiForCampaignAssignmentAgent(
   options?: UseMutationOptions<CampaignAssignmentAgentListResponse, CampaignApiError, CampaignAssignmentAgentCredentials>

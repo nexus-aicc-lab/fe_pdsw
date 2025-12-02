@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import DataGrid, { SelectCellFormatter } from "react-data-grid";
+import DataGrid from "react-data-grid";
 import 'react-data-grid/lib/styles.css';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { CommonButton } from "@/components/shared/CommonButton";
@@ -10,7 +10,6 @@ import CampaignModal from '../CampaignModal';
 import { useAuthStore, useMainStore, useTabStore } from '@/store';
 import { useApiForCreateMaxCall, useApiForDeleteMaxCall, useApiForMaxCallInitTimeList, useApiForMaxCallInitTimeUpdate, useApiForMaxCallList, useApiForUpdateMaxCall } from '@/features/preferences/hooks/useApiForMaxCall';
 import { useApiForCampaignAgentList } from '@/features/preferences/hooks/useApiForCampaignAgent';
-import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import TimePickerComponent from './TimePicker';
 import ContextMenu from './context_menu';
@@ -19,7 +18,6 @@ import { useOperationStore } from '../store/OperationStore';
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 import { useApiForCampaignAssignmentAgent } from '@/features/campaignManager/hooks/useApiForCampaignAssignmentAgent';
 import { useEnvironmentStore } from '@/store/environmentStore';
-import { se } from 'date-fns/locale';
 
 interface Row {
   id: string;
@@ -558,7 +556,7 @@ const DistributionLimit = () => {
     }
   };
 
-  const centerName = useEnvironmentStore.getState().centerName;
+  const { centerId, centerName} = useEnvironmentStore();
 
   // 백엔드에서 가져온 상담사 리스트 정보 처리
   const { mutate : fetchCounselorList } = useApiForCampaignAssignmentAgent({
@@ -704,6 +702,7 @@ const DistributionLimit = () => {
 
     if (selectedCampaignId && campaignAgents.length > 0) {
       fetchCounselorList({
+        centerId: centerId,
         campaignId: selectedCampaignId.toString(),
         tenantId: campaigns.filter(c => c.campaign_id.toString() === selectedCampaignId)[0].tenant_id.toString(),
       });

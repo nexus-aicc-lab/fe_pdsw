@@ -9,6 +9,7 @@ import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { AdditionalInfoTabParam } from './CampaignManagerDetail';
 import { useApiForCampaignAssignmentAgent } from '@/features/campaignManager/hooks/useApiForCampaignAssignmentAgent';
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
+import { useEnvironmentStore } from '@/store/environmentStore';
 
 interface ConsultingData {
   id: string;
@@ -42,6 +43,7 @@ type Props = {
 
 const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHandleAdditionalInfoTabChange}) => {
   const [initialData, setInitialData] = useState<TreeRow[]>([]);
+  const { centerId } = useEnvironmentStore();
   const transformToTreeData = (counselors: any[]) => {
     const result: any[] = [];
 
@@ -127,6 +129,7 @@ const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHand
   useEffect(() => {
     if (!(callCampaignMenu == 'NewCampaignManager') && campaignInfo && campaignInfo.campaign_id > 0 ) {  
       fetchCampaignAssignmentAgents({
+        centerId: centerId,
         tenantId: campaignInfo.tenant_id+''
         , campaignId: campaignInfo.campaign_id+''
       });
