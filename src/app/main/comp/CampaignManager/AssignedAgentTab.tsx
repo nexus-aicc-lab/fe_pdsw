@@ -10,6 +10,7 @@ import { AdditionalInfoTabParam } from './CampaignManagerDetail';
 import { useApiForCampaignAssignmentAgent } from '@/features/campaignManager/hooks/useApiForCampaignAssignmentAgent';
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 import { useEnvironmentStore } from '@/store/environmentStore';
+import { useApiForCampaignAgentList } from '@/features/preferences/hooks/useApiForCampaignAgent';
 
 interface ConsultingData {
   id: string;
@@ -97,6 +98,36 @@ const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHand
     }
   });
   
+  // 캠페인별 상담사 목록 조회
+  const { mutate: fetchCampaignAgentList } = useApiForCampaignAgentList({
+    onSuccess: (response) => {
+      if (response?.result_data && response.result_data.length > 0) {
+        const agentIds = response.result_data[0].agent_id;
+        fetchCampaignAssignmentAgents({
+          centerId: centerId,
+          tenantId: campaignInfo.tenant_id+'',
+          campaignId: campaignInfo.campaign_id+'',
+          agentIds: agentIds
+        });
+      }     
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인별 상담사 목록 조회', error.message);
+    }
+  });
+
+  function extractUniqueAgentIds(data: { agent_id: string[] }[]): string[] {
+    const agentIdSet = new Set<string>();
+
+    data.forEach(item => {
+      item.agent_id.forEach(agentId => {
+        agentIdSet.add(agentId);
+      });
+    });
+
+    return Array.from(agentIdSet);
+  }
+
   useEffect(() => {
     if( initialData.length > 0){
       // const expandedRowIds = initialData.map(row => row.id);
@@ -127,12 +158,10 @@ const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHand
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set([]));
 
   useEffect(() => {
-    if (!(callCampaignMenu == 'NewCampaignManager') && campaignInfo && campaignInfo.campaign_id > 0 ) {  
-      fetchCampaignAssignmentAgents({
-        centerId: centerId,
-        tenantId: campaignInfo.tenant_id+''
-        , campaignId: campaignInfo.campaign_id+''
-      });
+    if (!(callCampaignMenu == 'NewCampaignManager') && campaignInfo && campaignInfo.campaign_id > 0 ) { 
+      fetchCampaignAgentList({
+        campaign_id: [campaignInfo.campaign_id]
+      }); 
     }
     setInitialData([]);
   }, [callCampaignMenu,campaignInfo]);

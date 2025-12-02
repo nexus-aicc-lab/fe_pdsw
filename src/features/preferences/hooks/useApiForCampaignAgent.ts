@@ -1,7 +1,6 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { CampaignAgentListCredentials, CampaignAgentListResponse } from "../types/SystemPreferences";
 import { ApiError } from "next/dist/server/api-utils";
-import { fetchCampaignAgentList } from "../api/apiForCampaignAgent";
+import { fetchCampaignAgentList, CampaignAgentListCredentials, CampaignAgentListResponse } from "../api/apiForCampaignAgent";
 
 export function useApiForCampaignAgentList(
     options?: UseMutationOptions<CampaignAgentListResponse, ApiError, CampaignAgentListCredentials>

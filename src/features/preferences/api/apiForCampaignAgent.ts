@@ -1,5 +1,20 @@
-import { CampaignAgentListCredentials, CampaignAgentListResponse } from "../types/SystemPreferences";
 import { axiosInstance } from "@/lib/axios";
+
+export interface CampaignAgentListCredentials {
+  campaign_id: number[];
+}
+
+interface CampaignAgentListDataResponse {
+  campaign_id: number;
+  agent_id: string[];
+}
+
+export interface CampaignAgentListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  result_data: CampaignAgentListDataResponse[];
+}
 
 // 캠페인 소속 상담사 조회 API
 export const fetchCampaignAgentList = async (credentials: CampaignAgentListCredentials): Promise<CampaignAgentListResponse> => {

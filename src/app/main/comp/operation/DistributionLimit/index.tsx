@@ -705,6 +705,7 @@ const DistributionLimit = () => {
         centerId: centerId,
         campaignId: selectedCampaignId.toString(),
         tenantId: campaigns.filter(c => c.campaign_id.toString() === selectedCampaignId)[0].tenant_id.toString(),
+        agentIds: campaignAgents
       });
 
     }

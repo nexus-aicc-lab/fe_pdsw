@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { CampaignAgentListCredentials, AgentReadyCountDataResponse } from "../types/SystemPreferences";
+import { AgentReadyCountDataResponse } from "../types/SystemPreferences";
 import { ApiError } from "next/dist/server/api-utils";
-import { fetchAgentReadyCount } from "../api/apiForAgentReadyCount";
+import { fetchAgentReadyCount, CampaignAgentListCredentials } from "../api/apiForAgentReadyCount";
 
 export function useApiForAgentReadyCount(
     options?: UseMutationOptions<AgentReadyCountDataResponse, ApiError, CampaignAgentListCredentials>

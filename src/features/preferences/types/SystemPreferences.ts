@@ -236,16 +236,6 @@ export interface MaxCallDeleteDataResponse {
   campaign_id: number;
 }
 
-
-export interface CampaignAgentListCredentials {
-  campaign_id: number[];
-}
-
-export interface CampaignAgentListDataResponse {
-  campaign_id: number;
-  agent_id: string[];
-}
-
 export interface AgentReadyCountDataResponse {
   result_code: number;
   result_msg: string;
@@ -253,13 +243,6 @@ export interface AgentReadyCountDataResponse {
     campaign_id: number;
     ready_count: number;
   }
-}
-
-export interface CampaignAgentListResponse {
-  result_code: number;
-  result_msg: string;
-  result_count: number;
-  result_data: CampaignAgentListDataResponse[];
 }
 
 export interface MaxCallInitTimeListResponse {

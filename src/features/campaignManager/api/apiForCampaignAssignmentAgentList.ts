@@ -8,6 +8,7 @@ export interface CampaignAssignmentAgentCredentials {
   centerId: string;
   tenantId: string;
   campaignId: string;
+  agentIds?:string[];
 }
 
 // 캠페인 할당상담사 데이터 타입
@@ -33,7 +34,8 @@ export const fetchCampaignAssignmentAgents = async (credentials: CampaignAssignm
     centerId: credentials.centerId,
     tenantId: credentials.tenantId,
     campaignId: credentials.campaignId,
-    sessionKey: getCookie('session_key')
+    sessionKey: getCookie('session_key'),
+    agentIds: credentials.agentIds
   };
 
   try {
