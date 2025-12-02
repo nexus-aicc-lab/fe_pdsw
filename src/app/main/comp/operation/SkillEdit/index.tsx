@@ -9,7 +9,7 @@ import 'react-data-grid/lib/styles.css';
 import { useApiForCounselorAssignList } from '@/features/preferences/hooks/useApiForCounselorList';
 import { useApiForCampaignList, useApiForCreateSkill, useApiForDeleteAgentSkill, useApiForDeleteSkill, useApiForSkillAgentList, useApiForSkillCampaignList, useApiForSkillList, useApiForUpdateSkill } from '@/features/preferences/hooks/useApiForSkill';
 import { useAuthStore, useCampainManagerStore, useMainStore } from '@/store';
-import { CounselorAssignListResponse } from '@/features/preferences/types/SystemPreferences';
+import { CounselorAssignListResponse } from '@/features/preferences/api/apiForCounselorList';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
@@ -210,6 +210,7 @@ const SkillEdit = () => {
         const tenantId = rows.find((row) => row.skillId === selectedSkill.skillId)?.tenantId;
 
         fetchCounselorAssignList({
+          centerId: centerId,
           tenantId: Number(tenantId),
           skillId: Number(skillId)
         });
@@ -254,6 +255,7 @@ const SkillEdit = () => {
     
     // 상담사 불러오기
     fetchCounselorAssignList({
+      centerId: centerId,
       tenantId: row.tenantId,
       skillId: Number(row.skillId)
     });

@@ -1,8 +1,5 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { CounselorAssignListCredentials, CounselorAssignListResponse } from "../types/SystemPreferences";
-import { fetchCounselorAssignList,  } from "../api/apiForCounselorList";
-
-
+import { fetchCounselorAssignList, CounselorAssignListCredentials, CounselorAssignListResponse  } from "../api/apiForCounselorList";
 
 // 스킬 할당 상담사 목록 가져오기
 export function useApiForCounselorAssignList(

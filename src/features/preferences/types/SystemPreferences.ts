@@ -341,29 +341,6 @@ export interface CampaignListDataResponse {
   dial_mode: number; // 캠페인 발신 모드 구분 1 : Power Mode, 2 : Progressive Mode, 3 : Predictive Mode, 5 : Preview Mode
 }
 
-export interface CounselorAssignListCredentials {
-  tenantId: number;
-  skillId: number;
-}
-
-export interface CounselorAssignListResponse {
-  result_data: any;
-  code: string;
-  message: string;
-  skillAssignedCounselorList: SkillAssignedCounselorListItem[];
-}
-
-export interface SkillAssignedCounselorListItem {
-  affiliationGroupId: string; //상담사 소속그룹ID
-  affiliationGroupName: string; //상담사 소속그룹명
-  affiliationTeamId: string; // 상담사 팀아이디
-  affiliationTeamName: string; // 상담사 팀이름
-  counselorEmplNum: string; //상담사아이디
-  counselorId: string; //상담사 로그인아이디
-  counselorname: string; //상담사 이름
-  blendKind: string; //블렌드 구분(인바운드: 1, 아웃바운드: 2, 블렌드: 3)
-}
-
 export interface  CreateSkillCredentials {
   skill_id: number;
   tenant_id: number;

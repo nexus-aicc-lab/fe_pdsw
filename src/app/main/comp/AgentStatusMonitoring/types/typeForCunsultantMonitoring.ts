@@ -1,7 +1,3 @@
-// C:\nproject\fe_pdsw\src\app\main\comp\AgentStatusMonitoring\types\typeForCunsultantMonitoring.ts
-
-// C:\nproject\fe_pdsw\src\app\main\comp\AgentStatusMonitoring\types\typeForCunsultantMonitoring.ts
-
 // API 응답 관련 타입
 export interface AgentStateMonitoringListDataResponse {
     counselorId: string;
