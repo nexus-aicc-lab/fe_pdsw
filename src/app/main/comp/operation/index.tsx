@@ -29,6 +29,19 @@ export default function OperationBoard({ uniqueKey }: OperationBoardProps) {
   const { activeTabId } = useTabStore();
   const { tenant_id } = useAuthStore();
 
+  // 섹션 데이터를 배열로 정의
+  const sections = [
+    { id: 'section1', title: '캠페인별 발신번호 변경', component: CampaignLayout },
+    { id: 'section2', title: '전화 번호별 설명 편집', component: EditDescription },
+    { id: 'section3', title: '예약 콜 제한 설정', component: CallLimitSetting },
+    { id: 'section8', title: '콜백 리스트 초기화 시각 설정', component: SystemCallBackTimeSetting },
+    { id: 'section4', title: '분배 호수 제한 설정', component: DistributionLimit },
+    { id: 'section5', title: '스킬 편집', component: SkillEdit },
+    { id: 'section6', title: '채널 그룹 설정', component: ChannelGroupSetting },
+    // { id: 'section6', title: '상담 결과 코드 설정', component: ConsultResultSetting },
+    { id: 'section7', title: '서스펜드', component: SuspendView },
+  ]
+
   // 컴포넌트 마운트 시 초기 섹션 설정
   useEffect(() => {
 
@@ -69,19 +82,6 @@ export default function OperationBoard({ uniqueKey }: OperationBoardProps) {
     setOpenSectionId(newSectionId);
     clearOperationCampaign();
   }
-
-  // 섹션 데이터를 배열로 정의
-  const sections = [
-    { id: 'section1', title: '캠페인별 발신번호 변경', component: CampaignLayout },
-    { id: 'section2', title: '전화 번호별 설명 편집', component: EditDescription },
-    { id: 'section3', title: '예약 콜 제한 설정', component: CallLimitSetting },
-    { id: 'section8', title: '콜백 리스트 초기화 시각 설정', component: SystemCallBackTimeSetting },
-    { id: 'section4', title: '분배 호수 제한 설정', component: DistributionLimit },
-    { id: 'section5', title: '스킬 편집', component: SkillEdit },
-    { id: 'section6', title: '채널 그룹 설정', component: ChannelGroupSetting },
-    // { id: 'section6', title: '상담 결과 코드 설정', component: ConsultResultSetting },
-    { id: 'section7', title: '서스펜드', component: SuspendView },
-  ]
 
   return (
     <div className="divide-y accordion-wrap limit-width">
