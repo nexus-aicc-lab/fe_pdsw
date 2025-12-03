@@ -145,7 +145,7 @@ export default function Campaignprogress() {
   const [isColumnSetOpen, setIsColumnSetOpen] = useState(false);
   const [initData, setInitData] = useState<TreeRow[]>([]);
 
-  const { statisticsUpdateCycle } = useEnvironmentStore();
+  const { statisticsUpdateCycle, centerId, centerName } = useEnvironmentStore();
   const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [tempCampaignList, setTempCampaignList] = useState<MainDataResponse[]>([]);
@@ -223,7 +223,7 @@ export default function Campaignprogress() {
         let displayName = '';
 
         if (row.level === 0) {
-          displayName = '센터: NEXUS(1센터)';
+          displayName = `센터: ${centerName}(${centerId}센터)`;
         } else if (row.level === 1) {
           displayName = `테넌트 아이디: ${row.id.split('-')[1]}`;
         } else if (row.level === 2) {
@@ -373,7 +373,7 @@ export default function Campaignprogress() {
       let tempData: any[] = [];
       if (typeof list[i].children !== 'undefined') {
         if (list[i].id === 'center-center-1') {
-          tempData = ['센터: NEXUS(1센터)', '', ''];
+          tempData = [`센터: ${centerName}(${centerId}센터)`, '', ''];
           for (let j = 0; j < _columns.length; j++) {
             tempData.push('');
           }
