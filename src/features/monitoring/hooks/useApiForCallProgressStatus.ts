@@ -1,8 +1,8 @@
 // src/features/campaignManager/hooks/useApiForCallingNumber.ts
 import { useMutation } from '@tanstack/react-query';
-import { fetchCallProgressStatus } from '../api/mainCallProgressStatus';
+import { fetchCallProgressStatus, CallProgressStatusRequest, CallProgressStatusResponse } from '../api/mainCallProgressStatus';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { CallProgressStatusRequest, CallProgressStatusResponse, MonitoringApiError } from '../types/monitoringIndex';
+import { MonitoringApiError } from '../types/monitoringIndex';
 
 export function useApiForCallProgressStatus(
   options?: UseMutationOptions<CallProgressStatusResponse, MonitoringApiError, CallProgressStatusRequest>

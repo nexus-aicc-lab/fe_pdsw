@@ -100,7 +100,7 @@ export function TreeNodeForCampaignTab({
 
   const hasChildren = !!item.children?.length;
   const isExpanded = expandedNodes.has(item.id);
-  // ✅ 타입도 같이 체크
+  //  타입도 같이 체크
   const isSelected = selectedNodeId === item.id && selectedNodeType === item.type;
   // const statusIcon = item.type === "campaign" ? getStatusIcon(currentStatus) : null;
 

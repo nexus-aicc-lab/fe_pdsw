@@ -369,7 +369,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
 
   useEffect(() => {
     fetchOperatingTime();
-  }, []);
+  }, [fetchOperatingTime]);
 
 
 

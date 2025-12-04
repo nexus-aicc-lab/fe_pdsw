@@ -114,7 +114,7 @@ const UsageTimePopup: React.FC<UsageTimePopupProps> = ({ campaignIdList,dialKind
         dial_kind: dialKindList
       })
     }    
-  }, [campaignIdList,dialKindList]);
+  }, [campaignIdList,dialKindList,fetchCampaignHistory]);
   
   const modalContent = (
     <div className="w-full">

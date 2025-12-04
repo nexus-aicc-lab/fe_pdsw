@@ -102,7 +102,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const { campaignSkills } = useCampainManagerStore();
   const [ _campaignData, _setCampaignData ] = useState<CampaignDataMap>({});
   const [ waitingCounselorCnt, setWaitingCounselorCnt ] = useState<number>(0);
-  const { statisticsUpdateCycle } = useEnvironmentStore();
+  const { statisticsUpdateCycle, centerId } = useEnvironmentStore();
   const intervalOutboundCallProgressRef = React.useRef<NodeJS.Timeout | null>(null);
   const { activeTabId, openedTabs, setActiveTab, secondActiveTabId } = useTabStore();
   const [isPopup, setIsPopup] = useState(false);
@@ -444,6 +444,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
 
     // 즉시 fetch
     fetchCallProgressStatus({
+      centerId: centerId,
       tenantId: _tenantId,
       campaignId: _campaignId,
       agentIds: campaignAgents
@@ -453,6 +454,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     if (statisticsUpdateCycle > 0) {
       intervalOutboundCallProgressRef.current = setInterval(() => {
         fetchCallProgressStatus({
+          centerId: centerId,
           tenantId: _tenantId,
           campaignId: _campaignId,
           agentIds: campaignAgents
@@ -483,10 +485,10 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       const tenantId = campaignInfo?.tenant_id+'' || '1';
       const campaignId = campaignInfo?.campaign_id+'' || '0';
 
-      fetchCallProgressStatus({ tenantId, campaignId });
+      fetchCallProgressStatus({ centerId, tenantId, campaignId });
       if( statisticsUpdateCycle > 0 ){  
         intervalOutboundCallProgressRef.current = setInterval(() => {
-          fetchCallProgressStatus({ tenantId, campaignId });
+          fetchCallProgressStatus({ centerId, tenantId, campaignId });
         }, statisticsUpdateCycle * 1000);     
       }
     }else if(!isPopup){
@@ -553,6 +555,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       const tenantId = campaigns && campaigns.length > 0 ? [...new Set(campaigns.map(data => data.tenant_id))].join(',') : '1';
       const campaignId = tenants && tenants.length > 0 ? campaigns.map(data => data.campaign_id).join(',') : '0';
       fetchCallProgressStatus({
+        centerId: centerId,
         tenantId: tenantId,
         campaignId: campaignId,
         agentIds: campaignAgents
@@ -564,6 +567,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       const campaignId = campaignInfo?.campaign_id+'' !== 'undefined' ? campaignInfo?.campaign_id+'' 
         : tenants && tenants.length > 0 ? campaigns.map(data => data.campaign_id).join(',') : '0';
       fetchCallProgressStatus({
+        centerId: centerId,
         tenantId: tenantId,
         campaignId: campaignId,
         agentIds: campaignAgents

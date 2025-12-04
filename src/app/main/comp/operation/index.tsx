@@ -67,7 +67,7 @@ export default function OperationBoard({ uniqueKey }: OperationBoardProps) {
       setLocalOpenSectionId('section4');
       setActiveTab(activeTabId);
     }
-  }, [activeTabId]);
+  }, [activeTabId,setActiveTab]);
 
   // 전역 상태 변경 감지하여 로컬 상태 동기화
   useEffect(() => {

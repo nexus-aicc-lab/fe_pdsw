@@ -1,4 +1,3 @@
-
 // src/features/campaignManager/components/menus/IContextMenuForCampaignGroupAtCampaignGroup.tsx
 'use client';
 
@@ -6,7 +5,6 @@ import React, { useState } from "react";
 import { useTabStore } from "@/store/tabStore";
 import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
 import { Separator } from "react-contexify";
-// import { useApiForMultiUpdateCampaignProgressStatus } from "../hook/useApiForMultiUpdateCampaignProgressStatus";
 import {
   Dialog,
   DialogContent,
@@ -23,8 +21,6 @@ import {
   Trash2,
   PlusCircle,
   RefreshCcw,
-  AlertTriangle,
-  CheckCircle,
 } from "lucide-react";
 
 
@@ -81,15 +77,6 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<
     (state) => state.availableMenuIdsForCampaignGroupTabCampaignGroup
   );
 
-  // 캠페인 상태 일괄 변경 훅
-  // const { updateCampaignsStatus } = useApiForMultiUpdateCampaignProgressStatus();
-
-  // 멀티업데이트 팝업 상태
-  // const [confirmPopup, setConfirmPopup] = useState<{
-  //   open: boolean;
-  //   actionKey: "start" | "complete" | "stop" | "";
-  // }>({ open: false, actionKey: "" });
-
   // 결과 dialog 상태 관리
   const [resultDialog, setResultDialog] = useState({
     open: false,
@@ -97,71 +84,6 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<
     description: null as React.ReactNode,
     isError: false,
   });
-
-  // 캠페인 그룹 내 캠페인 ID/이름/정보 배열 추출
-  const campaignIds: string[] = node.campaignIds || [];
-  const campaignInfos: { name: string; status: number }[] = node.campaignInfos || [];
-
-  // 일괄 작업 실행
-  // const handleConfirmBulkAction = async () => {
-  //   const actionKey = confirmPopup.actionKey;
-  //   if (!actionKey || !statusMap[actionKey]) return;
-
-  //   try {
-  //     const result = await updateCampaignsStatus(
-  //       campaignIds,
-  //       statusMap[actionKey].code
-  //     );
-  //     setConfirmPopup({ open: false, actionKey: "" });
-  //     setResultDialog({
-  //       open: true,
-  //       title: `일괄 ${statusMap[actionKey].label} 결과`,
-  //       description: (
-  //         <div className="space-y-3">
-  //           <div className="flex items-center">
-  //             <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-  //             <span>
-  //               총 <span className="font-semibold">{result?.totalCount}</span>개 캠페인 중{" "}
-  //               <span className="font-semibold text-green-600">{result?.successCount}</span>개 성공,
-  //               <span className={`font-semibold ${result?.failCount ? "text-red-600" : ""}`}>
-  //                 {" "}
-  //                 {result?.failCount ?? 0}
-  //               </span>
-  //               개 실패
-  //             </span>
-  //           </div>
-  //           {result?.results && result.results.filter(r => !r.success).length > 0 && (
-  //             <div className="flex items-start">
-  //               <CheckCircle className="h-5 w-5 text-red-500 mt-1 mr-2" />
-  //               <div>
-  //                 <p className="font-medium">실패 캠페인:</p>
-  //                 <p className="text-red-600">
-  //                   {result.results.filter(r => !r.success).map(r => r.campaignId).join(", ")}
-  //                 </p>
-  //               </div>
-  //             </div>
-  //           )}
-  //         </div>
-  //       ),
-  //       isError: false,
-  //     });
-  //   } catch (e: any) {
-  //     setConfirmPopup({ open: false, actionKey: "" });
-  //     setResultDialog({
-  //       open: true,
-  //       title: `일괄 ${statusMap[actionKey].label} 실패`,
-  //       description: (
-  //         <div className="flex items-start">
-  //           <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5 mr-2" />
-  //           <span>
-  //             {e?.message || `일괄 ${statusMap[actionKey].label} 작업 중 오류가 발생했습니다.`}
-  //           </span>
-  //         </div>
-  //       ),
-  //       isError: true,
-  //     });
-  //   }
-  // };
 
   // 일괄 액션 메뉴 아이템
   const bulkActionItems = (["start", "complete", "stop"] as const).map((key, idx) => ({
