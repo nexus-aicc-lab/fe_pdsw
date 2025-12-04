@@ -370,6 +370,10 @@ export const useTabStore = create<TabLayoutStore>()(
               ?.tabs
               .find((tab): tab is TabItem => tab.uniqueKey === tabUniqueKey);  // 타입 가드 추가
 
+            // if( activeTab?.id === 22 ){
+            //   activeTab.id = Number(activeTab.id + tabUniqueKey.split('-')[1]);
+            // }
+
             // rows 업데이트
             const newRows = state.rows.map((row) => {
               if (row.id !== rowId) return row;
@@ -395,7 +399,8 @@ export const useTabStore = create<TabLayoutStore>()(
               ...state,
               rows: newRows,
               activeTabId: activeTab ? activeTab.id : state.activeTabId,
-              secondActiveTabId: _secondActiveTabId
+              secondActiveTabId: _secondActiveTabId,
+              activeTabKey: tabUniqueKey
             };
           }),
 

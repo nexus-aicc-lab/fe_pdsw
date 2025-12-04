@@ -236,6 +236,7 @@ const TabHeader = ({
             const isActiveInSection = section.activeTabKey === tab.uniqueKey;
             const isActiveGlobal = tab.id === activeTabId && tab.uniqueKey === activeTabKey;
             const isActive = isActiveInSection || isActiveGlobal;
+            debugger;
 
             return {
                 tab,
