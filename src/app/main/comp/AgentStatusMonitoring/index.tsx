@@ -327,7 +327,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
         return () => clearInterval(centerInterval);
       }
     }
-  }, [campaignAgents, campaignId,tenantId,campaigns, tenants,statisticsUpdateCycle]);
+  }, [campaignAgents, campaignId,tenantId,campaigns, tenants,statisticsUpdateCycle, centerId]);
   
   useEffect(() => {
     console.log( "##### activeTabId, secondActiveTabId,openedTabs: ", activeTabId, secondActiveTabId, openedTabs ); 

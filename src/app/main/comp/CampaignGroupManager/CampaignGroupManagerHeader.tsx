@@ -48,7 +48,7 @@ export default function CampaignGroupManagerHeader({ groupId, onSearch }: Props)
     } else {
       setIsTenantManager(false); // 드롭다운 활성화
     }
-  }, [tenants]);
+  }, [tenants, tenant_id]);
 
   return (
     <div className="flex title-background justify-between">
