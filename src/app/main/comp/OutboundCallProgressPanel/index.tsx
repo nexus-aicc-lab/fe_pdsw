@@ -97,9 +97,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   onCampaignChange,
   onDataUpdate
 }) => {
-  // const [internalSelectedCampaign, setInternalSelectedCampaign] = useState<string>('all');
   const { campaigns, tenants } = useMainStore();
-  const { campaignSkills } = useCampainManagerStore();
+  const { campaignSkills, outboundCallProgressCampaignId, setOutboundCallProgressCampaignId } = useCampainManagerStore();
   const [ _campaignData, _setCampaignData ] = useState<CampaignDataMap>({});
   const [ waitingCounselorCnt, setWaitingCounselorCnt ] = useState<number>(0);
   const { statisticsUpdateCycle, centerId } = useEnvironmentStore();
@@ -107,9 +106,6 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const { activeTabId, openedTabs, setActiveTab, secondActiveTabId } = useTabStore();
   const [isPopup, setIsPopup] = useState(false);
   const [campaignAgents, setCampaignAgents] = useState<string[]>([]);
-
-  // 실제 사용할 캠페인 ID 결정
-  const [ selectedCampaign, setSelectedCampaign] = useState<string>('all');
 
   // 빈 데이터 정의
   const emptyData: CampaignData = {
@@ -173,12 +169,12 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
 
   // 현재 선택된 캠페인의 데이터 (렌더링마다 계산)
   const currentData: CampaignData = (() => {
-    if (selectedCampaign === 'all') return allCampaignData;
-    if (!selectedCampaign) return emptyData;
+    if (outboundCallProgressCampaignId === 'all') return allCampaignData;
+    if (!outboundCallProgressCampaignId) return emptyData;
 
     // 선택된 캠페인에 해당하는 key 필터링 (예: "123-1", "123-2", ...)
     const campaignKeys = Object.keys(_campaignData).filter(key =>
-      key.startsWith(selectedCampaign + '-')
+      key.startsWith(outboundCallProgressCampaignId + '-')
     );
 
     if (campaignKeys.length === 0) return emptyData;
@@ -262,7 +258,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     if (onCampaignChange) {
       onCampaignChange(value);
     } else {
-      setSelectedCampaign(value);
+      setOutboundCallProgressCampaignId(value);
     }
 
     const newTabKey = `5-${Date.now()}`;
@@ -302,7 +298,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       // setWaitingCounselorCnt( data.waitingCounselorCnt );
       // if( tempList.length > 0 && ((_campaignId +'' === selectedCampaign +'') ||  (selectedCampaign === 'all' && _campaignId === '0')) ){
       // BQSQ-38 캠페인 전체 선택 시 변경된 _campaignId 검사 조건 변경 2025-09-17 - lab09
-      if( tempList.length > 0 && ((_campaignId +'' === selectedCampaign +'') ||  (selectedCampaign === 'all' && _campaignId.indexOf(',') !== -1 )) ){
+      if( tempList.length > 0 && ((_campaignId +'' === outboundCallProgressCampaignId +'') ||  (outboundCallProgressCampaignId === 'all' && _campaignId.indexOf(',') !== -1 )) ){
         const sumCallProgressStatus:SummaryCallProgressStatusDataType[] = [];
         for( let i=0;i<tempList.length;i++){
           const uniqueKey = `${tempList[i].campaignId}-${tempList[i].dialSequence}`;
@@ -379,7 +375,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         _setCampaignData(tempCampaignData);
         
       // }else if((_campaignId === selectedCampaign+'' || (selectedCampaign === 'all' && _campaignId === '0')){ 
-      }else if((_campaignId === selectedCampaign+'' || (selectedCampaign === 'all' && _campaignId.indexOf(',') !== -1))){   
+      }else if((_campaignId === outboundCallProgressCampaignId+'' || (outboundCallProgressCampaignId === 'all' && _campaignId.indexOf(',') !== -1))){   
         // BQSQ-38 캠페인 전체 선택 시 변경된 _campaignId 검사 조건 변경 2025-09-17 - lab09
         _setCampaignData({});
       }
@@ -473,15 +469,15 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   
   useEffect(() => {
     // 먼저 이전 interval 제거
-    if( selectedCampaign === '' ) return;
+    if( outboundCallProgressCampaignId === '' ) return;
     if (intervalOutboundCallProgressRef.current) {
       clearInterval(intervalOutboundCallProgressRef.current);
     }
     setIsRefreshing(true);
     setIsLoading(true);
     // console.log("##### selectedCampaign: ", selectedCampaign, typeof selectedCampaign);
-    if( selectedCampaign != 'all' && campaigns && campaigns.length > 0 ){
-      const campaignInfo = campaigns.find(data => data.campaign_id === Number(selectedCampaign));
+    if( outboundCallProgressCampaignId != 'all' && campaigns && campaigns.length > 0 ){
+      const campaignInfo = campaigns.find(data => data.campaign_id === Number(outboundCallProgressCampaignId));
       const tenantId = campaignInfo?.tenant_id+'' || '1';
       const campaignId = campaignInfo?.campaign_id+'' || '0';
 
@@ -499,30 +495,30 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         clearInterval(intervalOutboundCallProgressRef.current);
       }
     };
-  }, [selectedCampaign,statisticsUpdateCycle,campaigns]);
+  }, [outboundCallProgressCampaignId,statisticsUpdateCycle,campaigns]);
   
   useEffect(() => {
     console.log( "##### activeTabId, secondActiveTabId: ", activeTabId, secondActiveTabId ); 
     if (activeTabId === 5 || secondActiveTabId === 5) {
       const tempData = openedTabs.filter(tab => tab.id === 5);
       if (tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
-        setSelectedCampaign(tempData[0].campaignId);
+        setOutboundCallProgressCampaignId(tempData[0].campaignId);
       }else{
-        setSelectedCampaign('all');
+        // setOutboundCallProgressCampaignId('all');
       }
     }else{
       clearInterval(intervalOutboundCallProgressRef.current!);
       intervalOutboundCallProgressRef.current = null;
       setIsLoading(false);
       setIsRefreshing(false);
-      setSelectedCampaign('');
+      // setOutboundCallProgressCampaignId('');
     }
   }, [activeTabId, openedTabs, secondActiveTabId]);
 
   useEffect(() => {
     if( externalCampaignId ){
       
-      setSelectedCampaign( externalCampaignId );
+      setOutboundCallProgressCampaignId( externalCampaignId );
       setShouldRenderSelect(false);
       
     }else{
@@ -551,7 +547,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     setIsRefreshing(true);
     setIsLoading(true);
 
-    if( selectedCampaign === 'all' ){
+    if( outboundCallProgressCampaignId === 'all' ){
       const tenantId = campaigns && campaigns.length > 0 ? [...new Set(campaigns.map(data => data.tenant_id))].join(',') : '1';
       const campaignId = tenants && tenants.length > 0 ? campaigns.map(data => data.campaign_id).join(',') : '0';
       fetchCallProgressStatus({
@@ -561,7 +557,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         agentIds: campaignAgents
       });
     }else{
-      const campaignInfo = campaigns.find(data => data.campaign_id === Number(selectedCampaign));
+      const campaignInfo = campaigns.find(data => data.campaign_id === Number(outboundCallProgressCampaignId));
       const tenantId = campaignInfo?.tenant_id+'' !== 'undefined' ? campaignInfo?.tenant_id+'' 
         : campaigns && campaigns.length > 0 ? campaigns.map(data => data.tenant_id).join(',') : '1';
       const campaignId = campaignInfo?.campaign_id+'' !== 'undefined' ? campaignInfo?.campaign_id+'' 
@@ -597,7 +593,7 @@ return (
         <div className="flex justify-between items-center gap-2">
           <div className="flex items-center gap-2">
             <Label className="w-20 min-w-20">캠페인</Label>
-            <Select onValueChange={handleCampaignChange} value={selectedCampaign}>
+            <Select onValueChange={handleCampaignChange} value={outboundCallProgressCampaignId}>
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="캠페인 전체" />
               </SelectTrigger>

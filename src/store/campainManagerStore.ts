@@ -38,6 +38,7 @@ interface CampainManagerState {
   campaignManagerHeaderSkill: string;
   campaignManagerHeaderCallNumber: string;
   campaignManagerCampaignId: string;
+  outboundCallProgressCampaignId: string;
   // 스킬 상태 추가
   skillsLoaded: boolean;
   skillsLoading: boolean;
@@ -70,6 +71,7 @@ interface CampainManagerActions {
   setCampaignManagerHeaderSkill: (campaignManagerHeaderSkill: string) => void;
   setCampaignManagerHeaderCallNumber: (campaignManagerHeaderCallNumber: string) => void;
   setCampaignManagerCampaignId: (campaignManagerCampaignId: string) => void;
+  setOutboundCallProgressCampaignId: (outboundCallProgressCampaignId: string) => void;
   setCopyCampaignManagerInfo: (copyCampaignManagerInfo: CampaignInfoInsertRequest) => void;
   setCopyCampaignInfo: (copyCampaignInfo: MainDataResponse) => void;
   setCopyTenantId: (copyTenantId: string) => void;
@@ -109,6 +111,7 @@ export const useCampainManagerStore = create<CampainManagerStore>()(
         campaignManagerHeaderSkill: '',
         campaignManagerHeaderCallNumber: '',
         campaignManagerCampaignId: '',
+        outboundCallProgressCampaignId: 'all',
         copyCampaignManagerInfo: {} as CampaignInfoInsertRequest,
         copyCampaignInfo: {} as MainDataResponse,
         copyTenantId: ' ',
@@ -162,6 +165,7 @@ export const useCampainManagerStore = create<CampainManagerStore>()(
         setCampaignManagerHeaderSkill: (campaignManagerHeaderSkill) => set({ campaignManagerHeaderSkill }),
         setCampaignManagerHeaderCallNumber: (campaignManagerHeaderCallNumber) => set({ campaignManagerHeaderCallNumber }),
         setCampaignManagerCampaignId: (campaignManagerCampaignId) => set({ campaignManagerCampaignId }),
+        setOutboundCallProgressCampaignId: (outboundCallProgressCampaignId) => set({ outboundCallProgressCampaignId }),
         setCopyCampaignManagerInfo: (copyCampaignManagerInfo) => set({ copyCampaignManagerInfo }),
         setCopyCampaignInfo: (copyCampaignInfo) => set({ copyCampaignInfo }),
         setCopyTenantId: (copyTenantId) => set({ copyTenantId }),
@@ -194,6 +198,7 @@ export const useCampainManagerStore = create<CampainManagerStore>()(
           campaignManagerHeaderSkill: '',
           campaignManagerHeaderCallNumber: '',
           campaignManagerCampaignId: '',
+          outboundCallProgressCampaignId: 'all',
           copyCampaignManagerInfo: {} as CampaignInfoInsertRequest,
           copyCampaignInfo: {} as MainDataResponse,
           copyTenantId: ' ',

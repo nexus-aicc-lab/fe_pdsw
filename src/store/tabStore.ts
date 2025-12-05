@@ -64,6 +64,7 @@ export interface TabLayoutStore {
   activeTabId: number | null;
   secondActiveTabId: number | null;
   activeTabKey: string | null;
+  secondActiveTabKey: string | null;
 
   // 스킬 할당에 사용하던 부가 정보들
   campaignIdForUpdateFromSideMenu: string | null;
@@ -142,7 +143,7 @@ export interface TabLayoutStore {
   // 추가: 전역 activeTab을 설정하는 함수
   // ─────────────────────────────
   setActiveTab: (tabId: number, uniqueKey: string) => void;
-  setSecondActiveTab: (tabId: number, uniqueKey: string) => void;
+  setSecondActiveTab: (tabId: number, uniqueKey: string ) => void;
   simulateHeaderMenuClick: (menuId: number) => void;
 
   // 화면 분할 관련 상태 추가
@@ -242,6 +243,7 @@ export const useTabStore = create<TabLayoutStore>()(
         activeTabId: null,
         activeTabKey: null,
         secondActiveTabId: null,
+        secondActiveTabKey: null,
 
         counselorSkillAssignmentInfo: {
           tenantId: null,
@@ -363,6 +365,7 @@ export const useTabStore = create<TabLayoutStore>()(
           set((state) => {
             // 새로운 활성 탭 찾기: 타입 안전성을 위해 find 메서드 결과 타입을 명시
             let _secondActiveTabId = null;
+            let _secondActiveTabKey = null;
             const activeTab = state.rows
               .find(row => row.id === rowId)
               ?.sections
@@ -383,6 +386,8 @@ export const useTabStore = create<TabLayoutStore>()(
                   if (section.id !== sectionId){
                     _secondActiveTabId = section.activeTabKey !== null
                       ? Number(section.activeTabKey?.split('-')[0]) : null;
+                    _secondActiveTabKey = section.activeTabKey !== null
+                      ? Number(section.activeTabKey?.split('-')[1]) : null;
                     return section;
                   }else{                    
                     return {
@@ -400,6 +405,7 @@ export const useTabStore = create<TabLayoutStore>()(
               rows: newRows,
               activeTabId: activeTab ? activeTab.id : state.activeTabId,
               secondActiveTabId: _secondActiveTabId,
+              secondActiveTabKey: _secondActiveTabKey,
               activeTabKey: tabUniqueKey
             };
           }),
@@ -822,6 +828,7 @@ export const useTabStore = create<TabLayoutStore>()(
               newState.activeTabId = activeTab.id;
               newState.activeTabKey = activeTab.uniqueKey;
               newState.secondActiveTabId = null;
+              newState.secondActiveTabKey = null;
             } else if (lastMovedTabKey && !state.activeTabKey) {
               // 전역 활성 탭이 없었던 경우, 이동된 탭 중 마지막 탭을 활성화
               const lastTab = sectionToRemove.tabs.find(tab => tab.uniqueKey === lastMovedTabKey);
@@ -829,6 +836,7 @@ export const useTabStore = create<TabLayoutStore>()(
                 newState.activeTabId = lastTab.id;
                 newState.activeTabKey = lastTab.uniqueKey;
                 newState.secondActiveTabId = null;
+                newState.secondActiveTabKey = null;
               }
             }
 
@@ -853,6 +861,7 @@ export const useTabStore = create<TabLayoutStore>()(
             let sourceSection = null;
             let sourceRow = null;
             let _secondActiveTabId = null;
+            let _secondActiveTabKey = null;
 
             for (const row of state.rows) {
               for (const section of row.sections) {
@@ -897,6 +906,9 @@ export const useTabStore = create<TabLayoutStore>()(
                       );
                       _secondActiveTabId = remainingTabs.length > 0
                         ? Number(remainingTabs[remainingTabs.length - 1].id)
+                        : null;
+                      _secondActiveTabKey = remainingTabs.length > 0
+                        ? Number(remainingTabs[remainingTabs.length - 1].uniqueKey)
                         : null;
                       return {
                         ...section,
@@ -979,6 +991,7 @@ export const useTabStore = create<TabLayoutStore>()(
               tabGroups: updatedGroups,
               activeTabId: movedTab.id,
               secondActiveTabId: _secondActiveTabId,
+              secondActiveTabKey: _secondActiveTabKey,
               activeTabKey: movedTab.uniqueKey,
             };
           }),
@@ -1079,6 +1092,7 @@ export const useTabStore = create<TabLayoutStore>()(
               rows: newRows,
               tabGroups: state.tabGroups.filter((g) => g.id !== groupId),
               secondActiveTabId: null,
+              secondActiveTabKey: null,
             };
           }),
 
@@ -1237,8 +1251,8 @@ export const useTabStore = create<TabLayoutStore>()(
         // ─────────────────────────────
         setSecondActiveTab: (tabId, uniqueKey) => {
           set({
-            activeTabId: tabId,
-            activeTabKey: uniqueKey,
+            secondActiveTabId: tabId,
+            secondActiveTabKey: uniqueKey
           });
         },
         // 다른 탭 닫기 (현재 활성화된 탭 빼고 모두 닫기)

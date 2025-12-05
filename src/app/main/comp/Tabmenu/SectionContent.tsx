@@ -79,15 +79,11 @@ const SectionContent = ({
   rowId,
   sectionId,
   section,
-  activeTabId,
-  activeTabKey,
   setActiveTab
 }: {
   rowId: string;
   sectionId: string;
   section: { tabs: Tab[], activeTabKey?: string };
-  activeTabId: number | null;
-  activeTabKey: string | null;
   setActiveTab: (id: number, uniqueKey: string) => void;
 }) => {
   // 드롭퍼블 훅 사용
@@ -102,6 +98,7 @@ const SectionContent = ({
   
   // TabStore에서 드래그 상태 설정 메서드 가져오기
   const setContentDragOver = useTabStore(state => state.setContentDragOver);
+  const { activeTabId, activeTabKey, secondActiveTabId, secondActiveTabKey, setSecondActiveTab} = useTabStore();
   
   // isOver 상태가 변경될 때마다 TabStore 업데이트
   useEffect(() => {
@@ -116,12 +113,15 @@ const SectionContent = ({
   }, [isOver, rowId, sectionId, setContentDragOver]);
 
   // 콘텐츠 클릭 핸들러
-  const handleContentClick = useCallback(() => {
+  const handleContentClick = () => {
     const activeTab = section.tabs.find(t => t.uniqueKey === section.activeTabKey);
+    if ( secondActiveTabId != null && activeTabKey != secondActiveTabKey && activeTab?.uniqueKey != activeTabKey ){
+      setSecondActiveTab( Number(activeTabId), activeTabKey+'' );
+    }
     if (activeTab) {
       setActiveTab(activeTab.id, activeTab.uniqueKey);
     }
-  }, [section.tabs, section.activeTabKey, setActiveTab]);
+  };
 
   // 실제 컨텐츠 렌더링 함수 - useMemo로 메모이제이션
   const renderContent = useMemo(() => {

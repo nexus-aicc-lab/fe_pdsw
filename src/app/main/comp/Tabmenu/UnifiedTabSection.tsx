@@ -67,8 +67,6 @@ const UnifiedTabSection = ({
             rowId={rowId}
             sectionId={sectionId}
             section={section}
-            activeTabId={activeTabId}
-            activeTabKey={activeTabKey}
             setActiveTab={setActiveTab}
           />
         </div>
