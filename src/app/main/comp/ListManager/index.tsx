@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 // 공통 컴포넌트
 import TitleWrap from "@/components/shared/TitleWrap";
@@ -427,17 +427,43 @@ const ListManager: React.FC = () => {
           
           const reader = new FileReader();
           if( listManagerFileFormat === 'excel' && file.name.indexOf('.xls') > -1 ){
-            reader.onload = (event) => {
+            reader.onload = async (event) => {
               const fileContent = event.target?.result;
               
               if (fileContent) {
+
+                /*
                 const workbook = XLSX.read(fileContent, { type: 'array' });
         
                 const sheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[sheetName];
         
                 const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }); 
-        
+                */
+
+                 // ExcelJS Workbook 생성
+                const workbook = new ExcelJS.Workbook();
+
+                // ArrayBuffer 로딩
+                await workbook.xlsx.load(fileContent as ArrayBuffer);
+
+                // 첫 번째 시트 가져오기
+                const worksheet = workbook.worksheets[0];
+
+                // Excel 데이터를 2차원 배열로 변환
+                const data: any[][] = [];
+
+                worksheet.eachRow((row, rowNumber) => {
+                  // ExcelJS의 row.values는 1-based index이므로 0번째 요소 제거
+
+                  const rowValuesRaw = row.values;
+  
+                  // row.values가 배열인지 확인 후 slice
+                  if (Array.isArray(rowValuesRaw)) {
+                    const rowValues = rowValuesRaw.slice(1); // 0번째 요소 제거
+                    data.push(rowValues);
+                  }
+                });
                 if( data.length > 0 ){
                   let index = 0;
                   const tempSendList: SendRow[] = [];
@@ -681,6 +707,63 @@ const ListManager: React.FC = () => {
   };
 
   // 엑셀다운로드 핸들러
+  const handleExcelDownload = async () => {
+    const data = [
+      { 고객키: "1", 이름: "홍길동", 전화번호: "01031141714", 토큰: "연체고객1" },
+      { 고객키: "2", 이름: "김철수", 전화번호: "0234584260", 토큰: "연체고객2" },
+    ];
+
+    // 워크북 생성
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Sheet1');
+
+    // 헤더 정의
+    const headers = ["고객키(CSKE)", "고객이름(CSNA)", "고객전화번호(TNO1)", "토큰데이타(TKDA)"];
+    worksheet.addRow(headers);
+
+    // 데이터 추가
+    data.forEach(item => {
+      worksheet.addRow([item.고객키, item.이름, item.전화번호, item.토큰]);
+    });
+
+    // 모든 셀 텍스트 서식 적용 (maxRows, maxCols 설정)
+    const maxRows = 10000;
+    const maxCols = 20;
+
+    for (let r = 1; r <= maxRows; r++) {
+      for (let c = 1; c <= maxCols; c++) {
+        const cell = worksheet.getCell(r, c);
+        if (!cell.value) cell.value = '';
+        cell.numFmt = '@'; // 텍스트 형식
+      }
+    }
+
+    // 컬럼 너비 설정 (단위: 문자 수)
+    const colWidths = [
+      20, // 고객키
+      20, // 고객이름
+      20, // 전화번호
+      20, // 토큰
+    ];
+    colWidths.forEach((wch, index) => {
+      worksheet.getColumn(index + 1).width = wch;
+    });
+
+    // 엑셀 파일 다운로드
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'ListManager_OBListTemplate.xlsx';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url); // 메모리 해제
+  };
+  /*
   const handleExcelDownload = () => {
     const data = [
       { 고객키: "1", 이름: "홍길동", 전화번호: "01031141714", 토큰: "연체고객1" },
@@ -734,6 +817,8 @@ const ListManager: React.FC = () => {
     // 엑셀 파일 다운로드
     XLSX.writeFile(workbook, 'ListManager_OBListTemplate.xlsx');
   };
+  */
+
   // txt다운로드 핸들러
   const handleTxtDownload = () => {
     const data = [

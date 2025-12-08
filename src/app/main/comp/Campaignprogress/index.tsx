@@ -14,7 +14,7 @@ import { useApiForAllCampaignProgressInformation } from '@/features/monitoring/h
 import { CampaignProgressInformationResponseDataType } from '@/features/monitoring/types/monitoringIndex';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 // 모달
 import ColumnSet, { defaultColumnsData, ColumnSettingItem } from './ColumnSet';
 import { useEnvironmentStore } from '@/store/environmentStore';
@@ -401,7 +401,59 @@ export default function Campaignprogress() {
 
     return rtnList;
   };
+
   // 엑셀다운로드
+  const handleExcelDownload = async () => {
+    // 1. 데이터 준비
+    const wsData = filteredAndSortedData.map(row => {
+      return _columns.map(col => row[col.key]); // 각 row의 key와 컬럼 key 매핑
+    });
+    const tempList = createExcelData(filteredAndSortedData, _columns, true);
+
+    // 2. 헤더
+    const headers = ['센터', '테넌트 아이디', '캠페인 아이디', ..._columns.map(col => col.name)];
+
+    // 3. 워크북/워크시트 생성
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Sheet1');
+
+    // 4. 헤더 추가
+    worksheet.addRow(headers);
+
+    // 5. 데이터 추가
+    tempList.forEach(row => worksheet.addRow(row));
+
+    // 6. 텍스트 서식 지정 (모든 셀을 문자열로)
+    const maxRows = worksheet.rowCount;
+    const maxCols = headers.length;
+    for (let r = 1; r <= maxRows; r++) {
+      for (let c = 1; c <= maxCols; c++) {
+        const cell = worksheet.getCell(r, c);
+        if (!cell.value) cell.value = '';
+        cell.numFmt = '@'; // 문자열 포맷
+      }
+    }
+
+    // 7. 컬럼 너비 (필요에 따라 조정)
+    for (let c = 1; c <= maxCols; c++) {
+      worksheet.getColumn(c).width = 20;
+    }
+
+    // 8. 브라우저 다운로드
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'CampaignProgress.xlsx';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url); // 메모리 해제
+  };
+
+  /*
   const handleExcelDownload = () => {
     // Convert rows to a format suitable for Excel
     const wsData = filteredAndSortedData.map(row => {
@@ -424,6 +476,8 @@ export default function Campaignprogress() {
     // Export the file
     XLSX.writeFile(wb, 'CampaignProgress.xlsx');
   };
+  */
+
   //컬럼 설정 확인 이벤트.
   const handleColumnSetConfirm = (data: ColumnSettingItem[]) => {
     // setColumns(data);    
