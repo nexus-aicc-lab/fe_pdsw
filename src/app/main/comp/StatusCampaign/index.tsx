@@ -113,6 +113,11 @@ const StatusCampaign: React.FC = () => {
           setIsLoading(false); 
         }
     },
+    onError: (e) => {
+      clearInterval(intervalStatusCampaignRef.current!);
+      intervalStatusCampaignRef.current = null;
+      setIsLoading(false);
+    }
   });
 
   useEffect(() => {

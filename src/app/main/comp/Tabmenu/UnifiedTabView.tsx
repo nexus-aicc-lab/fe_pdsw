@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from "react";
 import { useTabStore } from "@/store/tabStore";
 import UnifiedTabSection from "./UnifiedTabSection";
-import ResizableDivider from "../ResizableDivider";
+import ResizableDivider from "./ResizableDivider";
 
 // 통합된 메인 컴포넌트 (탭 + 콘텐츠)
 const UnifiedTabView: React.FC = () => {

@@ -91,6 +91,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
   const [viewType, setViewType] = useState<ViewType>("gridView");
   const [selectedCall, setSelectedCall] = useState<CampaignProgressInformationResponseDataType | null>(null);
   const { statisticsUpdateCycle } = useEnvironmentStore();
+  const intervalCampaignMonitorDashbordRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // 사용자가 선택한 발신차수 저장용 - 09/06 추가 lab09
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -160,6 +161,9 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         setSelectedCall(initData);
       }
     },onError: (error) => {
+      if (intervalCampaignMonitorDashbordRef.current) {
+        clearInterval(intervalCampaignMonitorDashbordRef.current);
+      }
       ServerErrorCheck('캠페인 진행 정보 조회', error.message);
     }
   });
@@ -223,12 +227,17 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
     } else {
       // console.warn("캠페인 ID가 없어 API 호출이 비활성화됩니다.");
     }
-    if( statisticsUpdateCycle > 0 ){        
-      const interval = setInterval(() => {  
+    if( statisticsUpdateCycle > 0 ){             
+      intervalCampaignMonitorDashbordRef.current = setInterval(() => {
         refreshData();
-      }, statisticsUpdateCycle * 1000);  
-      return () => clearInterval(interval);
-    }
+      }, statisticsUpdateCycle * 1000);
+      return () => clearInterval(intervalCampaignMonitorDashbordRef.current!);
+    }    
+    return () => {
+      if (intervalCampaignMonitorDashbordRef.current) {
+        clearInterval(intervalCampaignMonitorDashbordRef.current);
+      }
+    };
   }, [numericCampaignId, campaigns,statisticsUpdateCycle]);
 
   return (
@@ -282,7 +291,8 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
           <div className="border rounded overflow-y-scroll h-[calc(100%-20px)]">
             <table className="w-full text-sm border-collapse">
               <tbody>
-                {isPending ? (
+                {/* {isPending ? ( */}
+                {false ? (
                   <tr>
                     <td className="p-4 text-center text-gray-500">로딩 중...</td>
                   </tr>
