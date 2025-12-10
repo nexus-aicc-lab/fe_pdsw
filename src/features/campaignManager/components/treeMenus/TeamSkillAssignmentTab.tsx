@@ -27,24 +27,6 @@ export function TeamSkillAssignmentTab() {
   const activeTabKey = useTabStore((state) => state.activeTabKey);
   const { candidateMembersForSkilAssign } = useCounselorFilterStore();
 
-  // 컴포넌트 마운트 시 상담사 정보 디버깅
-  // useEffect(() => {
-  //   console.group("🔍 [TeamSkillAssignmentTab] 컴포넌트 마운트");
-  //   console.log("📋 candidateMembersForSkilAssign 데이터:", candidateMembersForSkilAssign);
-  //   if (Array.isArray(candidateMembersForSkilAssign) && candidateMembersForSkilAssign.length > 0) {
-  //     console.log("👤 첫 번째 상담사:", candidateMembersForSkilAssign[0]);
-  //     console.log("👥 총 상담사 수:", candidateMembersForSkilAssign.length);
-  //     // 상담사 ID 목록 추출
-  //     const counselorIds = candidateMembersForSkilAssign
-  //       .filter(c => c && c.counselorId)
-  //       .map(c => c.counselorId);
-  //     console.log("🆔 유효한 상담사 ID 목록:", counselorIds);
-  //   } else {
-  //     console.warn("⚠️ 상담사 데이터가 없거나 형식이 올바르지 않습니다.");
-  //   }
-  //   console.groupEnd();
-  // }, [candidateMembersForSkilAssign]);
-
   // 상담사 배열이 유효한지 확인
   const isValidCounselorsArray = Array.isArray(candidateMembersForSkilAssign) && candidateMembersForSkilAssign.length > 0;
 

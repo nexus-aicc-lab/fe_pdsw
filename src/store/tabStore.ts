@@ -5,7 +5,6 @@ import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
 import React from "react";
 import { MenuItem, menuItems } from "@/widgets/header/model/menuItems";
-import { simulateMenuClick } from "@/widgets/header/utils";
 import { contextMenuItems } from "@/widgets/header/model/contextMenuItems";
 import { useOperationStore } from "@/app/main/comp/operation/store/OperationStore";
 import { useSystemDeviceStore } from "./systemDeviceStore";

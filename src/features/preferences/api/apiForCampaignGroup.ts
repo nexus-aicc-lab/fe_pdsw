@@ -206,8 +206,8 @@ export const transformToTreeData = (combinedData: ExtendedCombinedData): TreeNod
 
     // 최상위 NEXUS 노드에 테넌트 노드를 자식으로 추가
     return [{
-        id: centerId ? `${centerId}` :"nexus-root",
-        name: centerId && centerName ? `[${centerId}]${centerName}` :"[1]NEXUS",
+        id: centerId ? `$$${centerId}` :"nexus-root",
+        name: centerId && centerName ? `[${centerId}]${centerName}` :"[-]NEXUS",
         type: "root" as const,
         children: tenantNodes
     }];

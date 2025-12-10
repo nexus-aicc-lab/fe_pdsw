@@ -294,8 +294,14 @@ export default function LoginPage() {
   // store 의 session_key가 있으면서, 쿠키에 session_key가 존재하면 main 페이지로 이동하기전에 보여지는 빈 페이지
   if (isLoggedIn && cookiescheck) return (null);
 
+  const handleContextMenu = (e:any) => {
+    // 기본 브라우저 동작(오른쪽 클릭 메뉴)을 막습니다.
+    e.preventDefault();
+    // alert("마우스 오른쪽 버튼 사용이 금지되었습니다."); // 사용자에게 알림 (선택 사항)
+  };
+
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center">
+    <div className="min-h-screen flex flex-col justify-center items-center"  onContextMenu={handleContextMenu}>
 
       <Card className="w-[500px] shadow-none border-0 py-7 px-10">
         <div className="flex mb-8 mb-70">

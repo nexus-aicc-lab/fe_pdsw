@@ -44,11 +44,17 @@ export default function MainLayout({
     return isOpen ? `calc(100% - ${width}px)` : '100%';
   };
 
+  const handleContextMenu = (e:any) => {
+    // 기본 브라우저 동작(오른쪽 클릭 메뉴)을 막습니다.
+    e.preventDefault();
+    // alert("마우스 오른쪽 버튼 사용이 금지되었습니다."); // 사용자에게 알림 (선택 사항)
+  };
+
   const actualFooterHeight = isFooterOpen ? footerHeight : 32;
 
   return (
     <PortalProvider>
-      <div className={`${inter.className} h-screen overflow-hidden`}>
+      <div className={`${inter.className} h-screen overflow-hidden`} onContextMenu={handleContextMenu}>
         <div className="flex flex-col h-full">
           <Header />
           <div className="flex flex-1 overflow-hidden">

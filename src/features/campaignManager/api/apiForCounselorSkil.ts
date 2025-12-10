@@ -41,9 +41,9 @@ export async function assignSkillsToCounselor(
  */
 export const getAssignableSkillsForCounselor = async (tenantId: number): Promise<CounselorSkillListResponse> => {
 
-  // console.log("📌 상담사 할당 가능 스킬 목록 조회 시작:", tenantId);
-  // console.log("🔗 테넌트 ID 타입:", typeof tenantId);
-  // console.log("🔗 테넌트 ID for 캠페인 탭 헤더 :", tenantId);
+  // console.log(" 상담사 할당 가능 스킬 목록 조회 시작:", tenantId);
+  // console.log(" 테넌트 ID 타입:", typeof tenantId);
+  // console.log(" 테넌트 ID for 캠페인 탭 헤더 :", tenantId);
 
   const skillRequestData: CounselorSkillRequestData = {
     filter: {
@@ -70,12 +70,12 @@ export const getAssignableSkillsForCounselor = async (tenantId: number): Promise
       "collections/skill",
       skillRequestData
     );
-    // console.log("✅ 상담사 할당 가능 스킬 목록 조회 성공 ???????????????????????????? ", data);
+    // console.log(" 상담사 할당 가능 스킬 목록 조회 성공 ???????????????????????????? ", data);
 
     return data;
 
     // if (data.result_code === 0 && data.result_msg === "Success") {
-    //   console.log("✅ 상담사 할당 가능 스킬 목록 조회 성공:", data);
+    //   console.log(" 상담사 할당 가능 스킬 목록 조회 성공:", data);
     //   return data;
     // } else {
     //   throw new Error(`API Error: ${data.result_msg}`);
@@ -96,7 +96,7 @@ export const getAssignableSkillsForCounselor = async (tenantId: number): Promise
 export const getAssignedSkillsForCounselor = async (
   counselorId: string
 ): Promise<CounselorSkillListResponse> => {
-  // console.log("📌 상담사 스킬 데이터 조회 시작:", counselorId);
+  // console.log(" 상담사 스킬 데이터 조회 시작:", counselorId);
 
   try {
     const { data } = await axiosInstance.post<CounselorSkillListResponse>(
@@ -108,11 +108,11 @@ export const getAssignedSkillsForCounselor = async (
       }
     );
 
-    // console.log("✅ 상담사가 보유한 스킬 목록 조회 성공:", data);
+    // console.log(" 상담사가 보유한 스킬 목록 조회 성공:", data);
     return data;
   } catch (error) {
     const typedError = error as CounselorSkillApiError;
-    // console.error("❌ 상담사 스킬 목록 조회 실패:", error);
+    // console.error(" 상담사 스킬 목록 조회 실패:", error);
     throw new Error(
       typedError.response?.data?.result_msg || "상담사의 스킬 목록을 가져오는 데 실패했습니다."
     );
@@ -129,7 +129,7 @@ export const apiForGetRelatedInfoForAssignSkilToCounselor = async (
   counselorId: string,
   tenantId: number
 ): Promise<{ assignedSkills: CounselorSkillListResponse; assignableSkills: CounselorSkillListResponse }> => {
-  // console.log("📌 상담사 스킬 데이터 조회 시작:", counselorId, tenantId);
+  // console.log(" 상담사 스킬 데이터 조회 시작:", counselorId, tenantId);
 
   try {
     const [assignedSkills, assignableSkills] = await Promise.all([
@@ -137,12 +137,12 @@ export const apiForGetRelatedInfoForAssignSkilToCounselor = async (
       getAssignableSkillsForCounselor(tenantId), // 할당 가능한 스킬 목록
     ]);
 
-    // console.log("✅ 상담사가 보유한 스킬 목록:", assignedSkills);
-    // console.log("✅ 상담사에게 할당 가능한 스킬 목록:", assignableSkills);
+    // console.log(" 상담사가 보유한 스킬 목록:", assignedSkills);
+    // console.log(" 상담사에게 할당 가능한 스킬 목록:", assignableSkills);
 
     return { assignedSkills, assignableSkills };
   } catch (error) {
-    // console.error("❌ 상담사 스킬 조회 실패:", error);
+    // console.error(" 상담사 스킬 조회 실패:", error);
     throw new Error("스킬 데이터를 가져오는 중 오류가 발생했습니다.");
   }
 };
@@ -173,10 +173,10 @@ export const apiForDeleteCounselorsForSpecificSkill = async (
       }
     );
 
-    // console.log("✅ 스킬을 가진 상담사 목록에서 특정 상담사들 해제 성공:", data);
+    // console.log(" 스킬을 가진 상담사 목록에서 특정 상담사들 해제 성공:", data);
     return data;
   } catch (error) {
-    // console.error("❌ 스킬에서 상담사 해제 실패:", error);
+    // console.error(" 스킬에서 상담사 해제 실패:", error);
     const typedError = error as CounselorSkillApiError;
     throw new Error(
       typedError.response?.data?.result_msg || "스킬에서 상담사 해제 중 오류가 발생했습니다."
@@ -211,7 +211,7 @@ export const apiForAddCounselorsForSpecificSkill = async (
     //   });
     // }
 
-    // console.error("❌ 스킬에 상담사 추가 실패:", error);
+    // console.error(" 스킬에 상담사 추가 실패:", error);
     const typedError = error as CounselorSkillApiError;
     throw new Error(
       typedError.response?.data?.result_msg || "스킬에 상담사 추가 중 오류가 발생했습니다."
