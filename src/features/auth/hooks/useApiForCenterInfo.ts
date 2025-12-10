@@ -1,9 +1,6 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-
-import { fetchCenterInfo } from "../api/apiForFetchCenterInfo";
-import { CenterInfoDataResponse } from "../types/mainIndex";
+import { fetchCenterInfo, CenterInfoDataResponse } from "../api/apiForFetchCenterInfo";
 import { ApiError } from "../types/environmentIndex";
-
 
 export function useApiForCenterInfo(
     options?: UseMutationOptions<CenterInfoDataResponse, ApiError>

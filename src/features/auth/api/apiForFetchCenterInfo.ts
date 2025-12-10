@@ -1,9 +1,16 @@
 import { axiosRedisInstance } from "@/lib/axios";
-import { CenterInfoDataResponse } from "../types/mainIndex";
 
+// 센터 정보 데이터 타입 
+interface CenterInfoResponse {
+   centerId : string,
+   centerName: string
+}
 
-
-
+export interface CenterInfoDataResponse {
+  code: string;
+  message: string;
+  centerInfoList: CenterInfoResponse[];
+}
 
 // 센터 정보 가져오기
 export const fetchCenterInfo = async() => {

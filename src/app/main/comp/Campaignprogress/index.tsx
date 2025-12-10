@@ -574,6 +574,9 @@ export default function Campaignprogress() {
       });
     },
     onError: (error) => {
+      clearInterval(intervalCampaignprogressRef.current!);
+      intervalCampaignprogressRef.current = null;
+      setIsRefreshing(false);      
       ServerErrorCheck('스킬 조회', error.message);
     }
   });
@@ -586,10 +589,14 @@ export default function Campaignprogress() {
       processDataForGrid(data.result_data, selectedCampaign, selectedSkill, selectedStatus);
     },
     onError: (error) => {
+      clearInterval(intervalCampaignprogressRef.current!);
+      intervalCampaignprogressRef.current = null;
+      setIsRefreshing(false);      
       ServerErrorCheck('캠페인 스킬 조회', error.message);
     }
   });
 
+  // 전체캠페인진행정보
   const { mutate: fetchAllCampaignProgressInformation } = useApiForAllCampaignProgressInformation({
     onSuccess: (data) => {
       const tempList = data.progressInfoList.sort((a, b) => a.reuseCnt - b.reuseCnt);
@@ -632,6 +639,12 @@ export default function Campaignprogress() {
         tenant_id_array: []
       });
       // setIsLoading(false);
+    },
+    onError: (error) => {
+      clearInterval(intervalCampaignprogressRef.current!);
+      intervalCampaignprogressRef.current = null;
+      setIsRefreshing(false);      
+      ServerErrorCheck('캠페인 진행 정보', error.message);
     }
   });
 
@@ -690,6 +703,9 @@ export default function Campaignprogress() {
       }
     },
     onError: (error) => {
+      clearInterval(intervalCampaignprogressRef.current!);
+      intervalCampaignprogressRef.current = null;
+      setIsRefreshing(false);      
       ServerErrorCheck('캠페인 진행 정보', error.message);
     }
   });

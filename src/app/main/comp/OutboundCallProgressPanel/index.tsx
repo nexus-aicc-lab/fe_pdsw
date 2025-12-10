@@ -275,6 +275,11 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       setWaitingCounselorCnt( data.result_data.ready_count || 0 );
     },
     onError: (error) => {
+      // 기존 interval 제거
+      if (intervalOutboundCallProgressRef.current) {
+        clearInterval(intervalOutboundCallProgressRef.current);
+        intervalOutboundCallProgressRef.current = null;
+      }
       ServerErrorCheck('캠페인 대기 상담사 수 조회', error.message);
     }
   });
@@ -390,6 +395,12 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       setIsLoading(false);
       setIsRefreshing(false);
       
+      // 기존 interval 제거
+      if (intervalOutboundCallProgressRef.current) {
+        clearInterval(intervalOutboundCallProgressRef.current);
+        intervalOutboundCallProgressRef.current = null;
+      }
+
       ServerErrorCheck('발신진행상태 조회', error.message);
     }
   });
@@ -406,6 +417,13 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       setCampaignAgents(uniqueAgentIds);
     },
     onError: (error) => {
+        
+      // 기존 interval 제거
+      if (intervalOutboundCallProgressRef.current) {
+        clearInterval(intervalOutboundCallProgressRef.current);
+        intervalOutboundCallProgressRef.current = null;
+      }
+
       ServerErrorCheck('캠페인별 상담사 목록 조회', error.message);
     }
   });

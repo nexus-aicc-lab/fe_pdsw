@@ -266,7 +266,9 @@ export default function Header() {
     }
 
     // 홈 또는 로그인 페이지로 리다이렉트 
-    router.push('/login');
+    setTimeout(() => {      
+      router.push('/login');
+    }, 300);
   }
 
 

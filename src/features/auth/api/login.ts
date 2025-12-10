@@ -8,7 +8,7 @@ export const loginApi = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
 
-      // 🔐로그인 (내부 인증)
+      // 로그인 (내부 인증)
       const loginData: LoginRequest = {
         grant_type: 'nexus_admin',
         device_id: 'WEB',
@@ -44,7 +44,7 @@ export const loginApi = {
         sameSite: 'Lax',
         path: '/'
       });
-      // console.log("🍪 Cookies after setting userHost:", Cookies.get('userHost'));
+      // console.log(" Cookies after setting userHost:", Cookies.get('userHost'));
       // ###### 로그인 시간 기준으로 세션키 만료시간 설정 ######
       const currentDate = new Date();
       const expiredDate = new Date(currentDate.getTime() + data.expires_in * 1000); // 초 더하기

@@ -253,6 +253,9 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
         }
       }else{
         // console.log('ChannelMonitor: fetchChannelStateMonitoringList error', error);
+        clearInterval(intervalChannelMonitorRef.current!);
+        intervalChannelMonitorRef.current = null;
+        setIsRefreshing(false);
         ServerErrorCheck('장비 목록 조회', error.message);  
       }
     }
@@ -269,7 +272,9 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
       }
     },
     onError: (error) => {
-      
+      clearInterval(intervalChannelMonitorRef.current!);
+      intervalChannelMonitorRef.current = null;
+      setIsRefreshing(false);
       ServerErrorCheck('채널 그룹 목록 조회', error.message);  
     }
   })
@@ -298,6 +303,9 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
             window.close();
           }
         }else{
+          clearInterval(intervalChannelMonitorRef.current!);
+          intervalChannelMonitorRef.current = null;
+          setIsRefreshing(false);
           ServerErrorCheck('장비 목록 조회', error.message);  
         } 
       },
