@@ -7,7 +7,21 @@ const nextConfig: NextConfig = {
   reactStrictMode: false,
   // distDir: '.next_upds',
   images: {
-    domains: ['localhost', '10.10.40.145'],
+    //domains: ['localhost', '10.10.40.145'],
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '', // 포트가 명확하지 않으면 빈 문자열 또는 생략
+        pathname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: '10.10.40.145',
+        port: '',
+        pathname: '**',
+      },
+    ],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
 
