@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
   // distDir: '.next_upds',
   images: {
     unoptimized: true,
+    loader: "default",
     /*
     domains: ['localhost', '10.10.40.145'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
