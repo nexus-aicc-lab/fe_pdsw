@@ -10,9 +10,14 @@ import { useSidebarWidthStore } from "@/widgets/sidebar2/store/useSidebarWidthSt
 import { useAuthStore, useMainStore } from "@/store";
 import { useTreeMenuStore, ViewMode } from "@/store/storeForSsideMenuCampaignTab";
 import { useShallow } from "zustand/react/shallow";
-import { getStatusFromFlags } from "../api/apiForGetTreeMenuDataForSideMenu";
 import { useEnvironmentStore } from "@/store/environmentStore";
 
+function getStatusFromFlags(start_flag: number): 'started' | 'pending' | 'stopped' {
+  if (start_flag === 1) return 'started';      // 종료된 상태
+  if (start_flag === 2) return 'pending';      // 대기 상태
+  if (start_flag === 3) return 'stopped';      // 진행중 
+  return 'stopped';                            // 기타 케이스는 stopped
+}
 
 // 트리 노드 선택/확장 상태 관리
 interface TreeState {
