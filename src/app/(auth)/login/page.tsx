@@ -1,10 +1,10 @@
 // C:\nproject2\fe_pdsw_for_playwright\src\app\(auth)\login\page.tsx
 'use client';
 
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ExpandIcon, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from "@/components/ui/checkbox";
@@ -17,7 +17,6 @@ import { useApirForEnvironmentList } from '@/features/auth/hooks/useApiForEnviro
 import { useApiForOperatingTime } from '@/features/preferences/hooks/useApiForOperatingTime';
 import { EnvironmentListResponse } from "@/features/auth/types/environmentIndex";
 import Cookies from 'js-cookie';
-import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 import { useApiForCenterInfo } from '@/features/auth/hooks/useApiForCenterInfo';
 
 interface LoginFormData {
@@ -56,8 +55,8 @@ export default function LoginPage() {
     type: '0',
   });
 
-  const { setAuth } = useAuthStore();
-  const { setEnvironment, environmentData } = useEnvironmentStore(); // 새로운 환경설정 스토어 사용
+  const { setAuth, tenant_id } = useAuthStore();
+  const { setEnvironment, centerId } = useEnvironmentStore(); // 새로운 환경설정 스토어 사용
   const [tempEnvironment, setTempEnvironment] = useState<EnvironmentListResponse>(data);
   // 캠페인 운용 가능 시간 조회 API 호출
   const { mutate: fetchOperatingTime } = useApiForOperatingTime({
@@ -129,7 +128,7 @@ export default function LoginPage() {
   const { mutate: environment } = useApirForEnvironmentList({
     onSuccess: (data) => {
       
-      centerInfo(); // 센터정보 저장하는 api 호출
+      // centerInfo(); // 센터정보 저장하는 api 호출
 
       setTempEnvironment(data); // 환경설정 데이터를 state로 저장 (이후 useEffect로 store에 저장)
       
@@ -155,11 +154,6 @@ export default function LoginPage() {
   const { mutate: login } = useApiForLogin({
     onSuccess: (data) => {
 
-      // login.ts에서 throw error를 하기때문에 다른 오류 응답은 올수 없음
-      
-
-      // console.log('data (로그인 응답)', data);
-
       setAuth(
         formData.user_name,              // id
         data.tenant_id,                  // tenant_id
@@ -177,16 +171,13 @@ export default function LoginPage() {
       }
 
       // 환경설정 정보 요청
-      environment({
-        centerId: 1,                 // 하드코딩된 값
-        tenantId: data.tenant_id,    // 로그인 응답에서 받은 tenant_id
-        employeeId: formData.user_name  // 로그인 시 입력한 user_name
-      });
-      setIsPending(false);
-
-      
-
-      
+      // environment({
+      //   centerId: 1,                 // 하드코딩된 값
+      //   tenantId: data.tenant_id,    // 로그인 응답에서 받은 tenant_id
+      //   employeeId: formData.user_name  // 로그인 시 입력한 user_name
+      // });
+      // setIsPending(false); 
+      centerInfo(); // 센터정보 저장하는 api 호출
     },
     onError: (e) => {
       if (e.message === 'User does not exist.') {
@@ -254,6 +245,18 @@ export default function LoginPage() {
     }
   };
 
+  // 환경설정 정보 요청
+  useEffect(() => {
+    if( tenant_id > -1 && centerId !== '' ){
+      environment({
+        centerId: Number(centerId),                 // 하드코딩된 값
+        tenantId: tenant_id,    // 로그인 응답에서 받은 tenant_id
+        employeeId: formData.user_name  // 로그인 시 입력한 user_name
+      });
+      setIsPending(false); 
+    }
+  }, [tenant_id, centerId]);
+
   // 컴포넌트 마운트 시 저장된 사용자 이름 불러오기
   useEffect(() => {
     const rememberedUsername = localStorage.getItem('remembered_username');
@@ -264,6 +267,7 @@ export default function LoginPage() {
         remember: true
       }));
     }
+    useEnvironmentStore.getState().setCenterInfo('','');
   }, []);
 
   
