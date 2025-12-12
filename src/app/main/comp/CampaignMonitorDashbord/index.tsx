@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useMainStore } from '@/store';
+import { useMainStore, useTabStore } from '@/store';
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-custom";
 import { Label } from "@/components/ui/label";
@@ -92,6 +92,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
   const [selectedCall, setSelectedCall] = useState<CampaignProgressInformationResponseDataType | null>(null);
   const { statisticsUpdateCycle } = useEnvironmentStore();
   const intervalCampaignMonitorDashbordRef = React.useRef<NodeJS.Timeout | null>(null);
+  const { activeTabId, secondActiveTabId, activeTabKey, secondActiveTabKey, openedTabs } = useTabStore();
 
   // 사용자가 선택한 발신차수 저장용 - 09/06 추가 lab09
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -206,6 +207,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
   // 컴포넌트 마운트 시 캠페인 정보 로드 및 데이터 조회
   useEffect(() => {
     // console.log("컴포넌트 마운트, 캠페인 ID:", numericCampaignId);
+    console.log('activeTabId changed: ', activeTabId, activeTabKey, openedTabs);
     
     if (numericCampaignId) {
       // 캠페인 정보 찾기
@@ -238,7 +240,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         clearInterval(intervalCampaignMonitorDashbordRef.current);
       }
     };
-  }, [numericCampaignId, campaigns,statisticsUpdateCycle]);
+  }, [numericCampaignId, campaigns,statisticsUpdateCycle, activeTabId, secondActiveTabId, activeTabKey, secondActiveTabKey]);
 
   return (
     <div className="flex gap-4 w-full limit-width h-full">

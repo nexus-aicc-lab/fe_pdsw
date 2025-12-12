@@ -6,9 +6,6 @@ import "./globals.css";
 import ClientProvider from "@/components/providers/ClientProvider";
 import Script from 'next/script'
 
-import RedisTestButton from "@/components/providers/RedisTestButton";
-// import { useEffect } from "react";
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -52,8 +49,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased body-top`}
       >
         <ClientProvider>
-          {/* ✅ ClientProvider 내부에서 RedisTestButton 실행 */}
-          {/* <RedisTestButton /> */}
           {children}
         </ClientProvider>
       </body>

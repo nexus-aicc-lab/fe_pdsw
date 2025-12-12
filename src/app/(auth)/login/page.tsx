@@ -297,7 +297,7 @@ export default function LoginPage() {
   const handleContextMenu = (e:any) => {
     // 기본 브라우저 동작(오른쪽 클릭 메뉴)을 막습니다.
     e.preventDefault();
-    // alert("마우스 오른쪽 버튼 사용이 금지되었습니다."); // 사용자에게 알림 (선택 사항)
+    alert("마우스 오른쪽 버튼 사용이 금지되었습니다."); // 사용자에게 알림 (선택 사항)
   };
 
   return (
