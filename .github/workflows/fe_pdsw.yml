@@ -49,8 +49,9 @@ jobs:
           username: ${{ secrets.PDSW_USER }}
           password: ${{ secrets.PDSW_PASSWORD }}
           port: ${{ secrets.PDSW_PORT }}
-          source: "./.next/*, ./public/*"
+          source: "./.next/*, ./public/*, ./package.json, ./package-lock.json"
           target: "/home/nexus/fe_pdsw"
+          exclude: ".next/cache/**"
 
       - name: SSH로 서버(PDSW)에 접속후 서버 재시작
         uses: appleboy/ssh-action@v1.2.0
@@ -63,8 +64,9 @@ jobs:
           script: |
             cd /home/nexus/fe_pdsw
             npm -v
-            npm install
+            rm -rf node_modules
+            npm ci --production
             node env
-            pm2 delete fe_pdsw
+            pm2 delete fe_pdsw || true
             # pm2 start ecosystem.config.js --env production
             pm2 start "npx next start" --name fe_pdsw
