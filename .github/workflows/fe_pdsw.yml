@@ -42,6 +42,10 @@ jobs:
           npm run build
           ls ./.next
 
+      - name: next js 빌드 캐시 제거
+        run: |
+          rm -rf .next/cache
+
       - name: 서버(PDSW)에 파일/폴더 업로드
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -49,7 +53,7 @@ jobs:
           username: ${{ secrets.PDSW_USER }}
           password: ${{ secrets.PDSW_PASSWORD }}
           port: ${{ secrets.PDSW_PORT }}
-          source: "./.next/*, ./public/*"
+          source: "./.next/*, ./public/*, ./package.json, ./package-lock.json"
           target: "/home/nexus/fe_pdsw"
 
       - name: SSH로 서버(PDSW)에 접속후 서버 재시작
@@ -63,8 +67,9 @@ jobs:
           script: |
             cd /home/nexus/fe_pdsw
             npm -v
-            npm install
+            rm -rf node_modules
+            npm ci --production
             node env
-            pm2 delete fe_pdsw
+            pm2 delete fe_pdsw || true
             # pm2 start ecosystem.config.js --env production
             pm2 start "npx next start" --name fe_pdsw
