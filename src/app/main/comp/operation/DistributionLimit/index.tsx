@@ -567,13 +567,15 @@ const DistributionLimit = () => {
         
         data.assignedCounselorList.forEach(counselor => {
             counselorRows.push({
-              id: `agent-${counselor.counselorId}`,
+              // id: `agent-${counselor.counselorId}`,  //BOSQ-363 오류수정 20251215 2-1
+              id: `agent-${counselor.counselorEmplNum}`,
               center: centerName,
               group: counselor.affiliationGroupId,
               groupName : counselor.affiliationGroupName,
               part: counselor.affiliationTeamId,
               partName: counselor.affiliationTeamName,
-              agent_id: counselor.counselorId,
+              // agent_id: counselor.counselorId,       //BOSQ-363 오류수정 20251215 2-2
+              agent_id: counselor.counselorEmplNum,
               agent_name: counselor.counselorname,
               max_dist: '0',
               current_resp: '0',
