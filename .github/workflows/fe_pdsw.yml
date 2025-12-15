@@ -30,8 +30,8 @@ jobs:
       #    node-version: '22'
 
       # node_modules 생성
-      - name: npm install
-        run: npm install
+      - name: npm c install
+        run: npm ci
 
       # 단위테스트 (추후 진행)
       #- name: 단위테스트
