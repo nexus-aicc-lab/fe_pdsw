@@ -68,7 +68,7 @@ jobs:
             cd /home/nexus/fe_pdsw
             npm -v
             rm -rf node_modules
-            npm ci --production
+            npm ci --omit=dev
             node env
             pm2 delete fe_pdsw || true
             # pm2 start ecosystem.config.js --env production
