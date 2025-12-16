@@ -207,9 +207,11 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
   // 컴포넌트 마운트 시 캠페인 정보 로드 및 데이터 조회
   useEffect(() => {
     // console.log("컴포넌트 마운트, 캠페인 ID:", numericCampaignId);
-    console.log('activeTabId changed: ', activeTabId, activeTabKey, openedTabs);
+    console.log('activeTabId changed: ', activeTabId, activeTabKey,secondActiveTabId, secondActiveTabKey, openedTabs);
     
-    if (numericCampaignId) {
+    if (numericCampaignId && ( (activeTabId === 21 && activeTabKey?.split('-')[2] === numericCampaignId+'')
+      || ( typeof secondActiveTabKey === 'string' && secondActiveTabKey?.split('-')[2] === numericCampaignId+'' ))
+    ) {
       // 캠페인 정보 찾기
       if (campaigns && campaigns.length > 0) {
         const tempCampaign = campaigns.find(data => data.campaign_id === numericCampaignId);
@@ -226,15 +228,17 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         tenantId: campaigns.find(data => data.campaign_id === numericCampaignId)?.tenant_id || 1,
         campaignId: numericCampaignId
       });
+      if( statisticsUpdateCycle > 0 ){             
+        intervalCampaignMonitorDashbordRef.current = setInterval(() => {
+          refreshData();
+        }, statisticsUpdateCycle * 1000);
+        return () => clearInterval(intervalCampaignMonitorDashbordRef.current!);
+      }    
     } else {
-      // console.warn("캠페인 ID가 없어 API 호출이 비활성화됩니다.");
+      if (intervalCampaignMonitorDashbordRef.current) {
+        clearInterval(intervalCampaignMonitorDashbordRef.current);
+      }
     }
-    if( statisticsUpdateCycle > 0 ){             
-      intervalCampaignMonitorDashbordRef.current = setInterval(() => {
-        refreshData();
-      }, statisticsUpdateCycle * 1000);
-      return () => clearInterval(intervalCampaignMonitorDashbordRef.current!);
-    }    
     return () => {
       if (intervalCampaignMonitorDashbordRef.current) {
         clearInterval(intervalCampaignMonitorDashbordRef.current);

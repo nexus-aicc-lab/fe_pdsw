@@ -384,9 +384,9 @@ export const useTabStore = create<TabLayoutStore>()(
                 sections: row.sections.map((section) => {
                   if (section.id !== sectionId){
                     _secondActiveTabId = section.activeTabKey !== null
-                      ? Number(section.activeTabKey?.split('-')[0]) : null;
+                      ? Number(section.activeTabKey?.split('-')[0] == 'progress'?21:section.activeTabKey?.split('-')[0]) : null;
                     _secondActiveTabKey = section.activeTabKey !== null
-                      ? Number(section.activeTabKey?.split('-')[1]) : null;
+                      ? section.activeTabKey : null;
                     return section;
                   }else{                    
                     return {
@@ -907,7 +907,7 @@ export const useTabStore = create<TabLayoutStore>()(
                         ? Number(remainingTabs[remainingTabs.length - 1].id)
                         : null;
                       _secondActiveTabKey = remainingTabs.length > 0
-                        ? Number(remainingTabs[remainingTabs.length - 1].uniqueKey)
+                        ? remainingTabs[remainingTabs.length - 1].uniqueKey
                         : null;
                       return {
                         ...section,
@@ -1571,9 +1571,11 @@ export const useTabStore = create<TabLayoutStore>()(
               rows: updatedRowsWithTabMoved,
               activeTabId: tab.id,
               activeTabKey: tab.uniqueKey,
-              secondActiveTabKey: tab.secondActiveTabKey || null,
               secondActiveTabId: updatedRowsWithTabMoved[0].sections[0].tabs.length > 0
                 ? updatedRowsWithTabMoved[0].sections[0].tabs[updatedRowsWithTabMoved[0].sections[0].tabs.length - 1].id
+                : null,
+              secondActiveTabKey: updatedRowsWithTabMoved[0].sections[0].tabs.length > 0
+                ? updatedRowsWithTabMoved[0].sections[0].tabs[updatedRowsWithTabMoved[0].sections[0].tabs.length - 1].uniqueKey
                 : null
             };
           }),
