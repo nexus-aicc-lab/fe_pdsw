@@ -267,7 +267,7 @@ export default function LoginPage() {
         remember: true
       }));
     }
-    useEnvironmentStore.getState().setCenterInfo('','');
+    // useEnvironmentStore.getState().setCenterInfo('','');
   }, []);
 
   
