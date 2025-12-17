@@ -1,8 +1,8 @@
 // src/features/campaignManager/hooks/useApiForChannelStateMonitoringList.ts
 import { useMutation } from '@tanstack/react-query';
-import { fetchChannelStateMonitoringList } from '../api/mainChannelStateMonitoringList';
+import { fetchChannelStateMonitoringList, ChannelStatusMonitoringRequest, ChannelStatusMonitoringListResponse } from '../api/mainChannelStateMonitoringList';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { ChannelStatusMonitoringRequest, ChannelStatusMonitoringListResponse, MonitoringApiError } from '../types/monitoringIndex';
+import { MonitoringApiError } from '../types/monitoringIndex';
 
 export function useApiForChannelStateMonitoringList(
   options?: UseMutationOptions<ChannelStatusMonitoringListResponse, MonitoringApiError, ChannelStatusMonitoringRequest>

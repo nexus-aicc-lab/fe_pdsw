@@ -67,7 +67,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   const [_agentData, _setAgentData] = useState<AgentData[]>([]);
   const [campaignAgents, setCampaignAgents] = useState<string[]>([]);
   const { statisticsUpdateCycle, centerId } = useEnvironmentStore();
-  const { activeTabId, openedTabs, secondActiveTabId } = useTabStore();
+  const { activeTabId, openedTabs, secondActiveTabId, activeTabKey, secondActiveTabKey } = useTabStore();
   const intervalAgentStatusMonitoringRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const handleStatusChange = (status: keyof AgentStatus): void => {
@@ -263,100 +263,190 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
     }
   }, [_agentData]);
 
+  // useEffect(() => {
+  //   if (campaignAgents.length === 0 && campaignId === 0) return;
+
+  //   if (campaignId && campaigns.length > 0) {
+  //     const _tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
+  //     if (_tenantId) {
+  //       fetchAgentStateMonitoringList({
+  //         centerId: centerId,
+  //         tenantId: _tenantId+'',
+  //         campaignId: Number(campaignId),
+  //         agentIds: campaignAgents
+  //       });
+  //       if( statisticsUpdateCycle > 0 ){        
+  //         const campaignInterval = setInterval(() => {  
+  //           fetchAgentStateMonitoringList({
+  //             centerId: centerId,
+  //             tenantId: _tenantId+'',
+  //             campaignId: Number(campaignId),
+  //             agentIds: campaignAgents
+  //           });
+  //         }, statisticsUpdateCycle * 1000);  
+  //         return () => clearInterval(campaignInterval);
+  //       }
+  //     }
+  //   }
+  //   // 최초 로딩이나 새로고침시 BadRequest 방지를 위한 주석처리
+  //   else if( tenantId !== 'undefined' && tenantId !== 'A' && campaigns.length > 0) {
+  //     fetchAgentStateMonitoringList({
+  //       centerId: centerId,
+  //       tenantId: tenantId+'',
+  //       campaignId: 0,
+  //       agentIds: campaignAgents
+  //     });
+  //     if( statisticsUpdateCycle > 0 ){        
+  //       const tenantInterval = setInterval(() => {  
+  //         fetchAgentStateMonitoringList({
+  //           centerId: centerId,
+  //           tenantId: tenantId+'',
+  //           campaignId: 0,
+  //           agentIds: campaignAgents
+  //         });
+  //       }, statisticsUpdateCycle * 1000);  
+  //       return () => clearInterval(tenantInterval);
+  //     }
+  //   }
+  //   else if( tenantId !== 'undefined' && campaignId === 0 && tenantId === 'A' && campaigns.length > 0) {
+  //     const _tenantId = campaigns && campaigns.length > 0 ? [...new Set(campaigns.map(data => data.tenant_id))].join(',') : 'A';
+  //     fetchAgentStateMonitoringList({
+  //       centerId: centerId,
+  //       tenantId: _tenantId,
+  //       campaignId: 0,
+  //       agentIds: campaignAgents
+  //     });
+  //     if( statisticsUpdateCycle > 0 ){        
+  //       const centerInterval = setInterval(() => {  
+  //         fetchAgentStateMonitoringList({
+  //           centerId: centerId,
+  //           tenantId: _tenantId,
+  //           campaignId: 0,
+  //           agentIds: campaignAgents
+  //         });
+  //       }, statisticsUpdateCycle * 1000);  
+  //       return () => clearInterval(centerInterval);
+  //     }
+  //   }
+  // }, [campaignAgents, campaignId,tenantId,campaigns, tenants,statisticsUpdateCycle, centerId]);
+  
+  // useEffect(() => {
+  //   console.log( "##### activeTabId, secondActiveTabId,openedTabs: ", activeTabId, secondActiveTabId, openedTabs ); 
+  //   if ((activeTabId === 22 || secondActiveTabId === 22) && searchAgentState === false) {
+  //     if( tenantId === 'A' && campaigns.length > 0 ){
+  //       fetchCampaignAgentList({
+  //         campaign_id: [...new Set(campaigns.map(c => c.campaign_id))].filter((id): id is number => typeof id === 'number') as number[] 
+  //       });
+  //     }else if( campaignId === 0 && campaigns.length > 0 ){
+  //       fetchCampaignAgentList({
+  //         campaign_id: campaigns
+  //           .filter(c => c.tenant_id === Number(tenantId))        // tenantId 일치하는 캠페인만 선택
+  //           .map(c => c.campaign_id) as number[]                  // 캠페인 아이디만 추출하여 number[]로 변환
+  //       });
+  //     }else{
+  //       fetchCampaignAgentList({
+  //         campaign_id: [Number(campaignId) as number]
+  //       });
+  //     }
+  //   }else if(!(activeTabId === 22 || secondActiveTabId === 22) ){
+  //     clearInterval(intervalAgentStatusMonitoringRef.current!);
+  //     intervalAgentStatusMonitoringRef.current = null;
+  //     setSearchAgentState(false);
+  //     // setIsLoading(false);
+  //     // setIsRefreshing(false);
+  //     // setSelectedCampaign('');
+  //   }
+  // }, [searchAgentState,activeTabId, openedTabs, secondActiveTabId, activeTabKey, secondActiveTabKey]);
+
+  const clearAgentInterval = () => {
+    if (intervalAgentStatusMonitoringRef.current) {
+      clearInterval(intervalAgentStatusMonitoringRef.current);
+      intervalAgentStatusMonitoringRef.current = null;
+    }
+  };
+
   useEffect(() => {
     if (campaignAgents.length === 0 && campaignId === 0) return;
 
+    clearAgentInterval(); //  기존 interval 무조건 정리
+
+    let resolvedTenantId: string | null = null;
+
     if (campaignId && campaigns.length > 0) {
-      const _tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
-      if (_tenantId) {
-        fetchAgentStateMonitoringList({
-          centerId: centerId,
-          tenantId: _tenantId+'',
-          campaignId: Number(campaignId),
-          agentIds: campaignAgents
-        });
-        if( statisticsUpdateCycle > 0 ){        
-          const campaignInterval = setInterval(() => {  
-            fetchAgentStateMonitoringList({
-              centerId: centerId,
-              tenantId: _tenantId+'',
-              campaignId: Number(campaignId),
-              agentIds: campaignAgents
-            });
-          }, statisticsUpdateCycle * 1000);  
-          return () => clearInterval(campaignInterval);
-        }
-      }
+      resolvedTenantId =
+        campaigns.find(c => c.campaign_id === Number(campaignId))?.tenant_id + '';
+    } else if (tenantId !== 'undefined' && tenantId !== 'A') {
+      resolvedTenantId = tenantId + '';
+    } else if (tenantId === 'A' && campaigns.length > 0) {
+      resolvedTenantId = [...new Set(campaigns.map(c => c.tenant_id))].join(',');
     }
-    // 최초 로딩이나 새로고침시 BadRequest 방지를 위한 주석처리
-    else if( tenantId !== 'undefined' && tenantId !== 'A' && campaigns.length > 0) {
+
+    if (!resolvedTenantId) return;
+
+    const fetchFn = () =>
       fetchAgentStateMonitoringList({
-        centerId: centerId,
-        tenantId: tenantId+'',
-        campaignId: 0,
+        centerId,
+        tenantId: resolvedTenantId!,
+        campaignId: campaignId ? Number(campaignId) : 0,
         agentIds: campaignAgents
       });
-      if( statisticsUpdateCycle > 0 ){        
-        const tenantInterval = setInterval(() => {  
-          fetchAgentStateMonitoringList({
-            centerId: centerId,
-            tenantId: tenantId+'',
-            campaignId: 0,
-            agentIds: campaignAgents
-          });
-        }, statisticsUpdateCycle * 1000);  
-        return () => clearInterval(tenantInterval);
-      }
+
+    fetchFn(); // 최초 1회
+
+    if (statisticsUpdateCycle > 0) {
+      intervalAgentStatusMonitoringRef.current = setInterval(
+        fetchFn,
+        statisticsUpdateCycle * 1000
+      );
     }
-    else if( tenantId !== 'undefined' && campaignId === 0 && tenantId === 'A' && campaigns.length > 0) {
-      const _tenantId = campaigns && campaigns.length > 0 ? [...new Set(campaigns.map(data => data.tenant_id))].join(',') : 'A';
-      fetchAgentStateMonitoringList({
-        centerId: centerId,
-        tenantId: _tenantId,
-        campaignId: 0,
-        agentIds: campaignAgents
-      });
-      if( statisticsUpdateCycle > 0 ){        
-        const centerInterval = setInterval(() => {  
-          fetchAgentStateMonitoringList({
-            centerId: centerId,
-            tenantId: _tenantId,
-            campaignId: 0,
-            agentIds: campaignAgents
-          });
-        }, statisticsUpdateCycle * 1000);  
-        return () => clearInterval(centerInterval);
-      }
-    }
-  }, [campaignAgents, campaignId,tenantId,campaigns, tenants,statisticsUpdateCycle, centerId]);
+
+    return clearAgentInterval;
+  }, [
+    campaignAgents,
+    campaignId,
+    tenantId,
+    campaigns,
+    statisticsUpdateCycle,
+    centerId
+  ]);
   
   useEffect(() => {
-    console.log( "##### activeTabId, secondActiveTabId,openedTabs: ", activeTabId, secondActiveTabId, openedTabs ); 
-    if ((activeTabId === 22 || secondActiveTabId === 22) && searchAgentState === false) {
-      if( tenantId === 'A' && campaigns.length > 0 ){
+    const isAgentTabActive = activeTabId === 22 || secondActiveTabId === 22;
+
+    if (isAgentTabActive && !searchAgentState) {
+      setSearchAgentState(true);
+
+      if (tenantId === 'A' && campaigns.length > 0) {
         fetchCampaignAgentList({
-          campaign_id: [...new Set(campaigns.map(c => c.campaign_id))].filter((id): id is number => typeof id === 'number') as number[] 
+          campaign_id: [...new Set(campaigns.map(c => c.campaign_id))].filter(
+            (id): id is number => typeof id === 'number'
+          )
         });
-      }else if( campaignId === 0 && campaigns.length > 0 ){
+      } else if (campaignId === 0 && campaigns.length > 0) {
         fetchCampaignAgentList({
           campaign_id: campaigns
-            .filter(c => c.tenant_id === Number(tenantId))        // tenantId 일치하는 캠페인만 선택
-            .map(c => c.campaign_id) as number[]                  // 캠페인 아이디만 추출하여 number[]로 변환
+            .filter(c => c.tenant_id === Number(tenantId))
+            .map(c => c.campaign_id)
         });
-      }else{
+      } else {
         fetchCampaignAgentList({
-          campaign_id: [Number(campaignId) as number]
+          campaign_id: [Number(campaignId)]
         });
       }
-    }else if(!(activeTabId === 22 || secondActiveTabId === 22) ){
-      clearInterval(intervalAgentStatusMonitoringRef.current!);
-      intervalAgentStatusMonitoringRef.current = null;
-      setSearchAgentState(false);
-      // setIsLoading(false);
-      // setIsRefreshing(false);
-      // setSelectedCampaign('');
     }
-  }, [searchAgentState,activeTabId, openedTabs, secondActiveTabId]);
+
+    if (!isAgentTabActive) {
+      clearAgentInterval();
+      setSearchAgentState(false);
+    }
+  }, [
+    activeTabId,
+    secondActiveTabId,
+    campaignId,
+    tenantId,
+    campaigns,
+    searchAgentState, activeTabKey, secondActiveTabKey
+  ]);
 
   return (
     <div className="w-full h-full flex flex-col gap-4 limit-700">

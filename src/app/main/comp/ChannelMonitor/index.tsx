@@ -283,14 +283,21 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
   // 장비 목록 조회
   const { mutate: fetchDialingDeviceList } = useApiForDialingDevice({
       onSuccess: (data) => {
+        let _deviceId = "0";
         if( data.result_data.length > 0 ){
           const tempData: ItemType[] = data.result_data.map(item => ({
             key: `${item.device_id}`,
             name: item.device_name
           }));
           setSecondModeEquipment(tempData);
+          _deviceId = data.result_data.map(data => data.device_id).join(',');
+          fetchChannelStateMonitoringList({deviceId:_deviceId});
+        }else{
+          setSecondModeEquipment([]);
+          setChannelData([]);
+          setSecondModeCampaign([]);
+          setSecondModeCampaignGroup([]);
         }
-        fetchChannelStateMonitoringList({deviceId:0});
       },
       onError: (error) => {
         // onError 추가한 이유 : 통합모니터링 창이 켜있다가 가장 먼저 통신하는 api이므로
