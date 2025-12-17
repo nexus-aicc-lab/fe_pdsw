@@ -55,7 +55,7 @@ export default function LoginPage() {
     type: '0',
   });
 
-  const { setAuth, tenant_id } = useAuthStore();
+  const { setAuth, tenant_id, id } = useAuthStore();
   const { setEnvironment, centerId } = useEnvironmentStore(); // 새로운 환경설정 스토어 사용
   const [tempEnvironment, setTempEnvironment] = useState<EnvironmentListResponse>(data);
   // 캠페인 운용 가능 시간 조회 API 호출
@@ -251,7 +251,7 @@ export default function LoginPage() {
       environment({
         centerId: Number(centerId),                 // 하드코딩된 값
         tenantId: tenant_id,    // 로그인 응답에서 받은 tenant_id
-        employeeId: formData.user_name  // 로그인 시 입력한 user_name
+        employeeId: formData.user_name || id  // 로그인 시 입력한 user_name
       });
       setIsPending(false); 
     }

@@ -20,7 +20,7 @@ import GlobalErrorAlert from "@/components/shared/CommonGlobalError/CommonGlobal
 import logoutFunction from "@/components/common/logoutFunction";
 import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 import { useEnvironmentStore } from "@/store/environmentStore";
-import { useApiForCenterInfo } from "@/features/auth/hooks/useApiForCenterInfo";
+// import { useApiForCenterInfo } from "@/features/auth/hooks/useApiForCenterInfo";
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 
 
@@ -74,23 +74,23 @@ export default function Header() {
   }, []);
 
 
-  const { mutate: centerInfo} = useApiForCenterInfo({
-      onSuccess: (data) => {
-        // console.log('센터 정보:', data.centerInfoList.map((item) => item.centerName)[0]);
+  // const { mutate: centerInfo} = useApiForCenterInfo({
+  //     onSuccess: (data) => {
+  //       // console.log('센터 정보:', data.centerInfoList.map((item) => item.centerName)[0]);
   
-        useEnvironmentStore.getState().setCenterInfo(data.centerInfoList[0].centerId, data.centerInfoList[0].centerName);
-      },
-      onError: (error) => {
-        // console.log('센터 정보 조회 실패:', error);
-        // ServerErrorCheck('센터 정보 조회', error.message);
-      }
-  });
+  //       useEnvironmentStore.getState().setCenterInfo(data.centerInfoList[0].centerId, data.centerInfoList[0].centerName);
+  //     },
+  //     onError: (error) => {
+  //       // console.log('센터 정보 조회 실패:', error);
+  //       // ServerErrorCheck('센터 정보 조회', error.message);
+  //     }
+  // });
 
   useEffect(() => {
 
     // 환경 데이터가 없거나 null인 경우 초기값 스토어에 설정
     if(!environmentData || environmentData === null){
-
+debugger;
       // "campaignListAlram": 0,  			알림 설정 - 리스트 잔량 부족 시 알람 모드(주기적으로 계속) 0: 한 번만, 1: 주기적으로 계속
       // "statisticsUpdateCycle": 20,  		통계 갱신 주기 - 통계 가져오기 주기
       // "serverConnectionTime": 100,		서버 접속 시간 - 서버와의 접속 시간을 설정합니다.
@@ -116,9 +116,9 @@ export default function Header() {
         sendingWorkEndHours: "0000",
         dayOfWeekSetting: 'f,f,f,f,f,f,f',
       };
-      if(centerId === '' || centerName === '') {
-        centerInfo();
-      }
+      // if(centerId === '' || centerName === '') {
+      //   centerInfo();
+      // }
       
       setEnvironment(initialEnvironmentData);        
     }
