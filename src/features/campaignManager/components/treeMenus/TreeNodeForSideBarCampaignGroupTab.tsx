@@ -548,7 +548,8 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
   const handleMonitorCampaign = useCallback(() => {
     const { addMultiTab, setActiveTab } = useTabStore.getState();
-    const _uniqueKey = `monitor-${Date.now()}`;
+    // const _uniqueKey = `monitor-${Date.now()}`;
+    const _uniqueKey = `monitor-campaign-${node.campaign_id}-${Date.now()}`;
     setActiveTab(22, _uniqueKey);
     addMultiTab({
       id: 22,

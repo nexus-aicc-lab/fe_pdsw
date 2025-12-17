@@ -344,7 +344,8 @@ export function ContextMenuForCampaignForCampaignTab({
 
   const handleMonitorClick = (tenantIdForCampaignTab: any, campaignId: any, campaignName: string) => {
     // console.log("tenantId 확인 at 캠페인탭 : ", tenantIdForCampaignTab);
-    const _uniqueKey = `monitor-${Date.now()}`;
+    // const _uniqueKey = `monitor-${Date.now()}`;
+    const _uniqueKey = `monitor-campaign-${campaignId}-${Date.now()}`;
     setActiveTab(22, _uniqueKey);
     addMultiTab({
       id: 22,

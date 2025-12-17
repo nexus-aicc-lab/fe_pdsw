@@ -33,7 +33,7 @@ export function IRootNodeContextMenu({ item }: RootNodeContextMenuProps) {
   const handleAgentStatusMonitor = useCallback(() => {
     addTab({
       id: 22,
-      uniqueKey: `22-${Date.now()}`,
+      uniqueKey: `monitor-center-${item.id}-${Date.now()}`,
       title: "상담사 상태 모니터",
       icon: "",
       href: "",

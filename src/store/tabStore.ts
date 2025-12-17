@@ -384,7 +384,7 @@ export const useTabStore = create<TabLayoutStore>()(
                 sections: row.sections.map((section) => {
                   if (section.id !== sectionId){
                     _secondActiveTabId = section.activeTabKey !== null
-                      ? Number(section.activeTabKey?.split('-')[0] == 'progress'?21:section.activeTabKey?.split('-')[0]) : null;
+                      ? Number(section.activeTabKey?.split('-')[0] == 'progress'?21:section.activeTabKey?.split('-')[0] == 'monitor'?22:section.activeTabKey?.split('-')[0]) : null;
                     _secondActiveTabKey = section.activeTabKey !== null
                       ? section.activeTabKey : null;
                     return section;

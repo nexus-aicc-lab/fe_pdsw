@@ -258,13 +258,14 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
         tempCounter++;
       }, 1000);
       return () => clearInterval(interval);
+    }else{
+      setAgentData([]);
     }
   }, [_agentData]);
 
   useEffect(() => {
     if (campaignAgents.length === 0 && campaignId === 0) return;
 
-    setAgentData([]);
     if (campaignId && campaigns.length > 0) {
       const _tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
       if (_tenantId) {
@@ -350,6 +351,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
     }else if(!(activeTabId === 22 || secondActiveTabId === 22) ){
       clearInterval(intervalAgentStatusMonitoringRef.current!);
       intervalAgentStatusMonitoringRef.current = null;
+      setSearchAgentState(false);
       // setIsLoading(false);
       // setIsRefreshing(false);
       // setSelectedCampaign('');

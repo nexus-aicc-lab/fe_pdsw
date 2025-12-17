@@ -211,7 +211,8 @@ export function ContextMenuForTreeNode({
   };
 
   const handleMonitorClick = (campaignId: any, campaignName: string) => {
-    const _uniqueKey = `monitor-${Date.now()}`;
+    // const _uniqueKey = `monitor-${Date.now()}`;
+    const _uniqueKey = `monitor-campaign-${campaignId}-${Date.now()}`;
 
     setActiveTab(22, _uniqueKey);
     addMultiTab({

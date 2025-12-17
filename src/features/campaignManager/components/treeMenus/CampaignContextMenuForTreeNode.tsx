@@ -107,7 +107,6 @@ export const CampaignContextMenu = ({
   };
 
   const handleMonitorClick = () => {
-    debugger;
     const _uniqueKey = TabIds.AGENT_MONITOR+'-'+Date.now();
     setActiveTab(12, _uniqueKey);
     addTab({

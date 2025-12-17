@@ -270,9 +270,9 @@ export function IContextMenuForCampaignForCampaignGroup({
   }, [setCampaignIdForUpdateFromSideMenu, addTab]);
 
   const handleMonitorClick = useCallback((tenantIdForCampaignTab: any, campaignId: any, campaignName: string) => {
-    debugger;
     
-    const _uniqueKey = `monitor-${Date.now()}`;
+    // const _uniqueKey = `monitor-${Date.now()}`;
+    const _uniqueKey = `monitor-campaign-${campaignId}-${Date.now()}`;
     setActiveTab(22, _uniqueKey);
     addMultiTab({
       id: 22,

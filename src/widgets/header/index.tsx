@@ -20,7 +20,7 @@ import GlobalErrorAlert from "@/components/shared/CommonGlobalError/CommonGlobal
 import logoutFunction from "@/components/common/logoutFunction";
 import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 import { useEnvironmentStore } from "@/store/environmentStore";
-import { useApiForCenterInfo } from "@/features/auth/hooks/useApiForCenterInfo";
+// import { useApiForCenterInfo } from "@/features/auth/hooks/useApiForCenterInfo";
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 
 
@@ -74,17 +74,17 @@ export default function Header() {
   }, []);
 
 
-  const { mutate: centerInfo} = useApiForCenterInfo({
-      onSuccess: (data) => {
-        // console.log('센터 정보:', data.centerInfoList.map((item) => item.centerName)[0]);
+  // const { mutate: centerInfo} = useApiForCenterInfo({
+  //     onSuccess: (data) => {
+  //       // console.log('센터 정보:', data.centerInfoList.map((item) => item.centerName)[0]);
   
-        useEnvironmentStore.getState().setCenterInfo(data.centerInfoList[0].centerId, data.centerInfoList[0].centerName);
-      },
-      onError: (error) => {
-        // console.log('센터 정보 조회 실패:', error);
-        // ServerErrorCheck('센터 정보 조회', error.message);
-      }
-  });
+  //       useEnvironmentStore.getState().setCenterInfo(data.centerInfoList[0].centerId, data.centerInfoList[0].centerName);
+  //     },
+  //     onError: (error) => {
+  //       // console.log('센터 정보 조회 실패:', error);
+  //       // ServerErrorCheck('센터 정보 조회', error.message);
+  //     }
+  // });
 
   useEffect(() => {
 
@@ -116,9 +116,9 @@ export default function Header() {
         sendingWorkEndHours: "0000",
         dayOfWeekSetting: 'f,f,f,f,f,f,f',
       };
-      if(centerId === '' || centerName === '') {
-        centerInfo();
-      }
+      // if(centerId === '' || centerName === '') {
+      //   centerInfo();
+      // }
       
       setEnvironment(initialEnvironmentData);        
     }
