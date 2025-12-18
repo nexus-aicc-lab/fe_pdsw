@@ -69,6 +69,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   const { statisticsUpdateCycle, centerId } = useEnvironmentStore();
   const { activeTabId, openedTabs, secondActiveTabId, activeTabKey, secondActiveTabKey } = useTabStore();
   const intervalAgentStatusMonitoringRef = React.useRef<NodeJS.Timeout | null>(null);
+  const [isPopup, setIsPopup] = useState(false);
 
   const handleStatusChange = (status: keyof AgentStatus): void => {
     setSelectedStatuses(prev => ({
@@ -435,11 +436,12 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
       }
     }
 
-    if (!isAgentTabActive) {
+    if (!isAgentTabActive && !isPopup) {
       clearAgentInterval();
       setSearchAgentState(false);
     }
   }, [
+    isPopup,
     activeTabId,
     secondActiveTabId,
     campaignId,
@@ -447,6 +449,12 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
     campaigns,
     searchAgentState, activeTabKey, secondActiveTabKey
   ]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsPopup(!!(window.opener && window.opener !== window));
+    }
+  }, []);
 
   return (
     <div className="w-full h-full flex flex-col gap-4 limit-700">
