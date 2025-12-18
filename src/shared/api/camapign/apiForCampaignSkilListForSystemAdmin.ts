@@ -1,6 +1,6 @@
 import { axiosInstance } from "@/lib/axios";
 
-// 📌 캠페인 스킬 항목 타입
+//  캠페인 스킬 항목 타입
 export interface CampaignSkillItemForSystemAdmin {
   skill_id: number;
   tenant_id: number;
@@ -9,7 +9,7 @@ export interface CampaignSkillItemForSystemAdmin {
   description?: string;
 }
 
-// 📌 요청 타입
+//  요청 타입
 export interface IRequestTypeForCampaignSkillListForSystemAdmin {
   filter?: {
     skill_id?: {
@@ -22,13 +22,13 @@ export interface IRequestTypeForCampaignSkillListForSystemAdmin {
     skill_id?: number; // 0: 오름차순, 1: 내림차순
     tenant_id?: number; // 0: 오름차순, 1: 내림차순
   };
-  page: {
-    index: number;
-    items: number;
-  };
+  // page?: {
+  //   index?: number;
+  //   items?: number;
+  // };
 }
 
-// 📌 응답 타입
+//  응답 타입
 export interface IResponseTypeForCampaignSkillListForSystemAdmin {
   result_code: number;
   result_msg: string;
@@ -37,7 +37,7 @@ export interface IResponseTypeForCampaignSkillListForSystemAdmin {
   result_data: CampaignSkillItemForSystemAdmin[];
 }
 
-// 📌 기본 요청 값
+//  기본 요청 값
 const defaultRequest: IRequestTypeForCampaignSkillListForSystemAdmin = {
   // filter: {
   //   skill_id: {
@@ -48,13 +48,13 @@ const defaultRequest: IRequestTypeForCampaignSkillListForSystemAdmin = {
   sort: {
     skill_id: 0
   },
-  page: {
-    index: 1,
-    items: 10
-  }
+  // page: {
+  //   index: 1,
+  //   items: 10
+  // }
 };
 
-// 📌 API 호출 함수
+//  API 호출 함수
 export const apiForCampaignSkillListForSystemAdmin = async (
   request: Partial<IRequestTypeForCampaignSkillListForSystemAdmin> = {}
 ): Promise<IResponseTypeForCampaignSkillListForSystemAdmin> => {
@@ -69,10 +69,10 @@ export const apiForCampaignSkillListForSystemAdmin = async (
       ...defaultRequest.sort,
       ...request.sort,
     },
-    page: {
-      ...defaultRequest.page,
-      ...request.page,
-    },
+    // page: {
+    //   ...defaultRequest.page,
+    //   ...request.page,
+    // },
   };
 
   const response = await axiosInstance.post<IResponseTypeForCampaignSkillListForSystemAdmin>(

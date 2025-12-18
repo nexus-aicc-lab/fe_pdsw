@@ -41,6 +41,7 @@ const data:EnvironmentListResponse = {
 
 export default function LoginPage() {
   const router = useRouter();
+  const [cookiesSessionKey, setCookiesSessionKey] = useState<string | undefined>(undefined);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<LoginFormData>({
     user_name: '',
@@ -268,18 +269,22 @@ export default function LoginPage() {
       }));
     }
     // useEnvironmentStore.getState().setCenterInfo('','');
+    // 쿠키는 클라이언트에서만 읽기
+    setCookiesSessionKey(Cookies.get('session_key'));
   }, []);
 
   
 
   // 쿠키에서 관리되는 session_key
-  const [cookiesSessionKey, setCookiesSessionKey] = useState(Cookies.get('session_key'));
+  // const [cookiesSessionKey, setCookiesSessionKey] = useState(Cookies.get('session_key'));
 
   // store에서 관리되는 세션 타임아웃 체크
   const isSessionTimeCheck = useAuthStore((state) => state.expires_check);
   
   // store에 session_key가 존재하는지 확인
-  const isLoggedIn = useAuthStore((state) => state.session_key !== ''); 
+  // const isLoggedIn = useAuthStore((state) => state.session_key !== ''); 
+  const sessionKey = useAuthStore((state) => state.session_key);
+  const isLoggedIn = !!sessionKey;
 
   // 쿠키가 session_key가 존재하는지 확인
   const cookiescheck = cookiesSessionKey !== undefined && cookiesSessionKey !== ''; 
@@ -289,13 +294,23 @@ export default function LoginPage() {
     // console.log('store에서 관리되는 세션 타임아웃 체크:', isSessionTimeCheck);
     // console.log('store에 session_key가 존재하는지 확인:', isLoggedIn);
     // 로그인 되어있는 상태로 login 페이지 접근시 replace
-    if (isLoggedIn && cookiescheck && isSessionTimeCheck === false) {
+    if (isLoggedIn && cookiesSessionKey && isSessionTimeCheck === false) {
       // store나 쿠키에 session_key가 존재하면서 세션 만료가 아닌 경우 login 페이지 접근시 main 페이지로 이동
       router.replace('/main');
     }
-  }, [isLoggedIn, cookiescheck, isSessionTimeCheck, router]); // 로그아웃이 안되는 현상 발생하여 수정 20251127
+  }, [isLoggedIn, cookiesSessionKey, isSessionTimeCheck, router]); // 로그아웃이 안되는 현상 발생하여 수정 20251127
+  // useEffect(() => {
+  //   // console.log('쿠키에서 관리되는 session_key:', cookiesSessionKey);
+  //   // console.log('store에서 관리되는 세션 타임아웃 체크:', isSessionTimeCheck);
+  //   // console.log('store에 session_key가 존재하는지 확인:', isLoggedIn);
+  //   // 로그인 되어있는 상태로 login 페이지 접근시 replace
+  //   if (isLoggedIn && cookiescheck && isSessionTimeCheck === false) {
+  //     // store나 쿠키에 session_key가 존재하면서 세션 만료가 아닌 경우 login 페이지 접근시 main 페이지로 이동
+  //     router.replace('/main');
+  //   }
+  // }, [isLoggedIn, cookiescheck, isSessionTimeCheck, router]); // 로그아웃이 안되는 현상 발생하여 수정 20251127
 
-  // store 의 session_key가 있으면서, 쿠키에 session_key가 존재하면 main 페이지로 이동하기전에 보여지는 빈 페이지
+  // // store 의 session_key가 있으면서, 쿠키에 session_key가 존재하면 main 페이지로 이동하기전에 보여지는 빈 페이지
   if (isLoggedIn && cookiescheck) return (null);
 
   const handleContextMenu = (e:any) => {

@@ -90,7 +90,6 @@ export default function Header() {
 
     // 환경 데이터가 없거나 null인 경우 초기값 스토어에 설정
     if(!environmentData || environmentData === null){
-debugger;
       // "campaignListAlram": 0,  			알림 설정 - 리스트 잔량 부족 시 알람 모드(주기적으로 계속) 0: 한 번만, 1: 주기적으로 계속
       // "statisticsUpdateCycle": 20,  		통계 갱신 주기 - 통계 가져오기 주기
       // "serverConnectionTime": 100,		서버 접속 시간 - 서버와의 접속 시간을 설정합니다.
