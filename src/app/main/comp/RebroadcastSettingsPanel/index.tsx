@@ -737,7 +737,7 @@ const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
     });
     const goLogin = () => {
     logoutFunction();
-    router.push('/login');
+    // router.push('/login');
   };
     
     // 캠페인 재발신 정보 추가

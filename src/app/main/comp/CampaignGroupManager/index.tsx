@@ -237,7 +237,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
 
   const goLogin = () => {
     logoutFunction();
-    router.push('/login');
+    // router.push('/login');
   };
 
   // 캠페인 그룹 소속 캠페인 데이터 로드 시 

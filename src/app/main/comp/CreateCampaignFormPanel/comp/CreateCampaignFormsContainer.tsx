@@ -548,7 +548,7 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
 
   const goLogin = () => {
     logoutFunction();
-    router.push('/login');
+    // router.push('/login');
   }
 
 

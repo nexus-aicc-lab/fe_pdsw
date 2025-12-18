@@ -99,7 +99,7 @@ export function AddCampaignGroupDialog({
 
   const goLogin = () => {
     logoutFunction();
-    router.push('/login');
+    // router.push('/login');
   };
   // 캠페인 그룹 생성 API 호출 훅 사용
   // const { mutate, isPending } = useApiForCreateCampaignGroup({

@@ -211,7 +211,7 @@ const ListManager: React.FC = () => {
   });
   const goLogin = () => {
     logoutFunction();
-    router.push('/login');
+    // router.push('/login');
   };
   
   // 블랙리스트 추가 api 호출

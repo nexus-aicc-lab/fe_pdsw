@@ -1910,7 +1910,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   });
   const goLogin = () => {
     logoutFunction();
-    router.push('/login');
+    // router.push('/login');
   };
 
   // 발신 속도 수정 API 호출

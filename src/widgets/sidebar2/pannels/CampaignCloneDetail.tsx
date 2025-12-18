@@ -1006,7 +1006,7 @@ export default function CampaignDetail() {
   });
   const goLogin = () => {
     logoutFunction();
-    router.push('/login');
+    // router.push('/login');
   };
 
   //캠페인 스케줄 등록 api 호출

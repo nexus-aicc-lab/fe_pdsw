@@ -596,9 +596,9 @@ const SkillEdit = () => {
                       onCancel: () => {}
                     });
                     logoutFunction();
-                    setTimeout(() => {
-                      router.push('/login');
-                    }, 1000);
+                    // setTimeout(() => {
+                    //   router.push('/login');
+                    // }, 1000);
                   } else {
                       failCount++;
                       showAlert(`스킬 ID ${skillId} 삭제 실패: ${error}`);
@@ -681,9 +681,9 @@ const SkillEdit = () => {
                 onCancel: () => {}
               });
               logoutFunction();
-              setTimeout(() => {
-                router.push('/login');
-              }, 1000);
+              // setTimeout(() => {
+              //   router.push('/login');
+              // }, 1000);
             } else {
                 showAlert(`삭제 실패: ${error.message}`);
             }
@@ -769,9 +769,9 @@ const SkillEdit = () => {
           onCancel: () => {}
         });
         logoutFunction();
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
+        // setTimeout(() => {
+        //   router.push('/login');
+        // }, 1000);
       } else {
         showAlert(`스킬 리스트 조회 실패: ${error.message}`);
       }
@@ -792,9 +792,9 @@ const SkillEdit = () => {
           onCancel: () => {}
         });
         logoutFunction();
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
+        // setTimeout(() => {
+        //   router.push('/login');
+        // }, 1000);
       }
     }
   });
@@ -814,9 +814,9 @@ const SkillEdit = () => {
           onCancel: () => {}
         });
         logoutFunction();
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
+        // setTimeout(() => {
+        //   router.push('/login');
+        // }, 1000);
       }
     }
   });
@@ -841,9 +841,9 @@ const SkillEdit = () => {
           onCancel: () => {}
         });
         logoutFunction();
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
+        // setTimeout(() => {
+        //   router.push('/login');
+        // }, 1000);
       }
     }
   });
@@ -882,9 +882,9 @@ const SkillEdit = () => {
           onCancel: () => {}
         });
         logoutFunction();
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
+        // setTimeout(() => {
+        //   router.push('/login');
+        // }, 1000);
       }
     }
   });
@@ -937,9 +937,9 @@ const SkillEdit = () => {
           onCancel: () => {}
         });
         logoutFunction();
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
+        // setTimeout(() => {
+        //   router.push('/login');
+        // }, 1000);
       } else if(error.message.split('||')[0] === '403') {
         showAlert(`이미 존재하는 스킬아이디 입니다.`);
       }

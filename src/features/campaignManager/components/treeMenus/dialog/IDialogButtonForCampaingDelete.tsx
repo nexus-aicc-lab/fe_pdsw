@@ -57,7 +57,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
 
   const goLogin = () => {
     logoutFunction();
-    router.push('/login');
+    // router.push('/login');
   };
 
   const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);

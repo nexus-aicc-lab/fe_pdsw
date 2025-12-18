@@ -28,7 +28,7 @@ const GlobalErrorAlert = () => {
         } else if(routerYn) {
             logoutFunction();
             // 일반 페이지에서 라우터 사용
-            router.push('/login');
+            // router.push('/login');
         }
       }
     } 

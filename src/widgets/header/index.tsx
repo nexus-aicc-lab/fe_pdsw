@@ -37,6 +37,7 @@ export default function Header() {
   const router = useRouter();
   const _tenantId = Number(Cookies.get('tenant_id'));
   const { id:userId, tenant_id, session_key: _sessionKey, role_id, menu_role_id } = useAuthStore();
+  const isLoggedIn = useAuthStore(state => state.session_key !== '');
 
   const [alertState, setAlertState] = useState(errorMessage);
   const [shouldFetchCounselors, setShouldFetchCounselors] = useState(false);
@@ -64,7 +65,7 @@ export default function Header() {
           type: '2',
           onClose: () => {
             logoutFunction();
-            router.push('/login');
+            // router.push('/login');
           },
         });
       } else {
@@ -265,9 +266,9 @@ export default function Header() {
     }
 
     // 홈 또는 로그인 페이지로 리다이렉트 
-    setTimeout(() => {      
-      router.push('/login');
-    }, 300);
+    // setTimeout(() => {      
+    //   router.push('/login');
+    // }, 300);
   }
 
 
@@ -302,7 +303,7 @@ export default function Header() {
 
   const goLogin = () => {
     logoutFunction();
-    router.push('/login');
+    // router.push('/login');
   }
 
   // useEffect(() => {
@@ -427,6 +428,12 @@ export default function Header() {
 
     }
   }, [tenants, _sessionKey]);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      router.replace('/login');
+    }
+  }, [isLoggedIn]);
 
   return (
     <div className="flex flex-col">

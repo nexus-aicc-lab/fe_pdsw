@@ -964,7 +964,7 @@ export default function Footer({
             onClose: () => {
               setAlertState({ ...errorMessage, isOpen: false });
               logoutFunction();
-              router.push('/login');
+              // router.push('/login');
             },
           });
         }, 300);
