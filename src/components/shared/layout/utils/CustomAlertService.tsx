@@ -2,7 +2,7 @@
 // src\components\shared\layout\utils\CustomAlertService.tsx
 import React, { ReactNode } from 'react';
 import ReactDOM from 'react-dom/client';
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription } from "@/components/ui/alert-dialog";
 import { CommonButton } from "@/components/shared/CommonButton";
 
 // CustomAlert와 동일한 인터페이스 사용
@@ -86,6 +86,9 @@ class CustomAlertService {
             <AlertDialogTitle className="text-sm text-[#fff] font-normal">
               {title}
             </AlertDialogTitle>
+            <AlertDialogDescription className="sr-only">
+              {typeof message === 'string' ? message : '알림 메시지'}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="p-4 bg-white rounded-bl-[.5rem] rounded-br-[.5rem]">
             <div className="text-sm text-[#333]">
