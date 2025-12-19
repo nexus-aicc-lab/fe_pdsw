@@ -95,7 +95,8 @@ export default function LoginPage() {
 
       // 로그인시 통합모니터링창 초기화
       localStorage.setItem('monitorPopupOpen', 'false');
-      router.push('/main');
+      // console.log('운용 가능 시간 조회 성공, 환경설정 스토어에 저장:', startTime, endTime, work);
+      // router.push('/main');
     },
     onError: (error) => {
       // console.log('운용 가능 시간 조회 실패:', error);
@@ -287,6 +288,7 @@ export default function LoginPage() {
   const isLoggedIn = !!sessionKey;
 
   // 쿠키가 session_key가 존재하는지 확인
+  // const cookiesSessionKey = Cookies.get('session_key');
   const cookiescheck = cookiesSessionKey !== undefined && cookiesSessionKey !== ''; 
 
   useEffect(() => {
@@ -294,11 +296,12 @@ export default function LoginPage() {
     // console.log('store에서 관리되는 세션 타임아웃 체크:', isSessionTimeCheck);
     // console.log('store에 session_key가 존재하는지 확인:', isLoggedIn);
     // 로그인 되어있는 상태로 login 페이지 접근시 replace
-    if (isLoggedIn && cookiesSessionKey && isSessionTimeCheck === false) {
+    console.log('로그인 상태로 login 페이지 접근시 main 페이지로 이동 처리 :: ',sessionKey);
+    if (isLoggedIn && isSessionTimeCheck === false) {
       // store나 쿠키에 session_key가 존재하면서 세션 만료가 아닌 경우 login 페이지 접근시 main 페이지로 이동
-      router.replace('/main');
+      router.push('/main');
     }
-  }, [isLoggedIn, cookiesSessionKey, isSessionTimeCheck, router]); // 로그아웃이 안되는 현상 발생하여 수정 20251127
+  }, [isLoggedIn, isSessionTimeCheck, router]); // 로그아웃이 안되는 현상 발생하여 수정 20251127
   // useEffect(() => {
   //   // console.log('쿠키에서 관리되는 session_key:', cookiesSessionKey);
   //   // console.log('store에서 관리되는 세션 타임아웃 체크:', isSessionTimeCheck);

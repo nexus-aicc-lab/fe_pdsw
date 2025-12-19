@@ -8,6 +8,7 @@ import {
   AlertDialogContent,
   AlertDialogTitle,
   AlertDialogHeader,
+  AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
 import { CommonButton } from "@/components/shared/CommonButton";
 
@@ -69,6 +70,9 @@ const CustomAlert = ({
           <AlertDialogTitle className="text-sm text-[#fff] font-normal">
             {title}
           </AlertDialogTitle>
+          <AlertDialogDescription className="sr-only">
+            {typeof message === 'string' ? message : '알림 메시지'}
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="p-4 bg-white rounded-bl-[.5rem] rounded-br-[.5rem] h-full">
           <div className="text-sm text-[#333]">
