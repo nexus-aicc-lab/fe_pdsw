@@ -198,7 +198,7 @@ export default function Header() {
   } = useTabStore();
 
   // const { data: campaignSkillsData } = useApiForGetCampaignSkills();
-  const { data: campaignGroupsData } = useApiForGetCampaignGroups();
+  // const { data: campaignGroupsData } = useApiForGetCampaignGroups();
 
   const { mutate: fetchSkillCampaignList } = useApiForSkillCampaignList({
     onSuccess: (data) => {
