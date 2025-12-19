@@ -320,6 +320,11 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
 
   // 캠페인 정보 초기화 (campaignId, selectedCampaign, 관련 데이터가 변경될 때마다 실행)
   useEffect(() => {
+    if ( !Array.isArray(schedules) ||
+      !Array.isArray(campaignSkills) ||
+      !Array.isArray(callingNumbers)) {
+      return;
+    }
     if (campaignId && selectedCampaign) {
       // masterCampaignId가 변경되거나 selectedCampaign이 업데이트되면 상태 재설정
       setTempCampaignsInfo({
@@ -2239,6 +2244,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
                 width={12}
                 height={12}
                 priority
+                style={{ width: 'auto', height: 'auto' }}
                 onClick={() =>
                   setSkillPopupState({
                     ...skillPopupState,

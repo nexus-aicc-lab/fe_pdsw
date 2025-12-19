@@ -14,8 +14,6 @@ import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
 import { Button } from "@/components/ui/button";
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
 import AuthTimeOutCheck from "@/components/providers/AuthTimeOutCheck";
-import { useApiForGetCampaignSkills } from '@/shared/hooks/skill/useApiForGetCampaignSkills';
-import { useApiForGetCampaignGroups } from "@/shared/hooks/campaign/useApiForGetCampaignGroups";
 import GlobalErrorAlert from "@/components/shared/CommonGlobalError/CommonGlobalError";
 import logoutFunction from "@/components/common/logoutFunction";
 import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
@@ -197,9 +195,6 @@ export default function Header() {
     setActiveTab,
   } = useTabStore();
 
-  // const { data: campaignSkillsData } = useApiForGetCampaignSkills();
-  // const { data: campaignGroupsData } = useApiForGetCampaignGroups();
-
   const { mutate: fetchSkillCampaignList } = useApiForSkillCampaignList({
     onSuccess: (data) => {
       // setCampaignData(data);
@@ -299,13 +294,14 @@ export default function Header() {
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
       if (data.result_code === 5) {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: '로그인 정보가 없습니다.',
-          type: '2',
-          onClose: () => goLogin(),
-        });
+        // setAlertState({
+        //   ...errorMessage,
+        //   isOpen: true,
+        //   message: '테넌트 정보가 없습니다.',
+        //   type: '2',
+        //   onClose: () => goLogin(),
+        // });
+        ServerErrorCheck('테넌트 조회', '테넌트 정보가 없습니다.');
         useMainStore.getState().setTenantsLoading(false);
       } else {
         if (tenant_id === 0) {

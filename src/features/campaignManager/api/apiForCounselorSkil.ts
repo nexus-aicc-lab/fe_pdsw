@@ -7,7 +7,6 @@ import {
   CounselorSkillListResponse,
   CounselorSkillRequestData
 } from "../types/typeForCounselorSkill";
-import { customAlertService } from "@/components/shared/layout/utils/CustomAlertService";
 
 /**
  * 상담사에게 선택한 스킬들을 할당하는 API
@@ -47,21 +46,11 @@ export const getAssignableSkillsForCounselor = async (tenantId: number): Promise
 
   const skillRequestData: CounselorSkillRequestData = {
     filter: {
-      // skill_id: { start: 1, end: 9999 },
-      // tenant_id: [tenantId],
       tenant_id: tenantId !== 0 ? [tenantId] : undefined,
     },
-    // sort: {
-    //   skill_id: 0,
-    //   tenant_id: 0,
-    // },
-    // page: {
-    //   index: 1,
-    //   items: 10
-    // },
     sort: {
       skill_id: 1,
-      tenant_id: 10
+      tenant_id: 0
     }
   };
 
@@ -70,16 +59,9 @@ export const getAssignableSkillsForCounselor = async (tenantId: number): Promise
       "collections/skill",
       skillRequestData
     );
-    // console.log(" 상담사 할당 가능 스킬 목록 조회 성공 ???????????????????????????? ", data);
 
     return data;
 
-    // if (data.result_code === 0 && data.result_msg === "Success") {
-    //   console.log(" 상담사 할당 가능 스킬 목록 조회 성공:", data);
-    //   return data;
-    // } else {
-    //   throw new Error(`API Error: ${data.result_msg}`);
-    // }
   } catch (error) {
     const typedError = error as CounselorSkillApiError;
     throw new Error(

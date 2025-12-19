@@ -41,12 +41,16 @@ const SkillListPopup = ({
     
 
     useEffect(() => {
-      if(tenantId !== null){
-        // skill_id가 0인 항목 제외
-        setRows( skills.filter((skill) => 
-            skill.tenant_id === tenantId && skill.skill_id !== 0
-        ));
-      }
+        if( !Array.isArray(skills) ) {
+            setRows([]);
+            return;
+        }
+        if(tenantId !== null){
+            // skill_id가 0인 항목 제외
+            setRows( skills.filter((skill) => 
+                skill.tenant_id === tenantId && skill.skill_id !== 0
+            ));
+        }
     }, [tenantId, skills]);
     // tenantId와 skills의 의존성 추가
     

@@ -5,7 +5,13 @@ import { MainDataResponse, TenantListDataResponse } from '../features/auth/types
 import { campaignChannel } from '@/lib/broadcastChannel';
 import { devtools, persist } from 'zustand/middleware';
 import { CampaignSkillItemForSystemAdmin } from '@/shared/api/camapign/apiForCampaignSkilListForSystemAdmin';
-import { CampaignGroupItemForSystemAdmin } from '@/shared/api/camapign/apiForGetCampaignGroupForSystemAdmin';
+
+//  캠페인 그룹 항목 타입
+export interface CampaignGroupItemForSystemAdmin {
+  tenant_id: number;
+  group_id: number;
+  group_name: string;
+}
 
 // Define the DataProps type for selectedCampaignRow
 export interface DataProps {

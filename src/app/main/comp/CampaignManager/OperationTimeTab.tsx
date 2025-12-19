@@ -441,7 +441,7 @@ const OperationTimeTab: React.FC<Props> = ({
                     }}
                   >
                     시간 추가
-                    <Image src="/addArrow.svg" alt="화살표" width={10} height={10} />
+                    <Image src="/addArrow.svg" alt="화살표" width={10} height={10} style={{ width: 'auto', height: 'auto' }} />
                   </CommonButton>
                 </div>
               </div>

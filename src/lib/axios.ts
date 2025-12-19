@@ -17,17 +17,17 @@ export const axiosRedisInstance = axios.create({
   
 });
 
-let sessionCheckYn = true;
+// let sessionCheckYn = true;
 
 axiosRedisInstance.interceptors.request.use(
   (config) => {
     // sessionCheckYn이 false이면 요청을 막음
-    if (!sessionCheckYn) {
-      return Promise.reject({
-        message: '세션 체크가 비활성화되어 API 요청이 차단되었습니다.',
-        config,
-      });
-    }
+    // if (!sessionCheckYn) {
+    //   return Promise.reject({
+    //     message: '세션 체크가 비활성화되어 API 요청이 차단되었습니다.',
+    //     config,
+    //   });
+    // }
     
     const sessionKey = getCookie('session_key');
 
@@ -46,7 +46,6 @@ axiosRedisInstance.interceptors.request.use(
       customAlertService.error('API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.', '세션 만료', () => {
         // console.log("### axiosRedisInstance REQUEST error throw", error);
         logoutFunction({ portcheck: false });
-        window.location.href = '/login';
       });
     }
 
@@ -60,17 +59,16 @@ axiosRedisInstance.interceptors.request.use(
 axiosInstance.interceptors.request.use(
   (config) => {
     // sessionCheckYn이 false이면 요청을 막음
-    if (!sessionCheckYn) {
-      return Promise.reject({
-        message: '세션 체크가 비활성화되어 API 요청이 차단되었습니다.',
-        config,
-      });
-    }
+    // if (!sessionCheckYn) {
+    //   return Promise.reject({
+    //     message: '세션 체크가 비활성화되어 API 요청이 차단되었습니다.',
+    //     config,
+    //   });
+    // }
     
     const sessionKey = getCookie('session_key');
 
     if( config.url !== '/login' && ( !sessionKey || sessionKey === '' ) ) {
-      sessionCheckYn = false;
       return Promise.reject({
         message: '세션 키가 없어 API 요청이 차단되었습니다.',
         config,
@@ -91,7 +89,6 @@ axiosInstance.interceptors.request.use(
       customAlertService.error('API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.', '세션 만료', () => {
         // console.log("### axiosInstance REQUEST error response", error);
         logoutFunction({ portcheck: false });
-        window.location.href = '/login';
       });
     }
 
@@ -105,12 +102,11 @@ axiosInstance.interceptors.response.use(
     // console.log("here 8888888888888 response", response);
     
     if (response.data.result_code === 5) {
-      sessionCheckYn = false;
+      // sessionCheckYn = false;
       // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
       customAlertService.error('API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.', '세션 만료', () => {
         // console.log("### axiosInstanc RESPONSE data error : ", response);
         logoutFunction({ portcheck: false });
-        window.location.href = '/login';
       });
     }
 
@@ -486,13 +482,11 @@ axiosInstance.interceptors.response.use(
     if (error.code === 'ECONNABORTED') {
       customAlertService.error('요청 시간이 초과되었습니다. 다시 로그인 해주세요.', '요청 시간 초과', () => {
         logoutFunction({ portcheck: false });
-        window.location.href = '/login';
       });
     }
     if( error.status === 500 ){      
       customAlertService.error('PDS 서버 시스템과 연결할 수 없습니다. 서버 동작 상태를 확인하여 주십시오. 프로그램을 종료합니다.', '세션 만료', () => {
         logoutFunction({ portcheck: false });
-        window.location.href = '/login';
       });
     }    
     if (error.response.data.result_code === 5) {
@@ -500,7 +494,6 @@ axiosInstance.interceptors.response.use(
       customAlertService.error('API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.', '세션 만료', () => {
         // console.log("### axiosInstanc RESPONSE throw error : ", error);
         logoutFunction({ portcheck: false });
-        window.location.href = '/login';
       });
     }
 
@@ -874,7 +867,6 @@ axiosInstance.interceptors.response.use(
     }
     if (error.response?.status === 401) {
       logoutFunction({ portcheck: false });
-      window.location.href = '/login';
       return Promise.reject(new Error('세션이 만료되었습니다. 다시 로그인해주세요.'));
     }
     return Promise.reject(error);
@@ -968,14 +960,12 @@ axiosRedisInstance.interceptors.response.use(
     if (error.code === 'ECONNABORTED') {
       customAlertService.error('요청 시간이 초과되었습니다. 다시 로그인 해주세요.', '요청 시간 초과', () => {
         logoutFunction({ portcheck: false });
-        window.location.href = '/login';
       });
     }
     // console.log("axios에서 result code 확인 1111111 : ", error);
     if( error.status === 500 ){      
       customAlertService.error('PDS 서버 시스템과 연결할 수 없습니다. 서버 동작 상태를 확인하여 주십시오. 프로그램을 종료합니다.', '세션 만료', () => {
         logoutFunction({ portcheck: false });
-        window.location.href = '/login';
       });
     }    
 
@@ -983,13 +973,11 @@ axiosRedisInstance.interceptors.response.use(
     if (error.response.data.result_code === 5) {
       customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
         logoutFunction({ portcheck: false });
-        window.location.href = '/login';
       });
     }
 
     if (error.response?.status === 401) {
       logoutFunction({ portcheck: false });
-      window.location.href = '/login';
       return Promise.reject(new Error('세션이 만료되었습니다. 다시 로그인해주세요.'));
     }
 

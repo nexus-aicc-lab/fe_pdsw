@@ -174,6 +174,21 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
 
   // filteredCampaigns를 grid 데이터 형식(Row)로 변환
   useEffect(() => {
+    if (
+      !Array.isArray(filteredCampaigns) ||
+      !Array.isArray(schedules) ||
+      !Array.isArray(campaignSkills) ||
+      !Array.isArray(callingNumbers)
+    ) {
+      return;
+    }
+
+    if (filteredCampaigns.length === 0) {
+      setTempData([]);
+      setSelectedCampaign(null);
+      setSelectedCampaignRow(null);
+      return;
+    }
     if (filteredCampaigns.length > 0) {
       const newTempData: Row[] = filteredCampaigns.map((campaign, index) => ({
         no: index + 1,
