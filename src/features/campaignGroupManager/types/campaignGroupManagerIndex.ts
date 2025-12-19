@@ -6,20 +6,6 @@ export interface CampaignGroupManagerApiError {
   status: number;
 }
 
-// 캠페인 그룹 조회 응답 데이터 타입
-export interface CampaignGroupSearchResponseDataType {
-  tenant_id: number;
-  group_id: number;
-  group_name: string;
-}
-
-// 캠페인 그룹 조회 응답
-export interface CampaignGroupSearchResponse {
-  result_code: number;
-  result_msg: string;
-  result_data: CampaignGroupSearchResponseDataType[];
-}
-
 // 캠페인 그룹 소속 캠페인 조회 응답 데이터 타입
 export interface CampaignGroupCampaignListResponseDataType {
   tenant_id: number;

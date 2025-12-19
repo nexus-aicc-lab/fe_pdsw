@@ -95,11 +95,11 @@ interface MainActions {
   updateCampaignStatus: (campaignId: number, newStatus: number) => void;
   setCampaignTotalProgressInfoCampaignId: (campaignTotalProgressInfoCampaignId: string) => void;
 
-  // 캠페인 스킬 액션 추가
-  setCampaignSkills: (skills: CampaignSkillItemForSystemAdmin[]) => void;
-  setCampaignSkillsLoaded: (loaded: boolean) => void;
-  setCampaignSkillsLoading: (loading: boolean) => void;
-  getCampaignSkillsByCampaignId: (campaignId: number) => CampaignSkillItemForSystemAdmin[];
+  // 스킬 캠페인 액션 추가
+  setSkillCampaigns: (skills: CampaignSkillItemForSystemAdmin[]) => void;
+  setSkillCampaignsLoaded: (loaded: boolean) => void;
+  setSkillCampaignsLoading: (loading: boolean) => void;
+  getSkillCampaignsByCampaignId: (campaignId: number) => CampaignSkillItemForSystemAdmin[];
 
 
   // 캠페인 그룹 관련 액션 추가
@@ -228,22 +228,22 @@ export const useMainStore = create<MainStore>()(
         },      
 
         // 캠페인 스킬 액션
-        setCampaignSkills: (skills) => set({
+        setSkillCampaigns: (skills) => set({
           campaignSkills: skills,
           campaignSkillsLoaded: true,
           campaignSkillsLoading: false
-        }, false, 'setCampaignSkills'),
+        }, false, 'setSkillCampaigns'),
         
-        setCampaignSkillsLoaded: (loaded) => set({ 
+        setSkillCampaignsLoaded: (loaded) => set({ 
           campaignSkillsLoaded: loaded 
-        }, false, 'setCampaignSkillsLoaded'),
+        }, false, 'setSkillCampaignsLoaded'),
         
-        setCampaignSkillsLoading: (loading) => set({ 
+        setSkillCampaignsLoading: (loading) => set({ 
           campaignSkillsLoading: loading 
-        }, false, 'setCampaignSkillsLoading'),
+        }, false, 'setSkillCampaignsLoading'),
         
         // 특정 캠페인 ID에 연결된 스킬 목록 반환
-        getCampaignSkillsByCampaignId: (campaignId) => {
+        getSkillCampaignsByCampaignId: (campaignId) => {
           // 캠페인 ID에 해당하는 스킬 필터링
           return get().campaignSkills.filter(skill => 
             skill.campaign_id && skill.campaign_id === campaignId

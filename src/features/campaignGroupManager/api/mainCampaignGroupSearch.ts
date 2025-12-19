@@ -1,6 +1,19 @@
 // src/features/campaignGroupManager/api/mainCampaignGroupSearch.ts
 import { axiosInstance } from '@/lib/axios';
-import { CampaignGroupSearchResponse } from '../types/campaignGroupManagerIndex';
+
+// 캠페인 그룹 조회 응답 데이터 타입
+interface CampaignGroupSearchResponseDataType {
+  tenant_id: number;
+  group_id: number;
+  group_name: string;
+}
+
+// 캠페인 그룹 조회 응답
+export interface CampaignGroupSearchResponse {
+  result_code: number;
+  result_msg: string;
+  result_data: CampaignGroupSearchResponseDataType[];
+}
 
 // 캠페인 그룹 조회 요청
 export const fetchCampaignGroupSearch = async (): Promise<CampaignGroupSearchResponse> => {

@@ -22,6 +22,8 @@ import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 import { useEnvironmentStore } from "@/store/environmentStore";
 // import { useApiForCenterInfo } from "@/features/auth/hooks/useApiForCenterInfo";
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
+import { useApiForSkillCampaignList } from '@/features/preferences/hooks/useApiForSkill';
+import { useApiForCampaignGroupSearch } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupSearch';
 
 
 const errorMessage = {
@@ -178,6 +180,8 @@ export default function Header() {
     campaigns,
     setCampaigns,
     setTenants,
+    setSkillCampaigns,
+    setCampaignGroups,
   } = useMainStore();
 
   const {
@@ -193,14 +197,34 @@ export default function Header() {
     setActiveTab,
   } = useTabStore();
 
-  const { data: campaignSkillsData } = useApiForGetCampaignSkills();
+  // const { data: campaignSkillsData } = useApiForGetCampaignSkills();
   const { data: campaignGroupsData } = useApiForGetCampaignGroups();
+
+  const { mutate: fetchSkillCampaignList } = useApiForSkillCampaignList({
+    onSuccess: (data) => {
+      // setCampaignData(data);
+      setSkillCampaigns(data.result_data || []);
+    },
+    onError: (error) => {
+      ServerErrorCheck('스킬 캠페인 조회', error.message);
+      // useMainStore.getState().setSkillCampaignsLoading(false);
+    }
+  });
+
+  const { mutate: fetchCampaignGroupSearch } = useApiForCampaignGroupSearch({
+    onSuccess: (data) => {
+      setCampaignGroups(data.result_data || []);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 그룹 조회', error.message);
+    }
+  });
 
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
       setSkills(data.result_data || []);
-      
-      useMainStore.getState().setCampaignSkillsLoaded(true); 
+
+      // useMainStore.getState().setSkillCampaignsLoaded(true);
       // console.log("Skills data loaded in header, updated store")
     },
     onError: (error) => {
@@ -290,6 +314,8 @@ export default function Header() {
           setTenants(data.result_data.filter(data => data.tenant_id === tenant_id));
         }
         // console.log("Tenant data loaded in header, updated store");
+        fetchSkillCampaignList();
+        fetchCampaignGroupSearch(null);
       }
     },
     onError: (error) => {

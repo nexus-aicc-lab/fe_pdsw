@@ -31,14 +31,6 @@ axiosRedisInstance.interceptors.request.use(
     
     const sessionKey = getCookie('session_key');
 
-    // session_key 없으면 요청 자체를 보내지 않음
-    if (!sessionKey) {
-      return Promise.reject({
-        message: '로그인 세션이 존재하지 않습니다. 다시 로그인해주세요.',
-        config,
-      });
-    }
-
     if (sessionKey && config.headers) {
       // Session-Cookie가 아닌 Session-Key로 변경
       config.headers['Session-Key'] = sessionKey;
@@ -76,14 +68,6 @@ axiosInstance.interceptors.request.use(
     }
     
     const sessionKey = getCookie('session_key');
-
-    // session_key 없으면 요청 자체를 보내지 않음
-    if (!sessionKey) {
-      return Promise.reject({
-        message: '로그인 세션이 존재하지 않습니다. 다시 로그인해주세요.',
-        config,
-      });
-    }
 
     if (sessionKey && config.headers) {
       // Session-Cookie가 아닌 Session-Key로 변경

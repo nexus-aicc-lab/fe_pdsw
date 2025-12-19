@@ -1,8 +1,8 @@
 // src/features/campaignManager/hooks/useApiForCampaignRedialPreviewSearch.ts
 import { useMutation } from '@tanstack/react-query';
-import { fetchCampaignGroupSearch } from '../api/mainCampaignGroupSearch';
+import { fetchCampaignGroupSearch, CampaignGroupSearchResponse } from '../api/mainCampaignGroupSearch';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { CampaignGroupSearchResponse, CampaignGroupManagerApiError } from '../types/campaignGroupManagerIndex';
+import { CampaignGroupManagerApiError } from '../types/campaignGroupManagerIndex';
 
 export function useApiForCampaignGroupSearch(
   options?: UseMutationOptions<CampaignGroupSearchResponse, CampaignGroupManagerApiError, null>

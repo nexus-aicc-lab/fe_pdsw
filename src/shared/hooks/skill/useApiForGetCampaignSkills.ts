@@ -14,18 +14,18 @@ interface UseApiForCampaignSkillsOptions {
 }
 
 export const useApiForGetCampaignSkills = (options?: UseApiForCampaignSkillsOptions) => {
-  const { setCampaignSkills, setCampaignSkillsLoading, setCampaignSkillsLoaded } = useMainStore();
+  const { setSkillCampaigns, setSkillCampaignsLoading, setSkillCampaignsLoaded } = useMainStore();
 
   return useQuery<IResponseTypeForCampaignSkillListForSystemAdmin, Error>({
     queryKey: ['campaignSkills', options?.request],
     queryFn: async () => {
-      setCampaignSkillsLoading(true);
+      setSkillCampaignsLoading(true);
       try {
         const response = await apiForCampaignSkillListForSystemAdmin(options?.request || {});
         
         if (response.result_code === 0) {
-          setCampaignSkills(response.result_data || []);
-          setCampaignSkillsLoaded(true);
+          setSkillCampaigns(response.result_data || []);
+          setSkillCampaignsLoaded(true);
           // console.log("Campaign skills data loaded, updated store");
         }
         
@@ -34,7 +34,7 @@ export const useApiForGetCampaignSkills = (options?: UseApiForCampaignSkillsOpti
         // console.error("Error loading campaign skills data:", error);
         throw error;
       } finally {
-        setCampaignSkillsLoading(false);
+        setSkillCampaignsLoading(false);
       }
     },
     enabled: options?.enabled ?? true,
