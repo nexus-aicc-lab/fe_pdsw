@@ -227,7 +227,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                     <Label>진행률(%)</Label>
                   </TableHeader>
                   <TableCell className="text-center text-sm">
-                  {(selectedCall?.totLstCnt || 0) === 0 ? 0 : parseFloat(((selectedCall?.nonTTCT || 0) / (selectedCall?.totLstCnt || 0) * 100).toFixed(1))}
+                  {(selectedCall?.totLstCnt || 0) === 0 ? 0 : parseFloat(((selectedCall?.nonTTCT || 0+(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)-failCnt) / (selectedCall?.totLstCnt || 0) * 100).toFixed(1))}
                   </TableCell>
                   <TableHeader className="w-[160px]">
                     <Label>리스트 대비 성공률 (%)</Label>
@@ -251,7 +251,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                     <Label>미발신</Label>
                   </TableHeader>
                   <TableCell className="text-center text-sm">
-                    {(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)-(selectedCall?.nogdeleteGL || 0)}
+                    {(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)-failCnt}
                   </TableCell>
                   <TableHeader className="w-[120px] !bg-[#DDF4F2]">
                     <Label>상담 결과 예약</Label>
@@ -416,13 +416,13 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                       <tbody>
                         <TableRow>
                           <TableHeader className="!bg-[#FEE9EC] w-[170px]"><Label>대기 리스트</Label></TableHeader>
-                          <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.scct || 0)-failCnt-blocklistCnt}</TableCell>
+                          <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)-failCnt-blocklistCnt}</TableCell>
                           {/* 대기리스트 = 진행대기 + 스케줄대기 */}
                         </TableRow>
                         <TableRow>
                           <TableHeader className="w-[170px]"><Label>진행 대기</Label></TableHeader>
                           
-                          <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.scct || 0)-(selectedCall?.nogblockTime || 0)-failCnt-blocklistCnt}</TableCell>
+                          <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)-(selectedCall?.nogblockTime || 0)-failCnt-blocklistCnt}</TableCell>
                           {/* 진행대기 = 총리스트 - 순수발신 - 스케줄대기 */}
                           {/* {(selectedCall?.totLstCnt || 0)-(selectedCall?.scct || 0)-failCnt-(selectedCall?.recallCnt || 0)-(selectedCall?.nogblockTime || 0)-(selectedCall?.nogdeleteGL || 0)} */ }
                           
@@ -439,7 +439,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                       <tbody>
                         <TableRow>
                           <TableHeader className="!bg-[#FEE9EC] w-[170px]"><Label>방지 리스트</Label></TableHeader>
-                          <TableCell className="text-center text-sm">{selectedCall?.nogdeleteGL || 0}</TableCell>
+                          <TableCell className="text-center text-sm">{blocklistCnt}</TableCell>
                         </TableRow>
                         <TableRow>
                           <TableHeader className="w-[200px]"><Label>블랙 리스트</Label></TableHeader>
