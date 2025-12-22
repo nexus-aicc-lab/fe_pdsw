@@ -1,11 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import CommonButton from "@/components/shared/CommonButton";
-import { useAuthStore } from "@/store/authStore";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
-import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
-import { Popover } from "@/components/ui/popover";
 import { PopoverClose } from "@radix-ui/react-popover";
 import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
 
@@ -16,6 +13,7 @@ interface Skill {
 
 interface SkilFilterOptionPannelForCampaignTabProps {
     shouldCloseOnConfirm?: boolean;
+    skillList?: Skill[];
     onConfirm?: () => void;
     selectedSkills?: number[];
     onSelectedSkillsChange?: (skills: number[]) => void;
@@ -23,14 +21,13 @@ interface SkilFilterOptionPannelForCampaignTabProps {
 
 const SkilFilterOptionPannelForCampaignTab = ({
     shouldCloseOnConfirm = false,
+    skillList = [],
     onConfirm,
     selectedSkills: externalSelectedSkills,
     onSelectedSkillsChange,
 }: SkilFilterOptionPannelForCampaignTabProps) => {
-    const { tenant_id } = useAuthStore();
-
-    // 할당 가능한 스킬 목록 가져오기
-    const { data: skills = [] as Skill[], isLoading, isError } = useAssignableSkills();
+    const isLoading = false;
+    const isError = false;
 
     // 로컬 상태로 체크 박스 선택 상태 관리
     const [internalSelectedSkills, setInternalSelectedSkills] = useState<number[]>([]);
@@ -92,8 +89,8 @@ const SkilFilterOptionPannelForCampaignTab = ({
             <div className="">
                 {/* 스킬 체크박스 목록 */}
                 <ul className="space-y-1 max-h-60 overflow-y-auto ">
-                    {skills.length > 0 ? (
-                        skills.map(({ skill_id, skill_name }: { skill_id: number; skill_name: string }) => (
+                    {skillList.length > 0 ? (
+                        skillList.map(({ skill_id, skill_name }: { skill_id: number; skill_name: string }) => (
                             <li key={skill_id} className="px-[6px] py-[3px] flex items-center gap-2 border-gray-200 hover:bg-[#F4F6F9]">
                                 <CustomCheckbox
                                     id={`skill-${skill_id}`}

@@ -4,17 +4,28 @@ import React, { useState, useEffect } from "react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import CommonButton from "@/components/shared/CommonButton";
 import { Check, CheckIcon } from "lucide-react";
-import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
 import Image from 'next/image'
 import SkilFilterOptionPannelForCampaignTab from "../TabActions/SkilFilterOptionPannelForCampaignTab";
 import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
-import { useAuthStore } from "@/store";
+import { useCampainManagerStore } from "@/store";
+
+// 스킬마스터정보조회 데이터 타입
+interface SkillListDataResponse {
+  tenant_id: number;
+  skill_id: number;
+  skill_name: string;
+  skill_description: string;
+}
 
 const IFilterButtonForCampaignTabHeader = () => {
   const [showSkillFilter, setShowSkillFilter] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   // 로컬에서 선택된 스킬 ID를 관리하기 위한 상태 추가
   const [localSelectedSkills, setLocalSelectedSkills] = useState<number[]>([]);
+  const [ allSkillIds, setAllSkillIds ] = useState<number[]>([]);
+  const [ allSelected, setAllSelected ] = useState<boolean>(false);
+  const [ someSelected, setSomeSelected ] = useState<boolean>(false);
+  const [ tempSkills, setTempSkills ] = useState<SkillListDataResponse[]>([]);
 
   // 통합 스토어에서 선택된 스킬 ID 목록과 필터 모드를 가져오기
   const {
@@ -24,16 +35,24 @@ const IFilterButtonForCampaignTabHeader = () => {
     setFilterMode
   } = useTreeMenuStore(); // 변경됨
   
-  const {tenant_id} = useAuthStore();
+  const { skills } = useCampainManagerStore();
   
-  // 할당 가능한 스킬 목록 가져오기
-  const { data: skills = [] } = useAssignableSkills(tenant_id);
+  useEffect(() => {
+    if( !Array.isArray(skills) ) return;
+    if( skills.length === 0 ) return;
+    setTempSkills(skills.sort((a, b) => b.skill_id - a.skill_id));
+  }, [skills]);
+  
+  useEffect(() => {
+    if( !Array.isArray(tempSkills) ) return;
+    if( tempSkills.length === 0 ) return;
+    setAllSkillIds(tempSkills.map(skill => skill.skill_id));
+    setAllSelected(allSkillIds.length > 0 && 
+      allSkillIds.every(id => localSelectedSkills.includes(id))
+    );
+    setSomeSelected(localSelectedSkills.length > 0 && !allSelected);
+  }, [tempSkills]);
 
-  // 현재 "전체 선택" 상태 확인 (로컬 상태 기준)
-  const allSkillIds = skills.map(skill => skill.skill_id);
-  const allSelected = allSkillIds.length > 0 && 
-    allSkillIds.every(id => localSelectedSkills.includes(id));
-  const someSelected = localSelectedSkills.length > 0 && !allSelected;
   
   // 팝오버가 열릴 때 스토어 값으로 로컬 상태 초기화
   useEffect(() => {
@@ -41,6 +60,17 @@ const IFilterButtonForCampaignTabHeader = () => {
       setLocalSelectedSkills([...skilIdsForCampaignTreeMenu].map(id => Number(id)));
     }
   }, [isPopoverOpen, skilIdsForCampaignTreeMenu]);
+
+  useEffect(() => {
+    if (allSkillIds.length === 0) return;
+
+    const isAllSelected =
+      allSkillIds.length > 0 &&
+      allSkillIds.every(id => localSelectedSkills.includes(id));
+
+    setAllSelected(isAllSelected);
+    setSomeSelected(localSelectedSkills.length > 0 && !isAllSelected);
+  }, [allSkillIds, localSelectedSkills]);
 
   // 선택 스킬로 보기 클릭 처리
   const handleSelectSkillsClick = () => {
@@ -182,6 +212,7 @@ const IFilterButtonForCampaignTabHeader = () => {
             </div>
             <SkilFilterOptionPannelForCampaignTab
               shouldCloseOnConfirm={true}
+              skillList={tempSkills}
               onConfirm={handleConfirmClick}
               selectedSkills={localSelectedSkills}
               onSelectedSkillsChange={handleLocalSkillChange}
