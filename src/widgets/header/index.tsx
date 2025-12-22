@@ -458,16 +458,16 @@ export default function Header() {
   // }, [isLoggedIn, _sessionKey]);
   // 세션키 없으면 20초 후 로그인 페이지로 리다이렉트
   useEffect(() => {
+    // 로그인 상태 & 세션키 존재하면 아무 작업 안 함
     if (isLoggedIn && _sessionKey) return;
 
-    let redirected = false;
-
+    // 20초 fallback 타이머
     const timeoutId = setTimeout(() => {
-      if (!redirected) {
-        redirected = true;
-        router.replace('/login');
-      }
+      router.replace('/login');
     }, 20000);
+
+    // 즉시 이동 시도 (네트워크/렌더링 지연 방지)
+    router.replace('/login');
 
     return () => clearTimeout(timeoutId);
   }, [isLoggedIn, _sessionKey, router]);
