@@ -451,11 +451,26 @@ export default function Header() {
     }
   }, [tenants, _sessionKey]);
 
+  // useEffect(() => {
+  //   if (!isLoggedIn || _sessionKey === "") {
+  //     router.replace('/login');
+  //   }
+  // }, [isLoggedIn, _sessionKey]);
+  // 세션키 없으면 20초 후 로그인 페이지로 리다이렉트
   useEffect(() => {
-    if (!isLoggedIn || _sessionKey === "") {
-      router.replace('/login');
-    }
-  }, [isLoggedIn, _sessionKey]);
+    if (isLoggedIn && _sessionKey) return;
+
+    let redirected = false;
+
+    const timeoutId = setTimeout(() => {
+      if (!redirected) {
+        redirected = true;
+        router.replace('/login');
+      }
+    }, 20000);
+
+    return () => clearTimeout(timeoutId);
+  }, [isLoggedIn, _sessionKey, router]);
 
   return (
     <div className="flex flex-col">
