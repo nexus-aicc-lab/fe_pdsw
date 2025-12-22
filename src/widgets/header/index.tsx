@@ -74,58 +74,6 @@ export default function Header() {
     }
   }, []);
 
-
-  // const { mutate: centerInfo} = useApiForCenterInfo({
-  //     onSuccess: (data) => {
-  //       // console.log('센터 정보:', data.centerInfoList.map((item) => item.centerName)[0]);
-  
-  //       useEnvironmentStore.getState().setCenterInfo(data.centerInfoList[0].centerId, data.centerInfoList[0].centerName);
-  //     },
-  //     onError: (error) => {
-  //       // console.log('센터 정보 조회 실패:', error);
-  //       // ServerErrorCheck('센터 정보 조회', error.message);
-  //     }
-  // });
-
-  useEffect(() => {
-
-    // 환경 데이터가 없거나 null인 경우 초기값 스토어에 설정
-    if(!environmentData || environmentData === null){
-      // "campaignListAlram": 0,  			알림 설정 - 리스트 잔량 부족 시 알람 모드(주기적으로 계속) 0: 한 번만, 1: 주기적으로 계속
-      // "statisticsUpdateCycle": 20,  		통계 갱신 주기 - 통계 가져오기 주기
-      // "serverConnectionTime": 100,		서버 접속 시간 - 서버와의 접속 시간을 설정합니다.
-      // "showChannelCampaignDayScop": 5,	채널 할당 시 보여 주는 캠페인 - 채널 할당 캠페인 범위
-      // "personalCampaignAlertOnly": 0,		알림 옆 라벨 - 본인 캠페인만 알림 여부 (체크 안 함) 0:전체, 1:본인
-      // "useAlramPopup": 0,					메시지 알림창 - 알람 팝업 사용 여부 (알리지 않음) 0:알리지 않음, 1:알림
-      // "unusedWorkHoursCalc": 1,			캠페인 기능 업무 시간 라벨 - 업무 시간 적용 여부 (체크) 체크되어 있을 때는 캠페인 가능 업무 시간 다 Disabled 0:사용, 1:미사용
-      // "sendingWorkStartHours": "0000",	발신 업무 시간 시작 시간 - 발신 업무 시작 시간
-      // "sendingWorkEndHours": "0000",		발신 업무 시간 종료 시간 - 발신 업무 종료 시간
-      // "dayOfWeekSetting": "f,f,f,f,f,f,f"	요일 설정 - 발신 업무 가능 요일 (f는 체크 안 됨, t는 체크)
-
-      const initialEnvironmentData = {
-        code: "0",
-        message: 'initial environment data',
-        campaignListAlram : 0,
-        statisticsUpdateCycle: 30,
-        serverConnectionTime: 100,
-        showChannelCampaignDayScop: 5,
-        personalCampaignAlertOnly: 0,
-        useAlramPopup: 0,
-        unusedWorkHoursCalc: 1,
-        sendingWorkStartHours: "0000",
-        sendingWorkEndHours: "0000",
-        dayOfWeekSetting: 'f,f,f,f,f,f,f',
-      };
-      // if(centerId === '' || centerName === '') {
-      //   centerInfo();
-      // }
-      
-      setEnvironment(initialEnvironmentData);        
-    }
-  
-  }, [environmentData]);
-
-
   const popupRef = useRef<Window | null>(null);
 
   const openInNewWindow = () => {
