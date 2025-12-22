@@ -452,10 +452,10 @@ export default function Header() {
   }, [tenants, _sessionKey]);
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn || _sessionKey === "") {
       router.replace('/login');
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, _sessionKey]);
 
   return (
     <div className="flex flex-col">

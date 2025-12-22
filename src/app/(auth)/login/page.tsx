@@ -297,11 +297,11 @@ export default function LoginPage() {
     // console.log('store에 session_key가 존재하는지 확인:', isLoggedIn);
     // 로그인 되어있는 상태로 login 페이지 접근시 replace
     // console.log('로그인 상태로 login 페이지 접근시 main 페이지로 이동 처리 :: ',sessionKey);
-    if (isLoggedIn && isSessionTimeCheck === false) {
+    if (isLoggedIn && isSessionTimeCheck === false && sessionKey && sessionKey !== '') {
       // store나 쿠키에 session_key가 존재하면서 세션 만료가 아닌 경우 login 페이지 접근시 main 페이지로 이동
       router.push('/main');
     }
-  }, [isLoggedIn, isSessionTimeCheck, router]); // 로그아웃이 안되는 현상 발생하여 수정 20251127
+  }, [isLoggedIn, isSessionTimeCheck, sessionKey, router]); // 로그아웃이 안되는 현상 발생하여 수정 20251127
   // useEffect(() => {
   //   // console.log('쿠키에서 관리되는 session_key:', cookiesSessionKey);
   //   // console.log('store에서 관리되는 세션 타임아웃 체크:', isSessionTimeCheck);

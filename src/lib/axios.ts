@@ -69,6 +69,7 @@ axiosInstance.interceptors.request.use(
     const sessionKey = getCookie('session_key');
 
     if( config.url !== '/login' && ( !sessionKey || sessionKey === '' ) ) {
+      logoutFunction({ portcheck: false });
       return Promise.reject({
         message: '세션 키가 없어 API 요청이 차단되었습니다.',
         config,
