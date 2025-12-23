@@ -77,16 +77,16 @@ export function TreeMenusForCampaigns() {
   const { centerId, centerName } = useEnvironmentStore();
 
   // 로딩 상태 확인
-  const isLoading = !tenantsLoaded || !campaignsLoaded || !campaignSkillsLoaded ||
-    tenants.length === 0 || campaigns.length === 0;
+  const isLoading = !tenantsLoaded || !campaignsLoaded || !campaignSkillsLoaded; 
+    //BOSQ-378	[태광] WEBPDS > 테넌트에 캠페인이 없을 경우 테넌트 레벨의 상담사가 WEBPDS 로그인 시 좌측 상담사 트리 loading.. 으로 표시됨
+    // tenants.length === 0 || campaigns.length === 0;
 
   // 데이터 준비 완료 상태
   const isReady = session_key !== "" &&
     tenantsLoaded &&
     campaignsLoaded &&
     campaignSkillsLoaded &&
-    tenants.length > 0 &&
-    campaigns.length > 0;
+    tenants.length > 0 ;
 
   // useMemo로 트리 데이터 생성
   const [treeData, error] = useMemo(() => {
