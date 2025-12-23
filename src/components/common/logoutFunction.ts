@@ -19,7 +19,11 @@ const logoutFunction = ({ portcheck = true }: PortCheck = {}) => {
     
     
     // 로그아웃 시 쿠키 삭제
-    Cookies.remove('session_key');
+    // Cookies.remove('session_key');
+    Cookies.remove('session_key', {
+        path: '/',
+        domain: window.location.hostname,
+    });
 
     // AuthStore의 상태를 초기화
     useAuthStore.getState().clearAuth();
