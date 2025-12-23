@@ -43,6 +43,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [cookiesSessionKey, setCookiesSessionKey] = useState<string | undefined>(undefined);
   const [showPassword, setShowPassword] = useState(false);
+  const [ _sessionKey, _setSessionKey ] = useState(''); // 임시로 session_key 상태 관리
   const [formData, setFormData] = useState<LoginFormData>({
     user_name: '',
     password: '',
@@ -56,7 +57,7 @@ export default function LoginPage() {
     type: '0',
   });
 
-  const { setAuth, tenant_id, id } = useAuthStore();
+  const { setAuth, setSessionKey, tenant_id, id } = useAuthStore();
   const { setEnvironment, centerId } = useEnvironmentStore(); // 새로운 환경설정 스토어 사용
   const [tempEnvironment, setTempEnvironment] = useState<EnvironmentListResponse>(data);
   // 캠페인 운용 가능 시간 조회 API 호출
@@ -97,6 +98,9 @@ export default function LoginPage() {
       localStorage.setItem('monitorPopupOpen', 'false');
       // console.log('운용 가능 시간 조회 성공, 환경설정 스토어에 저장:', startTime, endTime, work);
       // router.push('/main');
+      if( _sessionKey && _sessionKey !== ''){
+        setSessionKey(_sessionKey); // authStore에 session_key 저장
+      }
     },
     onError: (error) => {
       // console.log('운용 가능 시간 조회 실패:', error);
@@ -113,8 +117,16 @@ export default function LoginPage() {
   const { mutate: centerInfo} = useApiForCenterInfo({
     onSuccess: (data) => {
       // console.log('센터 정보:', data.centerInfoList.map((item) => item.centerName)[0]);
+      const _centerId = data.centerInfoList[0].centerId || '1';
+      const _centerName = data.centerInfoList[0].centerName || 'Nexus';
+      
+      environment({
+        centerId: Number(_centerId),                 // 하드코딩된 값
+        tenantId: tenant_id,    // 로그인 응답에서 받은 tenant_id
+        employeeId: formData.user_name || id  // 로그인 시 입력한 user_name
+      });
 
-      useEnvironmentStore.getState().setCenterInfo(data.centerInfoList[0].centerId,data.centerInfoList[0].centerName);
+      useEnvironmentStore.getState().setCenterInfo(_centerId,_centerName);
     },
     onError: (error) => {
       // console.error('센터 정보 로드 실패:', error);
@@ -159,11 +171,12 @@ export default function LoginPage() {
       setAuth(
         formData.user_name,              // id
         data.tenant_id,                  // tenant_id
-        data.session_key,                // session_key
+        '',                // session_key
         data.role_id,                    // role_id 추가
         data.menu_role_id,
         data.expires_in, // 로그인 시 respone 받는 만료시간(밀리세컨드)
       );
+      _setSessionKey(data.session_key); // 임시로 session_key 상태 관리
 
       // 기억하기가 체크되어 있다면 로컬 스토리지에 저장
       if (formData.remember) {
@@ -246,18 +259,6 @@ export default function LoginPage() {
       login(formData);
     }
   };
-
-  // 환경설정 정보 요청
-  useEffect(() => {
-    if( tenant_id > -1 && centerId !== '' ){
-      environment({
-        centerId: Number(centerId),                 // 하드코딩된 값
-        tenantId: tenant_id,    // 로그인 응답에서 받은 tenant_id
-        employeeId: formData.user_name || id  // 로그인 시 입력한 user_name
-      });
-      setIsPending(false); 
-    }
-  }, [tenant_id, centerId]);
 
   // 컴포넌트 마운트 시 저장된 사용자 이름 불러오기
   useEffect(() => {

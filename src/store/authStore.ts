@@ -14,6 +14,7 @@ type AuthStore = {
   expires_check : boolean | null;
   // Actions
   setAuth: (id: string, tenant_id: number, session_key: string, role_id: number, menu_role_id: number, expires_in: number) => void;
+  setSessionKey: (session_key: string) => void;
   clearAuth: () => void;
   setExpiresCheck: (value: boolean) => void;
   startExpirationWatcher: () => void;
@@ -46,6 +47,9 @@ export const useAuthStore = create<AuthStore>()(
           // set({ expires_in: currentTime + 10000 }); // 만료시간을 현재 시간 + 10초로 설정 (테스트용)
 
           get().startExpirationWatcher();
+        },
+        setSessionKey: (session_key) => {
+          set({ session_key }, false, "setSessionKey");
         },
 
         // 만료시간 감시하는 타이머 추가
