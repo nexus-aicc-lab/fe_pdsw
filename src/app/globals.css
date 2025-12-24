@@ -33,10 +33,7 @@
 }
 
 /* 글로벌 폰트 적용 */
-/* * {
-  font-family: 'Pretendard', Arial, Helvetica, sans-serif;
-} */
-html, body {
+* {
   font-family: 'Pretendard', Arial, Helvetica, sans-serif;
 }
 
