@@ -45,6 +45,7 @@ import { useDeleteCampaignHelper } from '@/features/campaignManager/utils/delete
 import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 import { useCampaignDialStatusStore } from '@/store/campaignDialStatusStore';
 import logoutFunction from '@/components/common/logoutFunction';
+import SkillInput from '@/components/common/skillInput';
 
 
 
@@ -2234,7 +2235,14 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
               </SelectContent>
             </Select>
           </div>
-          <div className='flex items-center gap-2 relative'>
+
+          <SkillInput
+            value={tempCampaignInfo.campaign_id === 0 ? '' : inputSkills}
+            campaignId={tempCampaignInfo.campaign_id}
+            onOpenPopup={() => setSkillPopupState({ ...skillPopupState, isOpen: true })}
+          />
+
+          {/* <div className='flex items-center gap-2 relative'>
             <Label className="w-[74px] min-w-[74px]">스킬</Label>
             <CustomInput value={tempCampaignInfo.campaign_id === 0 ? '' :inputSkills} readOnly />
             <button className="absolute right-2 top-[52%] transform -translate-y-1/2 ml-2">
@@ -2253,7 +2261,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
                 }
               />
             </button>
-          </div>
+          </div> */}
+
           <div className='flex items-center gap-2'>
             <Label className="w-[74px] min-w-[74px]">발신번호</Label>
             <CustomInput value={tempCampaignInfo.campaign_id === 0 ? '' :inputCallingNumber} className="w-full" disabled={selectedCampaign !== null} readOnly 
