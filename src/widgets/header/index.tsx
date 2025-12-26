@@ -45,6 +45,9 @@ export default function Header() {
 
   const { environmentData, setEnvironment, centerId, centerName} = useEnvironmentStore();
 
+  // AbortController 배열 - 모든 API 취소 가능
+  const abortControllers = useRef<AbortController[]>([]);
+
   const {
     availableHeaderMenuIds,
   } = useAvailableMenuStore();
@@ -223,7 +226,9 @@ export default function Header() {
   };
 
   const handleLoginOut = () => {
-
+    // 진행 중 API 요청 취소
+    abortControllers.current.forEach(controller => controller.abort());
+    abortControllers.current = [];
     // 로그아웃 공통함수로 처리
     logoutFunction();
 
@@ -232,10 +237,8 @@ export default function Header() {
       popupRef.current.close();
     }
 
-    // 홈 또는 로그인 페이지로 리다이렉트 
-    // setTimeout(() => {      
-    //   router.push('/login');
-    // }, 300);
+    // 로그인 페이지로 즉시 이동
+    router.replace('/login');
   }
 
 
