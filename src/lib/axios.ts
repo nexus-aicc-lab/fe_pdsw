@@ -6,14 +6,12 @@ import logoutFunction from '@/components/common/logoutFunction';
 
 export const axiosInstance = axios.create({
   baseURL: '/pds',
-  withCredentials: true,
-  timeout: 20000 // 20초
+  withCredentials: true
 });
 
 export const axiosRedisInstance = axios.create({
   baseURL: '/api_upds/v1',
-  withCredentials: true,
-  timeout: 20000 // 20초
+  withCredentials: true
   
 });
 
@@ -480,11 +478,6 @@ axiosInstance.interceptors.response.use(
   },
   async (error) => {
 
-    if (error.code === 'ECONNABORTED') {
-      customAlertService.error('요청 시간이 초과되었습니다. 다시 로그인 해주세요.', '요청 시간 초과', () => {
-        logoutFunction({ portcheck: false });
-      });
-    }
     if( error.status === 500 ){      
       customAlertService.error('PDS 서버 시스템과 연결할 수 없습니다. 서버 동작 상태를 확인하여 주십시오. 프로그램을 종료합니다.', '세션 만료', () => {
         logoutFunction({ portcheck: false });
@@ -958,11 +951,6 @@ axiosRedisInstance.interceptors.response.use(
   },
   async (error) => {
 
-    if (error.code === 'ECONNABORTED') {
-      customAlertService.error('요청 시간이 초과되었습니다. 다시 로그인 해주세요.', '요청 시간 초과', () => {
-        logoutFunction({ portcheck: false });
-      });
-    }
     // console.log("axios에서 result code 확인 1111111 : ", error);
     if( error.status === 500 ){      
       customAlertService.error('PDS 서버 시스템과 연결할 수 없습니다. 서버 동작 상태를 확인하여 주십시오. 프로그램을 종료합니다.', '세션 만료', () => {
