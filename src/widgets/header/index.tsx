@@ -1,6 +1,6 @@
 import { CommonButton } from "@/components/shared/CommonButton";
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import { useTabStore } from '@/store/tabStore'
 import Cookies from 'js-cookie'
 import { MenuItem, menuItems } from '@/widgets/header/model/menuItems'
@@ -34,7 +34,7 @@ const errorMessage = {
 };
 
 export default function Header() {
-  const router = useRouter();
+  // const router = useRouter();
   const _tenantId = Number(Cookies.get('tenant_id'));
   const { id:userId, tenant_id, session_key: _sessionKey, role_id, menu_role_id } = useAuthStore();
   const isLoggedIn = useAuthStore(state => state.session_key !== '');
@@ -415,15 +415,17 @@ export default function Header() {
     if (isLoggedIn && _sessionKey) return;
 
     // 20초 fallback 타이머
-    const timeoutId = setTimeout(() => {
-      router.replace('/login');
-    }, 20000);
+    // const timeoutId = setTimeout(() => {
+    //   router.replace('/login');
+    // }, 20000);
 
     // 즉시 이동 시도 (네트워크/렌더링 지연 방지)
-    router.replace('/login');
+    // router.replace('/login');
+    //  Next.js 상태 무시하고 즉시 이동
+    window.location.href = '/login';
 
-    return () => clearTimeout(timeoutId);
-  }, [isLoggedIn, _sessionKey, router]);
+    // return () => clearTimeout(timeoutId);
+  }, [isLoggedIn, _sessionKey]);
 
   return (
     <div className="flex flex-col">
