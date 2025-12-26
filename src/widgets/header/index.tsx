@@ -238,7 +238,9 @@ export default function Header() {
     }
 
     // 로그인 페이지로 즉시 이동
-    router.replace('/login');
+    // router.replace('/login');
+    //  Next.js 상태 무시하고 즉시 이동
+    window.location.href = '/login';
   }
 
 
