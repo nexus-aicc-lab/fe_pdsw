@@ -35,6 +35,7 @@ import CampaignAddPopup from '@/features/campaignManager/components/popups/Campa
 import { useRouter } from 'next/navigation';
 import { CampaignInfo } from '../CreateCampaignFormPanel/variables/variablesForCreateCampaignForm';
 import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
+import SkillInput from '@/components/common/skillInput';
 
 const dialModeList = [
   { dial_id: 1, dial_name: 'Power' },
@@ -1231,26 +1232,8 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
               </SelectContent>
             </Select>
           </div>
-          <div className='flex items-center gap-2 relative'>
-            <Label className="w-[74px] min-w-[74px]">스킬</Label>
-            <CustomInput value={inputSkills} className="w-full" readOnly />
-            <button
-              className="absolute right-2 top-[52%] transform -translate-y-1/2">
-              <Image
-                src="/skill-popup.svg"
-                alt="스킬팝업"
-                width={12}
-                height={12}
-                priority
-                onClick={() =>
-                  setSkillPopupState({
-                    ...skillPopupState,
-                    isOpen: true,
-                  })
-                }
-              />
-            </button>
-          </div>
+          <SkillInput value={inputSkills} campaignId={campaignId} onOpenPopup={() => setSkillPopupState({ ...skillPopupState, isOpen: true })} />
+          
           {selectedCampaign !== null ?
             <div className='flex items-center gap-2'>
               <Label className="w-[74px] min-w-[74px]">발신번호</Label>
