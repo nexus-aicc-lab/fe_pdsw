@@ -2,10 +2,9 @@
 
 import React, { useState, useCallback } from "react";
 import { useTabStore } from "@/store/tabStore";
-import dynamic from "next/dynamic";
+import UnifiedTabSection from "./UnifiedTabSection";
 import ResizableDivider from "./ResizableDivider";
 
-const UnifiedTabSection = dynamic(() => import("./UnifiedTabSection"), { ssr: false });
 
 // 통합된 메인 컴포넌트 (탭 + 콘텐츠)
 const UnifiedTabView: React.FC = () => {

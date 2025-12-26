@@ -12,13 +12,7 @@ import {
 } from "@dnd-kit/core";
 import { useTabStore } from "@/store/tabStore";
 import DraggableTab from "./comp/Tabmenu/DraggableTab";
-// import UnifiedTabView from "./comp/Tabmenu/UnifiedTabView";
-import dynamic from "next/dynamic";
-
-const UnifiedTabView = dynamic(
-  () => import("./comp/Tabmenu/UnifiedTabView"),
-  { ssr: false } //  핵심
-);
+import UnifiedTabView from "./comp/Tabmenu/UnifiedTabView";
 
 interface ActiveTabState {
   id: number;
@@ -38,8 +32,6 @@ const MainPage = () => {
     moveTabToGroup,
     moveTabWithinSection,
     setActiveTab: setGlobalActiveTab,
-    addSectionAndMoveTab,        // 추가
-    updateSectionWidths,         // 추가
   } = useTabStore();
 
   // DnD 센서 설정 - 드래그를 시작하기 위한 최소 거리 설정
@@ -102,31 +94,16 @@ const handleDragEnd = useCallback((event: DragEndEvent) => {
     if (currentRow && currentRow.sections.length < 2) {
       // 새 섹션을 추가하고 탭 이동을 한번에 처리
       // 여기서 원래 너비를 저장하기 위해 store의 getState를 사용하여 직접 접근
-      // const storeState = useTabStore.getState();
-      // const originalSectionWidth = storeState.rows.find(r => r.id === targetRowId)?.sections[0].width || 50;
+      const storeState = useTabStore.getState();
+      const originalSectionWidth = storeState.rows.find(r => r.id === targetRowId)?.sections[0].width || 50;
       
       // 새 섹션 추가 후 기존 섹션 너비를 보존하는 로직
-      // storeState.addSectionAndMoveTab(tabId, uniqueKey, targetRowId, activeSectionId);
+      storeState.addSectionAndMoveTab(tabId, uniqueKey, targetRowId, activeSectionId);
       
       // 섹션이 추가된 후에 너비 업데이트
-      // if (storeState.rows.find(r => r.id === targetRowId)?.sections.length === 2) {
-      //   storeState.updateSectionWidths(targetRowId, [originalSectionWidth, 100 - originalSectionWidth]);
-      // }
-
-      const originalSectionWidth =
-        rows.find(r => r.id === targetRowId)?.sections[0].width || 50;
-
-      addSectionAndMoveTab(
-        tabId,
-        uniqueKey,
-        targetRowId,
-        activeSectionId
-      );
-
-      updateSectionWidths(targetRowId, [
-        originalSectionWidth,
-        100 - originalSectionWidth,
-      ]);
+      if (storeState.rows.find(r => r.id === targetRowId)?.sections.length === 2) {
+        storeState.updateSectionWidths(targetRowId, [originalSectionWidth, 100 - originalSectionWidth]);
+      }
 
     } else if (activeRowId !== targetRowId || activeSectionId !== targetSectionId) {
       // 이미 섹션이 2개라면 기존 섹션으로 이동 (같은 섹션이 아닌 경우에만)
@@ -183,7 +160,7 @@ const handleDragEnd = useCallback((event: DragEndEvent) => {
   }
 
   setActiveTab(null);
-}, [rows, moveTabToSection, moveTabToGroup, moveTabWithinSection, addSectionAndMoveTab, updateSectionWidths]);
+}, [rows, moveTabToSection, moveTabToGroup, moveTabWithinSection]);
 
   // 드래그 중인 탭 오버레이 메모이제이션
   const dragOverlay = useMemo(() => {
@@ -204,18 +181,19 @@ const handleDragEnd = useCallback((event: DragEndEvent) => {
   }, [activeTab, activeTabId, activeTabKey, setGlobalActiveTab]);
 
   return (
-    <div className="flex flex-col h-full bg-white overflow-hidden">
-      {rows.length > 0 && (
-        <DndContext
-          sensors={sensors}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-        >
-          <UnifiedTabView />
-          {activeTab && <DragOverlay>{dragOverlay}</DragOverlay>}
-        </DndContext>
-      )}
-    </div>
+    <DndContext 
+      sensors={sensors} 
+      onDragStart={handleDragStart} 
+      onDragEnd={handleDragEnd}
+    >
+      <div className="flex flex-col h-full bg-white overflow-hidden">
+        {/* 통합된 탭 뷰 컴포넌트 사용 */}
+        <UnifiedTabView />
+      </div>
+
+      {/* 드래그 중인 탭 오버레이 */}
+      <DragOverlay>{dragOverlay}</DragOverlay>
+    </DndContext>
   );
 };
 
