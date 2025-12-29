@@ -276,15 +276,7 @@ export default function Header() {
         popupRef.current.close();
         console.log('팝업 창 닫기 완료');
       }
-
-      // 로그인 페이지로 안전하게 이동
-      if (router && router.replace) {
-        router.replace('/login?_rsc=1w1y1'); // SPA 방식 이동
-        // console.log('Next.js 라우터로 로그인 페이지 이동');
-      } else {
-        window.location.replace('/login?_rsc=1w1y1'); 
-        // console.log('브라우저 강제 이동으로 로그인 페이지 이동');
-      }
+      window.location.replace('/login'); 
     } catch (error) {
       // console.error('로그아웃 처리 중 오류 발생:', error);
       // 최소한 로그인 화면 이동 보장
