@@ -1,7 +1,8 @@
+import ClientProvider from "@/components/providers/ClientProvider";
 export default function MonitorLayout({
     children,
   }: {
     children: React.ReactNode;
   }) {
-    return children;
+    return <ClientProvider>{children}</ClientProvider>;
   }
