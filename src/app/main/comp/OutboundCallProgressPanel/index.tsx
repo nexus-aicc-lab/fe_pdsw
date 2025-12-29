@@ -124,7 +124,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   };
 
   // allCampaignData를 매번 계산 (렌더링마다)
-  const allCampaignData: CampaignData = (() => {
+  const allCampaignData = React.useMemo(() => {
     if (Object.keys(_campaignData).length === 0) return emptyData;
 
     // 1. 통계 합계
@@ -165,10 +165,10 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       barData: totalBarData,
       gridData: totalGridData
     };
-  })();
+  }, [_campaignData]);
 
   // 현재 선택된 캠페인의 데이터 (렌더링마다 계산)
-  const currentData: CampaignData = (() => {
+  const currentData = React.useMemo(() => {
     if (outboundCallProgressCampaignId === 'all') return allCampaignData;
     if (!outboundCallProgressCampaignId) return emptyData;
 
@@ -222,7 +222,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     });
 
     return campaignData;
-  })();
+  }, [outboundCallProgressCampaignId, allCampaignData]);
 
   // 데이터 업데이트 시 부모 컴포넌트에 알림
   useEffect(() => {
@@ -516,24 +516,6 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   }, [outboundCallProgressCampaignId,statisticsUpdateCycle,campaigns]);
   
   useEffect(() => {
-    console.log( "##### activeTabId, secondActiveTabId: ", activeTabId, secondActiveTabId ); 
-    if (activeTabId === 5 || secondActiveTabId === 5) {
-      const tempData = openedTabs.filter(tab => tab.id === 5);
-      if (tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
-        setOutboundCallProgressCampaignId(tempData[0].campaignId);
-      }else{
-        // setOutboundCallProgressCampaignId('all');
-      }
-    }else{
-      clearInterval(intervalOutboundCallProgressRef.current!);
-      intervalOutboundCallProgressRef.current = null;
-      setIsLoading(false);
-      setIsRefreshing(false);
-      // setOutboundCallProgressCampaignId('');
-    }
-  }, [activeTabId, openedTabs, secondActiveTabId]);
-
-  useEffect(() => {
     if( externalCampaignId ){
       
       setOutboundCallProgressCampaignId( externalCampaignId );
@@ -563,42 +545,46 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   // 새로고침해서 fetch 하는 함수
   const refreshData = () => {
     setIsRefreshing(true);
-    setIsLoading(true);
+    // setIsLoading(true);
+    const tenantId = campaigns?.length
+      ? [...new Set(campaigns.map(c => c.tenant_id))].join(',')
+      : '1';
+    const campaignId = outboundCallProgressCampaignId === 'all'
+      ? campaigns.map(c => c.campaign_id).join(',')
+      : outboundCallProgressCampaignId;
 
-    if( outboundCallProgressCampaignId === 'all' ){
-      const tenantId = campaigns && campaigns.length > 0 ? [...new Set(campaigns.map(data => data.tenant_id))].join(',') : '1';
-      const campaignId = tenants && tenants.length > 0 ? campaigns.map(data => data.campaign_id).join(',') : '0';
-      fetchCallProgressStatus({
-        centerId: centerId,
-        tenantId: tenantId,
-        campaignId: campaignId,
-        agentIds: campaignAgents
-      });
-    }else{
-      const campaignInfo = campaigns.find(data => data.campaign_id === Number(outboundCallProgressCampaignId));
-      const tenantId = campaignInfo?.tenant_id+'' !== 'undefined' ? campaignInfo?.tenant_id+'' 
-        : campaigns && campaigns.length > 0 ? campaigns.map(data => data.tenant_id).join(',') : '1';
-      const campaignId = campaignInfo?.campaign_id+'' !== 'undefined' ? campaignInfo?.campaign_id+'' 
-        : tenants && tenants.length > 0 ? campaigns.map(data => data.campaign_id).join(',') : '0';
-      fetchCallProgressStatus({
-        centerId: centerId,
-        tenantId: tenantId,
-        campaignId: campaignId,
-        agentIds: campaignAgents
-      });
-    }
-
+    fetchCallProgressStatus({
+      centerId,
+      tenantId,
+      campaignId,
+      agentIds: campaignAgents
+    });
   };
 
   // 갱신주기마다 refreshData 실행 useEffect
   useEffect(() => {
-    if (statisticsUpdateCycle > 0 && intervalOutboundCallProgressRef.current === null) {
-      intervalOutboundCallProgressRef.current = setInterval(() => {
-        refreshData();
-      }, statisticsUpdateCycle * 1000);
-      return () => clearInterval(intervalOutboundCallProgressRef.current!);
+    if (activeTabId === 5 || secondActiveTabId === 5) {
+      // 이미 interval이 있으면 삭제 후 재생성 방지
+      if (!intervalOutboundCallProgressRef.current) {
+        intervalOutboundCallProgressRef.current = setInterval(refreshData, statisticsUpdateCycle * 1000);
+        refreshData(); // interval 등록 시 즉시 fetch
+      }
+    } else {
+      if (intervalOutboundCallProgressRef.current) {
+        clearInterval(intervalOutboundCallProgressRef.current);
+        intervalOutboundCallProgressRef.current = null;
+        setIsLoading(false);
+        setIsRefreshing(false);
+      }
     }
-  }, [statisticsUpdateCycle]);
+
+    return () => {
+      if (intervalOutboundCallProgressRef.current) {
+        clearInterval(intervalOutboundCallProgressRef.current);
+        intervalOutboundCallProgressRef.current = null;
+      }
+    };
+  }, [activeTabId, secondActiveTabId, statisticsUpdateCycle]);
 
 return (
   isLoading ? (
