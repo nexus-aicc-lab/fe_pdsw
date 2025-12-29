@@ -18,6 +18,7 @@ import { useApiForOperatingTime } from '@/features/preferences/hooks/useApiForOp
 import { EnvironmentListResponse } from "@/features/auth/types/environmentIndex";
 import Cookies from 'js-cookie';
 import { useApiForCenterInfo } from '@/features/auth/hooks/useApiForCenterInfo';
+import { Settings } from "lucide-react";
 
 interface LoginFormData {
   user_name: string;
@@ -43,6 +44,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [cookiesSessionKey, setCookiesSessionKey] = useState<string | undefined>(undefined);
   const [showPassword, setShowPassword] = useState(false);
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
   const [ _sessionKey, _setSessionKey ] = useState(''); // 임시로 session_key 상태 관리
   const { setEnvironment, setCenterInfo } = useEnvironmentStore(); // 새로운 환경설정 스토어 사용
   const [formData, setFormData] = useState<LoginFormData>({
@@ -267,6 +269,10 @@ export default function LoginPage() {
    * ========================= */
   // 컴포넌트 마운트 시 저장된 사용자 이름 불러오기
   useEffect(() => {
+    // 쿠키에서 세션 가져오기
+    const cookieKey = Cookies.get('session_key');
+    setCookiesSessionKey(cookieKey);
+
     const rememberedUsername = localStorage.getItem('remembered_username');
     if (rememberedUsername) {
       setFormData(prev => ({
@@ -278,6 +284,8 @@ export default function LoginPage() {
     
     // 이미 로그인 상태 + 세션 만료되지 않은 경우 바로 main
     if (session_key && !expires_check) router.replace('/main');
+    // 세션 체크 완료 표시
+    setIsAuthChecked(true);
   }, [session_key, expires_check, router]);
 
   /** =========================
@@ -296,16 +304,13 @@ export default function LoginPage() {
     }
   }, [expires_check, clearAuth, router]);
   
-  // 쿠키가 session_key가 존재하는지 확인
-  // const cookiesSessionKey = Cookies.get('session_key');
-  const cookiescheck = cookiesSessionKey !== undefined && cookiesSessionKey !== ''; 
-
   // // store 의 session_key가 있으면서, 쿠키에 session_key가 존재하면 main 페이지로 이동하기전에 보여지는 빈 페이지
   // if (isLoggedIn && cookiescheck) return (null);
-  if (!!session_key && cookiescheck) {
+  if (!isAuthChecked || (!!session_key && cookiesSessionKey)) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <span className="text-sm text-gray-500">이동 중입니다...</span>
+      <div className="flex items-center justify-center py-10">
+        <Settings className="w-5 h-5 text-indigo-500 animate-spin mr-3" />
+        <span className="text-sm text-gray-600">환경 설정 로딩중...</span>
       </div>
     );
   }

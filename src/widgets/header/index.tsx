@@ -259,6 +259,39 @@ export default function Header() {
     }
   }
 
+  useEffect(() => {
+    // 로그인 상태 & 세션키 존재하면 아무 작업 안 함
+    if (isLoggedIn && _sessionKey) return;
+
+    try {
+      // 진행 중 API 요청 취소
+      if (abortControllers.current.length > 0) {
+        abortControllers.current.forEach(controller => controller.abort());
+        abortControllers.current = [];
+        console.log('진행 중 API 요청 취소 완료');
+      }
+
+      // 통합 모니터 팝업 닫기
+      if (popupRef.current && !popupRef.current.closed) {
+        popupRef.current.close();
+        console.log('팝업 창 닫기 완료');
+      }
+
+      // 로그인 페이지로 안전하게 이동
+      if (router && router.replace) {
+        router.replace('/login?_rsc=1w1y1'); // SPA 방식 이동
+        // console.log('Next.js 라우터로 로그인 페이지 이동');
+      } else {
+        window.location.replace('/login?_rsc=1w1y1'); 
+        // console.log('브라우저 강제 이동으로 로그인 페이지 이동');
+      }
+    } catch (error) {
+      // console.error('로그아웃 처리 중 오류 발생:', error);
+      // 최소한 로그인 화면 이동 보장
+      window.location.replace('/login?_rsc=1w1y1'); 
+    }
+  }, [isLoggedIn, _sessionKey]);
+
 
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
@@ -419,17 +452,6 @@ export default function Header() {
 
     }
   }, [tenants, _sessionKey]);
-
-  useEffect(() => {
-    // 로그인 상태 & 세션키 존재하면 아무 작업 안 함
-    if (isLoggedIn && _sessionKey) return;
-
-    // 즉시 이동 시도 (네트워크/렌더링 지연 방지)
-    // router.replace('/login');
-    //  Next.js 상태 무시하고 즉시 이동
-    // window.location.href = '/login';
-    window.location.replace('/login');
-  }, [isLoggedIn, _sessionKey]);
 
   return (
     <div className="flex flex-col">
