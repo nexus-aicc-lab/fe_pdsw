@@ -1,6 +1,6 @@
 import { CommonButton } from "@/components/shared/CommonButton";
 import Image from 'next/image'
-// import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useTabStore } from '@/store/tabStore'
 import Cookies from 'js-cookie'
 import { MenuItem, menuItems } from '@/widgets/header/model/menuItems'
@@ -34,7 +34,7 @@ const errorMessage = {
 };
 
 export default function Header() {
-  // const router = useRouter();
+  const router = useRouter();
   const _tenantId = Number(Cookies.get('tenant_id'));
   const { id:userId, tenant_id, session_key: _sessionKey, role_id, menu_role_id } = useAuthStore();
   const isLoggedIn = useAuthStore(state => state.session_key !== '');
@@ -225,22 +225,38 @@ export default function Header() {
     );
   };
 
-  const handleLoginOut = () => {
-    // 진행 중 API 요청 취소
-    abortControllers.current.forEach(controller => controller.abort());
-    abortControllers.current = [];
-    // 로그아웃 공통함수로 처리
-    logoutFunction();
+  const handleLoginOut = () => {    
+    try {
+      // 진행 중 API 요청 취소
+      if (abortControllers.current.length > 0) {
+        abortControllers.current.forEach(controller => controller.abort());
+        abortControllers.current = [];
+        console.log('진행 중 API 요청 취소 완료');
+      }
 
-    // 통합모니터창이 열려있다면 popup close
-    if (popupRef.current && !popupRef.current.closed) {
-      popupRef.current.close();
+      // 통합 모니터 팝업 닫기
+      if (popupRef.current && !popupRef.current.closed) {
+        popupRef.current.close();
+        console.log('팝업 창 닫기 완료');
+      }
+
+      // 로그아웃 공통 함수 실행
+      logoutFunction();
+      // console.log('로그아웃 처리 완료');
+
+      // 로그인 페이지로 안전하게 이동
+      if (router && router.replace) {
+        router.replace('/login?_rsc=1w1y1'); // SPA 방식 이동
+        // console.log('Next.js 라우터로 로그인 페이지 이동');
+      } else {
+        window.location.replace('/login?_rsc=1w1y1'); 
+        // console.log('브라우저 강제 이동으로 로그인 페이지 이동');
+      }
+    } catch (error) {
+      // console.error('로그아웃 처리 중 오류 발생:', error);
+      // 최소한 로그인 화면 이동 보장
+      window.location.replace('/login?_rsc=1w1y1'); 
     }
-
-    // 로그인 페이지로 즉시 이동
-    // router.replace('/login');
-    //  Next.js 상태 무시하고 즉시 이동
-    // window.location.href = '/login';
   }
 
 
@@ -404,28 +420,15 @@ export default function Header() {
     }
   }, [tenants, _sessionKey]);
 
-  // useEffect(() => {
-  //   if (!isLoggedIn || _sessionKey === "") {
-  //     router.replace('/login');
-  //   }
-  // }, [isLoggedIn, _sessionKey]);
-  // 세션키 없으면 20초 후 로그인 페이지로 리다이렉트
   useEffect(() => {
     // 로그인 상태 & 세션키 존재하면 아무 작업 안 함
     if (isLoggedIn && _sessionKey) return;
-
-    // 20초 fallback 타이머
-    // const timeoutId = setTimeout(() => {
-    //   router.replace('/login');
-    // }, 20000);
 
     // 즉시 이동 시도 (네트워크/렌더링 지연 방지)
     // router.replace('/login');
     //  Next.js 상태 무시하고 즉시 이동
     // window.location.href = '/login';
     window.location.replace('/login');
-
-    // return () => clearTimeout(timeoutId);
   }, [isLoggedIn, _sessionKey]);
 
   return (
