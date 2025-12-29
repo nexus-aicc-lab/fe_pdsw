@@ -1,5 +1,4 @@
 // src/features/store/authStore.ts
-import exp from "constants";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
@@ -87,6 +86,12 @@ export const useAuthStore = create<AuthStore>()(
       }),
       {
         name: "auth-storage", // localStorage에 저장될 키 이름
+        migrate: (persistedState, version) => {
+          // 만약 이전 상태가 undefined면 초기 상태로
+          if (!persistedState) return { state: { id: "", tenant_id: -1, session_key: "", role_id: 0, menu_role_id: 0, expires_in: 0, expires_check: false }, version };
+          return { state: persistedState, version };
+        },
+        version: 1, // 버전 관리
       }
     ),
     { name: "AuthStore" } // Redux DevTools에 표시될 스토어 이름

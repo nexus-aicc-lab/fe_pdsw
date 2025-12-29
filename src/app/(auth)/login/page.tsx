@@ -44,6 +44,7 @@ export default function LoginPage() {
   const [cookiesSessionKey, setCookiesSessionKey] = useState<string | undefined>(undefined);
   const [showPassword, setShowPassword] = useState(false);
   const [ _sessionKey, _setSessionKey ] = useState(''); // 임시로 session_key 상태 관리
+  const { setEnvironment, setCenterInfo } = useEnvironmentStore(); // 새로운 환경설정 스토어 사용
   const [formData, setFormData] = useState<LoginFormData>({
     user_name: '',
     password: '',
@@ -56,14 +57,28 @@ export default function LoginPage() {
     title: '로그인',
     type: '0',
   });
+  
+  const { mutate: environment } = useApirForEnvironmentList({
+    onSuccess: (data) => {      
+      // centerInfo(); // 센터정보 저장하는 api 호출
+      setTempEnvironment(data); // 환경설정 데이터를 state로 저장 (이후 useEffect로 store에 저장)
+    },
+    onError: (error) => {
+      // console.error('환경설정 데이터 로드 실패:', error);
+      setAlertState({
+        isOpen: true,
+        message: '환경설정 데이터를 불러오는데 실패했습니다.',
+        title: '환경설정',
+        type: '2',
+      });
+    }
+  });
 
-  const { setAuth, setSessionKey, tenant_id, id } = useAuthStore();
-  const { setEnvironment, centerId } = useEnvironmentStore(); // 새로운 환경설정 스토어 사용
+  const { setAuth, setSessionKey, tenant_id, id, expires_check, clearAuth, session_key } = useAuthStore();
   const [tempEnvironment, setTempEnvironment] = useState<EnvironmentListResponse>(data);
   // 캠페인 운용 가능 시간 조회 API 호출
   const { mutate: fetchOperatingTime } = useApiForOperatingTime({
     onSuccess: (data) => {
-
       const startTime = data.result_data.start_time;
       const endTime = data.result_data.end_time;
       const work = data.result_data.days_of_week;
@@ -126,7 +141,7 @@ export default function LoginPage() {
         employeeId: formData.user_name || id  // 로그인 시 입력한 user_name
       });
 
-      useEnvironmentStore.getState().setCenterInfo(_centerId,_centerName);
+      setCenterInfo(_centerId,_centerName);
     },
     onError: (error) => {
       // console.error('센터 정보 로드 실패:', error);
@@ -139,25 +154,6 @@ export default function LoginPage() {
     }
   });
   
-  const { mutate: environment } = useApirForEnvironmentList({
-    onSuccess: (data) => {
-      
-      // centerInfo(); // 센터정보 저장하는 api 호출
-
-      setTempEnvironment(data); // 환경설정 데이터를 state로 저장 (이후 useEffect로 store에 저장)
-      
-    },
-    onError: (error) => {
-      // console.error('환경설정 데이터 로드 실패:', error);
-      setAlertState({
-        isOpen: true,
-        message: '환경설정 데이터를 불러오는데 실패했습니다.',
-        title: '환경설정',
-        type: '2',
-      });
-    }
-  });
-
   // tempEnvironment가 업데이트 완료되었을때
   useEffect(() => {
     if (tempEnvironment && tempEnvironment.code !== "") {
@@ -165,6 +161,9 @@ export default function LoginPage() {
     }
   }, [tempEnvironment, fetchOperatingTime]);
 
+  /** =========================
+   *  로그인 API
+   * ========================= */
   const { mutate: login } = useApiForLogin({
     onSuccess: (data) => {
 
@@ -236,6 +235,9 @@ export default function LoginPage() {
     },
   });
 
+  /** =========================
+   *  폼 제출
+   * ========================= */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsPending(true);
@@ -259,7 +261,10 @@ export default function LoginPage() {
       login(formData);
     }
   };
-
+  
+  /** =========================
+   *  초기 마운트
+   * ========================= */
   // 컴포넌트 마운트 시 저장된 사용자 이름 불러오기
   useEffect(() => {
     const rememberedUsername = localStorage.getItem('remembered_username');
@@ -270,53 +275,40 @@ export default function LoginPage() {
         remember: true
       }));
     }
-    // useEnvironmentStore.getState().setCenterInfo('','');
-    // 쿠키는 클라이언트에서만 읽기
-    setCookiesSessionKey(Cookies.get('session_key'));
-  }, []);
+    
+    // 이미 로그인 상태 + 세션 만료되지 않은 경우 바로 main
+    if (session_key && !expires_check) router.replace('/main');
+  }, [session_key, expires_check, router]);
 
+  /** =========================
+   *  세션 만료 감시
+   * ========================= */
+  useEffect(() => {
+    if (expires_check) {
+      clearAuth(); // 세션 만료 시 로그아웃 처리
+      setAlertState({
+        isOpen: true,
+        message: '세션이 만료되었습니다. 다시 로그인해주세요.',
+        title: '로그인',
+        type: '2',
+      });
+      router.replace('/login');
+    }
+  }, [expires_check, clearAuth, router]);
   
-
-  // 쿠키에서 관리되는 session_key
-  // const [cookiesSessionKey, setCookiesSessionKey] = useState(Cookies.get('session_key'));
-
-  // store에서 관리되는 세션 타임아웃 체크
-  const isSessionTimeCheck = useAuthStore((state) => state.expires_check);
-  
-  // store에 session_key가 존재하는지 확인
-  // const isLoggedIn = useAuthStore((state) => state.session_key !== ''); 
-  const sessionKey = useAuthStore((state) => state.session_key);
-  const isLoggedIn = !!sessionKey;
-
   // 쿠키가 session_key가 존재하는지 확인
   // const cookiesSessionKey = Cookies.get('session_key');
   const cookiescheck = cookiesSessionKey !== undefined && cookiesSessionKey !== ''; 
 
-  useEffect(() => {
-    // console.log('쿠키에서 관리되는 session_key:', cookiesSessionKey);
-    // console.log('store에서 관리되는 세션 타임아웃 체크:', isSessionTimeCheck);
-    // console.log('store에 session_key가 존재하는지 확인:', isLoggedIn);
-    // 로그인 되어있는 상태로 login 페이지 접근시 replace
-    // console.log('로그인 상태로 login 페이지 접근시 main 페이지로 이동 처리 :: ',sessionKey);
-    if (isLoggedIn && isSessionTimeCheck === false && sessionKey && sessionKey !== '') {
-      // store나 쿠키에 session_key가 존재하면서 세션 만료가 아닌 경우 login 페이지 접근시 main 페이지로 이동
-      // router.push('/main');
-      window.location.href = '/main';
-    }
-  }, [isLoggedIn, isSessionTimeCheck, sessionKey]); // 로그아웃이 안되는 현상 발생하여 수정 20251127
-  // useEffect(() => {
-  //   // console.log('쿠키에서 관리되는 session_key:', cookiesSessionKey);
-  //   // console.log('store에서 관리되는 세션 타임아웃 체크:', isSessionTimeCheck);
-  //   // console.log('store에 session_key가 존재하는지 확인:', isLoggedIn);
-  //   // 로그인 되어있는 상태로 login 페이지 접근시 replace
-  //   if (isLoggedIn && cookiescheck && isSessionTimeCheck === false) {
-  //     // store나 쿠키에 session_key가 존재하면서 세션 만료가 아닌 경우 login 페이지 접근시 main 페이지로 이동
-  //     router.replace('/main');
-  //   }
-  // }, [isLoggedIn, cookiescheck, isSessionTimeCheck, router]); // 로그아웃이 안되는 현상 발생하여 수정 20251127
-
   // // store 의 session_key가 있으면서, 쿠키에 session_key가 존재하면 main 페이지로 이동하기전에 보여지는 빈 페이지
-  if (isLoggedIn && cookiescheck) return (null);
+  // if (isLoggedIn && cookiescheck) return (null);
+  if (!!session_key && cookiescheck) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="text-sm text-gray-500">이동 중입니다...</span>
+      </div>
+    );
+  }
 
   const handleContextMenu = (e:any) => {
     // 기본 브라우저 동작(오른쪽 클릭 메뉴)을 막습니다.
@@ -354,6 +346,8 @@ export default function LoginPage() {
                 </div>
                 <Input
                   type="text"
+                  name="username"
+                  autoComplete="username"
                   placeholder="아이디를 입력하세요"
                   className="input-field"
                   value={formData.user_name}
@@ -377,6 +371,8 @@ export default function LoginPage() {
                 <div className="relative flex-grow">
                   <Input
                     type={showPassword ? "text" : "password"}
+                    name="password"
+                    autoComplete="current-password"
                     placeholder="비밀번호를 입력하세요"
                     className="input-field"
                     value={formData.password}

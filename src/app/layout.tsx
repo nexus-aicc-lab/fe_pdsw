@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "react-date-picker/dist/DatePicker.css";
 import "./globals.css";
-import ClientProvider from "@/components/providers/ClientProvider";
+// import ClientProvider from "@/components/providers/ClientProvider";
 import Script from 'next/script'
 
 const geistSans = Geist({
@@ -48,9 +48,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased body-top`}
       >
-        <ClientProvider>
-          {children}
-        </ClientProvider>
+        {/*  Provider 제거 */}
+        {children}
       </body>
     </html>
   );

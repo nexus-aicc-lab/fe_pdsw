@@ -8,6 +8,7 @@ import Header from '@/widgets/header';
 import { useSidebarWidthStore } from '@/widgets/sidebar2/store/useSidebarWidthStore';
 import { PortalProvider } from '@/features/campaignManager/components/treeMenus/provider/usePortal';
 import Sidebar2 from '@/widgets/sidebar2';
+import ClientProvider from "@/components/providers/ClientProvider";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -51,47 +52,49 @@ export default function MainLayout({
   const actualFooterHeight = isFooterOpen ? footerHeight : 32;
 
   return (
-    <PortalProvider>
-      <div className={`${inter.className} h-screen overflow-hidden`} onContextMenu={handleContextMenu}>
-        <div className="flex flex-col h-full">
-          <Header />
-          <div className="flex flex-1 overflow-hidden">
-            <Sidebar2 />
-            <main
-              className="flex flex-col h-full relative"
-              style={{ width: getMainWidth() }}
-            >
-              <div 
-                ref={contentRef}
-                className="refined-scrollbar overflow-auto flex-1"
-                style={{
-                  height: `calc(100% - ${actualFooterHeight}px)`,
-                  padding: '20px 25px 20px 35px',
-                  boxSizing: 'border-box',
-                }}
+    <ClientProvider>      
+      <PortalProvider>
+        <div className={`${inter.className} h-screen overflow-hidden`} onContextMenu={handleContextMenu}>
+          <div className="flex flex-col h-full">
+            <Header />
+            <div className="flex flex-1 overflow-hidden">
+              <Sidebar2 />
+              <main
+                className="flex flex-col h-full relative"
+                style={{ width: getMainWidth() }}
               >
-                <div className="h-full min-w-[800px]">
-                  {children}
+                <div 
+                  ref={contentRef}
+                  className="refined-scrollbar overflow-auto flex-1"
+                  style={{
+                    height: `calc(100% - ${actualFooterHeight}px)`,
+                    padding: '20px 25px 20px 35px',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  <div className="h-full min-w-[800px]">
+                    {children}
+                  </div>
                 </div>
-              </div>
-              <div
-                className="flex-shrink-0"
-                style={{
-                  height: `${actualFooterHeight}px`,
-                }}
-              >
-                <Footer
-                  footerHeight={footerHeight}
-                  onToggleDrawer={toggleFooter}
-                  onResizeHeight={handleResize}
-                  onResizeStart={() => {}}
-                  onResizeEnd={handleResizeEnd}
-                />
-              </div>
-            </main>
+                <div
+                  className="flex-shrink-0"
+                  style={{
+                    height: `${actualFooterHeight}px`,
+                  }}
+                >
+                  <Footer
+                    footerHeight={footerHeight}
+                    onToggleDrawer={toggleFooter}
+                    onResizeHeight={handleResize}
+                    onResizeStart={() => {}}
+                    onResizeEnd={handleResizeEnd}
+                  />
+                </div>
+              </main>
+            </div>
           </div>
         </div>
-      </div>
-    </PortalProvider>
+      </PortalProvider>      
+    </ClientProvider>
   );
 }

@@ -422,7 +422,8 @@ export default function Header() {
     // 즉시 이동 시도 (네트워크/렌더링 지연 방지)
     // router.replace('/login');
     //  Next.js 상태 무시하고 즉시 이동
-    window.location.href = '/login';
+    // window.location.href = '/login';
+    window.location.replace('/login');
 
     // return () => clearTimeout(timeoutId);
   }, [isLoggedIn, _sessionKey]);
