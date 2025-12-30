@@ -231,31 +231,23 @@ export default function Header() {
       if (abortControllers.current.length > 0) {
         abortControllers.current.forEach(controller => controller.abort());
         abortControllers.current = [];
-        console.log('진행 중 API 요청 취소 완료');
       }
 
       // 통합 모니터 팝업 닫기
       if (popupRef.current && !popupRef.current.closed) {
         popupRef.current.close();
-        console.log('팝업 창 닫기 완료');
       }
 
       // 로그아웃 공통 함수 실행
       logoutFunction();
       // console.log('로그아웃 처리 완료');
 
-      // 로그인 페이지로 안전하게 이동
-      if (router && router.replace) {
-        router.replace('/login?_rsc=1w1y1'); // SPA 방식 이동
-        // console.log('Next.js 라우터로 로그인 페이지 이동');
-      } else {
-        window.location.replace('/login?_rsc=1w1y1'); 
-        // console.log('브라우저 강제 이동으로 로그인 페이지 이동');
-      }
+      // 즉시 렌더링 중단 + 로그인 이동 (핵심)
+      window.location.href = '/login';
     } catch (error) {
       // console.error('로그아웃 처리 중 오류 발생:', error);
       // 최소한 로그인 화면 이동 보장
-      window.location.replace('/login?_rsc=1w1y1'); 
+      window.location.href = '/login';
     }
   }
 
@@ -268,19 +260,17 @@ export default function Header() {
       if (abortControllers.current.length > 0) {
         abortControllers.current.forEach(controller => controller.abort());
         abortControllers.current = [];
-        console.log('진행 중 API 요청 취소 완료');
       }
 
       // 통합 모니터 팝업 닫기
       if (popupRef.current && !popupRef.current.closed) {
         popupRef.current.close();
-        console.log('팝업 창 닫기 완료');
       }
-      window.location.replace('/login'); 
+      window.location.href = '/login';
     } catch (error) {
       // console.error('로그아웃 처리 중 오류 발생:', error);
       // 최소한 로그인 화면 이동 보장
-      window.location.replace('/login?_rsc=1w1y1'); 
+      window.location.href = '/login';
     }
   }, [isLoggedIn, _sessionKey]);
 

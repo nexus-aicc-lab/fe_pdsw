@@ -83,7 +83,7 @@ const SystemMonitoring: React.FC = () => {
   // 상태 관리 추가
   const [systemsData, setSystemsData] = useState<SystemData[]>([]);
   const { statisticsUpdateCycle } = useEnvironmentStore();
-  const { activeTabId } = useTabStore();
+  const { activeTabId, secondActiveTabId } = useTabStore();
   const intervalSystemMonitoringRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // API 호출 및 응답 처리
@@ -136,7 +136,7 @@ const SystemMonitoring: React.FC = () => {
   });
 
   useEffect(() => {
-    if (activeTabId === 23) {
+    if (activeTabId === 23 || secondActiveTabId === 23) {
       systemMonitoring({}); // 시스템 모니터링 API 호출
       if( statisticsUpdateCycle > 0 ){        
         intervalSystemMonitoringRef.current = setInterval(() => {  
@@ -149,7 +149,7 @@ const SystemMonitoring: React.FC = () => {
       intervalSystemMonitoringRef.current = null;
     //   setIsRefreshing(false);
     }
-  }, [activeTabId,statisticsUpdateCycle]);
+  }, [activeTabId, secondActiveTabId, statisticsUpdateCycle]);
 
   return (
     <div className="w-full limit-width">

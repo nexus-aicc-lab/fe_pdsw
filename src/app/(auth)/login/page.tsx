@@ -25,7 +25,7 @@ interface LoginFormData {
   password: string;
   remember: boolean;
 }
-const data:EnvironmentListResponse = {
+const EMPTY_ENV:EnvironmentListResponse = {
   campaignListAlram:0
   , code:""
   , dayOfWeekSetting: ""
@@ -42,120 +42,82 @@ const data:EnvironmentListResponse = {
 
 export default function LoginPage() {
   const router = useRouter();
-  const [cookiesSessionKey, setCookiesSessionKey] = useState<string | undefined>(undefined);
-  const [showPassword, setShowPassword] = useState(false);
-  const [isAuthChecked, setIsAuthChecked] = useState(false);
-  const [ _sessionKey, _setSessionKey ] = useState(''); // 임시로 session_key 상태 관리
+  const { setAuth, setSessionKey, tenant_id, id, expires_check, clearAuth, session_key } = useAuthStore();
   const { setEnvironment, setCenterInfo } = useEnvironmentStore(); // 새로운 환경설정 스토어 사용
+  const [ _sessionKey, _setSessionKey ] = useState(''); // 임시로 session_key 상태 관리
+  const [showPassword, setShowPassword] = useState(false);
+  const [isPending, setIsPending] = useState(false);
+  const [loading, setLoading] = useState(true); // 환경설정/세션 로딩 상태
+
   const [formData, setFormData] = useState<LoginFormData>({
     user_name: '',
     password: '',
     remember: false
   });
-  const [isPending, setIsPending] = useState(false);
   const [alertState, setAlertState] = useState({
     isOpen: false,
     message: '',
     title: '로그인',
     type: '0',
   });
+  const [tempEnvironment, setTempEnvironment] = useState<EnvironmentListResponse>(EMPTY_ENV);
   
-  const { mutate: environment } = useApirForEnvironmentList({
-    onSuccess: (data) => {      
-      // centerInfo(); // 센터정보 저장하는 api 호출
-      setTempEnvironment(data); // 환경설정 데이터를 state로 저장 (이후 useEffect로 store에 저장)
-    },
-    onError: (error) => {
-      // console.error('환경설정 데이터 로드 실패:', error);
-      setAlertState({
-        isOpen: true,
-        message: '환경설정 데이터를 불러오는데 실패했습니다.',
-        title: '환경설정',
-        type: '2',
-      });
+  /* =========================
+     이미 로그인 상태면 바로 main
+  ========================= */
+  useEffect(() => {
+    if (session_key && !expires_check) {
+      router.replace('/main');
+    } else {
+      setLoading(false); // 로그인 화면 렌더링 허용
     }
+  }, [session_key, expires_check, router]);
+
+  /* =========================
+     아이디 기억하기
+  ========================= */
+  useEffect(() => {
+    const remembered = localStorage.getItem('remembered_username');
+    if (remembered) {
+      setFormData(prev => ({
+        ...prev,
+        user_name: remembered,
+        remember: true,
+      }));
+    }
+  }, []);
+
+  /* =========================
+     환경설정 API
+  ========================= */
+  const { mutate: environment } = useApirForEnvironmentList({
+    onSuccess: data => setTempEnvironment(data),
   });
 
-  const { setAuth, setSessionKey, tenant_id, id, expires_check, clearAuth, session_key } = useAuthStore();
-  const [tempEnvironment, setTempEnvironment] = useState<EnvironmentListResponse>(data);
   // 캠페인 운용 가능 시간 조회 API 호출
   const { mutate: fetchOperatingTime } = useApiForOperatingTime({
     onSuccess: (data) => {
-      const startTime = data.result_data.start_time;
-      const endTime = data.result_data.end_time;
-      const work = data.result_data.days_of_week;
-      
-      if( startTime === '0000' && endTime === '0000' && work === '0000000' ){
-        // setStartTime("0000");
-        // setEndTime("0000");          
-        // setDayOfWeek(['f','f','f','f','f','f','f']);
-        // setUnusedWorkHoursCalc(true);
-        // 환경설정 데이터를 별도 스토어에 저장
-        setEnvironment({
-          ...tempEnvironment,
-          sendingWorkEndHours: endTime,
-          sendingWorkStartHours: startTime,
-          dayOfWeekSetting: 'f,f,f,f,f,f,f',
-        });
-      }else{
-        // setStartTime(startTime);
-        // setEndTime(endTime);
-        // setDayOfWeek(convertBinaryString(work).split(','));
-        // setUnusedWorkHoursCalc(false);
-        // 환경설정 데이터를 별도 스토어에 저장
-        setEnvironment({
-          ...tempEnvironment,
-          sendingWorkEndHours: endTime,
-          sendingWorkStartHours: startTime,
-          dayOfWeekSetting: convertBinaryString(work),
-        });
-      }
+      const { start_time, end_time, days_of_week } = data.result_data;
+
+      setEnvironment({
+        ...tempEnvironment,
+        sendingWorkStartHours: start_time,
+        sendingWorkEndHours: end_time,
+        dayOfWeekSetting: days_of_week
+          .split('')
+          .map(v => (v === '1' ? 't' : 'f'))
+          .join(','),
+      });
 
       // 로그인시 통합모니터링창 초기화
       localStorage.setItem('monitorPopupOpen', 'false');
       // console.log('운용 가능 시간 조회 성공, 환경설정 스토어에 저장:', startTime, endTime, work);
-      // router.push('/main');
       if( _sessionKey && _sessionKey !== ''){
         setSessionKey(_sessionKey); // authStore에 session_key 저장
       }
     },
-    onError: (error) => {
-      // console.log('운용 가능 시간 조회 실패:', error);
-      // router.push('/main');
-    }
   });
-  const convertBinaryString = (input:string) => {
-    return input
-      .split('')               // 문자열을 문자 배열로 변환
-      .map(char => char === '1' ? 't' : 'f') // 각각 '1'이면 't', 아니면 'f'로
-      .join(',');              // 쉼표로 연결
-  };
 
-  const { mutate: centerInfo} = useApiForCenterInfo({
-    onSuccess: (data) => {
-      // console.log('센터 정보:', data.centerInfoList.map((item) => item.centerName)[0]);
-      const _centerId = data.centerInfoList[0].centerId || '1';
-      const _centerName = data.centerInfoList[0].centerName || 'Nexus';
-      
-      environment({
-        centerId: Number(_centerId),                 // 하드코딩된 값
-        tenantId: tenant_id,    // 로그인 응답에서 받은 tenant_id
-        employeeId: formData.user_name || id  // 로그인 시 입력한 user_name
-      });
-
-      setCenterInfo(_centerId,_centerName);
-    },
-    onError: (error) => {
-      // console.error('센터 정보 로드 실패:', error);
-      setAlertState({
-        isOpen: true,
-        message: '센터 정보를 불러오는데 실패했습니다.',
-        title: '로그인',
-        type: '2',
-      });
-    }
-  });
-  
   // tempEnvironment가 업데이트 완료되었을때
   useEffect(() => {
     if (tempEnvironment && tempEnvironment.code !== "") {
@@ -163,6 +125,22 @@ export default function LoginPage() {
     }
   }, [tempEnvironment, fetchOperatingTime]);
 
+  /* =========================
+     센터 정보
+  ========================= */
+  const { mutate: centerInfo} = useApiForCenterInfo({
+    onSuccess: data => {
+      const center = data.centerInfoList[0];
+      environment({
+        centerId: Number(center.centerId),
+        tenantId: tenant_id,
+        employeeId: formData.user_name || id,
+      });
+      setCenterInfo(center.centerId, center.centerName);
+      setLoading(false); // 모든 초기화 완료
+    },
+  });
+  
   /** =========================
    *  로그인 API
    * ========================= */
@@ -186,13 +164,6 @@ export default function LoginPage() {
         localStorage.removeItem('remembered_username');
       }
 
-      // 환경설정 정보 요청
-      // environment({
-      //   centerId: 1,                 // 하드코딩된 값
-      //   tenantId: data.tenant_id,    // 로그인 응답에서 받은 tenant_id
-      //   employeeId: formData.user_name  // 로그인 시 입력한 user_name
-      // });
-      // setIsPending(false); 
       centerInfo(); // 센터정보 저장하는 api 호출
     },
     onError: (e) => {
@@ -238,11 +209,10 @@ export default function LoginPage() {
   });
 
   /** =========================
-   *  폼 제출
+   *  로그인 제출
    * ========================= */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsPending(true);
     if (formData.user_name === '') {
       setAlertState({
         isOpen: true,
@@ -250,7 +220,7 @@ export default function LoginPage() {
         title: '로그인',
         type: '2',
       });
-      setIsPending(false);
+      return;
     } else if (formData.password === '') {
       setAlertState({
         isOpen: true,
@@ -258,55 +228,31 @@ export default function LoginPage() {
         title: '로그인',
         type: '2',
       });
-      setIsPending(false);
-    } else {
-      login(formData);
+      return;
     }
+    setIsPending(true);
+    login(formData);
   };
   
   /** =========================
-   *  초기 마운트
-   * ========================= */
-  // 컴포넌트 마운트 시 저장된 사용자 이름 불러오기
-  useEffect(() => {
-    // 쿠키에서 세션 가져오기
-    const cookieKey = Cookies.get('session_key');
-    setCookiesSessionKey(cookieKey);
-
-    const rememberedUsername = localStorage.getItem('remembered_username');
-    if (rememberedUsername) {
-      setFormData(prev => ({
-        ...prev,
-        user_name: rememberedUsername,
-        remember: true
-      }));
-    }
-    
-    // 이미 로그인 상태 + 세션 만료되지 않은 경우 바로 main
-    if (session_key && !expires_check) router.replace('/main');
-    // 세션 체크 완료 표시
-    setIsAuthChecked(true);
-  }, [session_key, expires_check, router]);
-
-  /** =========================
    *  세션 만료 감시
    * ========================= */
-  useEffect(() => {
-    if (expires_check) {
-      clearAuth(); // 세션 만료 시 로그아웃 처리
-      setAlertState({
-        isOpen: true,
-        message: '세션이 만료되었습니다. 다시 로그인해주세요.',
-        title: '로그인',
-        type: '2',
-      });
-      router.replace('/login');
-    }
-  }, [expires_check, clearAuth, router]);
+  // useEffect(() => {
+  //   if (expires_check) {
+  //     clearAuth(); // 세션 만료 시 로그아웃 처리
+  //     setAlertState({
+  //       isOpen: true,
+  //       message: '세션이 만료되었습니다. 다시 로그인해주세요.',
+  //       title: '로그인',
+  //       type: '2',
+  //     });
+  //     router.replace('/login');
+  //   }
+  // }, [expires_check, clearAuth, router]);
   
   // // store 의 session_key가 있으면서, 쿠키에 session_key가 존재하면 main 페이지로 이동하기전에 보여지는 빈 페이지
   // if (isLoggedIn && cookiescheck) return (null);
-  if (!isAuthChecked || (!!session_key && cookiesSessionKey)) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center py-10">
         <Settings className="w-5 h-5 text-indigo-500 animate-spin mr-3" />
