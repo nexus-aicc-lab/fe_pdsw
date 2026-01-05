@@ -376,7 +376,10 @@ export default function LoginPage() {
 
       <p className="footer-text mt-4">
         © {new Date().getFullYear()} NEXUS COMMUNITY All rights reserved.
-        <span className="ml-2 text-xs text-gray-500">v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
+        <span className="ml-2 text-xs text-gray-500">v{typeof window !== 'undefined'
+        ? window.__RUNTIME_CONFIG__?.APP_VERSION ?? '0.1.0'
+        : '0.1.0'}
+        </span>
       </p>
 
       <CustomAlert

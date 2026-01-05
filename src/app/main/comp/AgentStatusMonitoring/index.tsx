@@ -414,7 +414,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   useEffect(() => {
     const isAgentTabActive = activeTabId === 22 || secondActiveTabId === 22;
 
-    if (isAgentTabActive && !searchAgentState) {
+    if ( (isAgentTabActive && !searchAgentState)  || (!isAgentTabActive && isPopup)) {
       setSearchAgentState(true);
 
       if (tenantId === 'A' && campaigns.length > 0) {
