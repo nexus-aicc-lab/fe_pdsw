@@ -61,6 +61,15 @@ export default function LoginPage() {
     type: '0',
   });
   const [tempEnvironment, setTempEnvironment] = useState<EnvironmentListResponse>(EMPTY_ENV);
+
+  const [appVersion, setAppVersion] = useState('0.1.0');
+
+  // 2. 마운트 시점에만 window 객체 접근
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.__RUNTIME_CONFIG__) {
+      setAppVersion(window.__RUNTIME_CONFIG__.APP_VERSION || '0.1.0');
+    }
+  }, []);
   
   /* =========================
      이미 로그인 상태면 바로 main
@@ -376,9 +385,7 @@ export default function LoginPage() {
 
       <p className="footer-text mt-4">
         © {new Date().getFullYear()} NEXUS COMMUNITY All rights reserved.
-        <span className="ml-2 text-xs text-gray-500">v{typeof window !== 'undefined'
-        ? window.__RUNTIME_CONFIG__?.APP_VERSION ?? '0.1.0'
-        : '0.1.0'}
+        <span className="ml-2 text-xs text-gray-500">v{appVersion}
         </span>
       </p>
 

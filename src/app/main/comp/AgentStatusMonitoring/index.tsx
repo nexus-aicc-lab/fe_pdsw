@@ -367,7 +367,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   };
 
   useEffect(() => {
-    if (campaignAgents.length === 0 ) return;
+    // if (campaignAgents.length === 0 ) return;
 
     clearAgentInterval(); //  기존 interval 무조건 정리
 
@@ -413,8 +413,8 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   
   useEffect(() => {
     const isAgentTabActive = activeTabId === 22 || secondActiveTabId === 22;
-
-    if ( (isAgentTabActive && !searchAgentState)  || (!isAgentTabActive && isPopup)) {
+    
+    if ((isAgentTabActive || isPopup) && !searchAgentState) {
       setSearchAgentState(true);
 
       if (tenantId === 'A' && campaigns.length > 0) {
