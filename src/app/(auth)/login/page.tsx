@@ -38,6 +38,7 @@ const EMPTY_ENV:EnvironmentListResponse = {
   , statisticsUpdateCycle: 0
   , unusedWorkHoursCalc: 0
   , useAlramPopup: 0
+  , maskInfo: 1
 }
 
 export default function LoginPage() {

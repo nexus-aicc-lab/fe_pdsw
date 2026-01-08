@@ -1,5 +1,4 @@
-// lib/sseService.ts
-import { isEqual } from 'lodash'; // Assuming you use lodash for deep comparison
+import { isEqual } from 'lodash';
 
 interface SseData {
   announce: string;
@@ -7,156 +6,116 @@ interface SseData {
   data: any;
   kind: string;
   campaign_id: string;
-  skill_id?: string;
-  // Include other potential fields from tempEventData if needed
-  [key: string]: any; // Allow for additional fields
+  [key: string]: any;
 }
 
 let eventSourceInstance: EventSource | null = null;
-let currentTenantId: string | null = null;
-let currentUserId: string | null = null;
-let currentApiUrl: string | null = null;
+let currentParams = { tenant_id: '', id: '', apiUrl: '' };
 
-// Store the last received message details to prevent redundant updates
-let lastAnnounce = "";
-let lastData: any = {};
-let lastKind = "";
-let lastCampaignId = "";
+// 재연결 관련 변수
+let reconnectDelay = 1000; // 시작 지연 시간 1초
+let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+let watchdogTimeout: ReturnType<typeof setTimeout> | null = null;
+const MAX_RECONNECT_DELAY = 30000; // 최대 지연 30초
+const HEARTBEAT_INTERVAL = 40000; // 서버가 30초마다 주므로 40초로 설정
 
-// Use a Set to store listener functions (React state setters, etc.)
+// 캐시 변수
+let lastMessageCache: Partial<SseData> = {};
+
 const listeners = new Set<(data: SseData) => void>();
 
 export const sseService = {
   connect: (tenant_id: string, id: string, apiUrl: string) => {
-    // Ensure running only in the browser
-    if (typeof window === 'undefined' || !window.EventSource) {
-      // console.warn("SSE Service: Not running in a browser environment or EventSource not supported.");
+    if (typeof window === 'undefined' || !window.EventSource) return;
+
+    // 파라미터 저장 (재연결 시 사용)
+    currentParams = { tenant_id, id, apiUrl };
+
+    // 기존 연결이 OPEN 상태이고 파라미터가 같다면 유지
+    if (eventSourceInstance?.readyState === EventSource.OPEN && 
+        isEqual(currentParams, { tenant_id, id, apiUrl })) {
       return;
     }
 
-    if (!tenant_id || !id || !apiUrl) {
-      // console.warn("SSE Service: Missing tenant_id, id, or apiUrl.");
-      return;
-    }
-
-    // If already connected with the same parameters, do nothing
-    if (
-      eventSourceInstance &&
-      currentTenantId === tenant_id &&
-      currentUserId === id &&
-      currentApiUrl === apiUrl &&
-      eventSourceInstance.readyState !== EventSource.CLOSED // Check if not closed
-    ) {
-      // console.log("SSE Service: Already connected with the same parameters.");
-      return;
-    }
-
-    // If parameters changed or connection doesn't exist/is closed, close the old one first
     sseService.disconnect();
-    // console.log("SSE Service: Attempting to connect...");
-
-    currentTenantId = tenant_id;
-    currentUserId = id;
-    currentApiUrl = apiUrl;
 
     const url = `${apiUrl}/notification/${tenant_id}/subscribe/${id}`;
-    // console.info("SSE Service: Connecting to URL:", url);
+    eventSourceInstance = new EventSource(url);
 
-    try {
-      eventSourceInstance = new EventSource(url);
+    // 1. 연결 성공 시
+    eventSourceInstance.onopen = () => {
+      console.log(`[SSE] Connected to ${id}`);
+      reconnectDelay = 1000; // 재연결 지연 초기화
+      sseService.startWatchdog(); // 감시 타이머 시작
+    };
 
-      eventSourceInstance.onopen = () => {
-        // console.log("SSE Service: Connection opened.");
-        // Reset last message cache on new connection
-        lastAnnounce = "";
-        lastData = {};
-        lastKind = "";
-        lastCampaignId = "";
-      };
+    // 2. 에러 발생 시 (자동 재연결 로직)
+    eventSourceInstance.onerror = () => {
+      console.error(`[SSE] Connection error. Attempting reconnect in ${reconnectDelay}ms`);
+      sseService.handleReconnect();
+    };
 
-      eventSourceInstance.onerror = (error) => {
-        // console.error("SSE Service: EventSource failed:", error);
-        // Optionally implement reconnection logic here
-        sseService.disconnect(); // Close on error
-        // Maybe notify listeners about the error/disconnection
-        // listeners.forEach(listener => listener({ error: 'Connection failed' })); // Example error notification
-      };
+    // 3. 서버에서 보낸 Heartbeat 수신 (매우 중요)
+    eventSourceInstance.addEventListener('heartbeat', (event: any) => {
+      // console.debug("[SSE] Heartbeat received:", event.data); // ping
+      sseService.startWatchdog(); // 핑을 받았으므로 타이머 갱신
+    });
 
-      eventSourceInstance.addEventListener('message', (event) => {
-        // console.log("SSE Service: Raw message received:", event.data);
+    // 4. 일반 메시지 수신
+    eventSourceInstance.addEventListener('message', (event) => {
+      sseService.startWatchdog(); // 메시지를 받아도 생존한 것으로 간주
 
-        if (event.data === "Connected!!") {
-          // console.log("SSE Service: Handshake message received.");
-          return; // Ignore the initial connection message
+      if (event.data === "Connected!!") return;
+
+      try {
+        const newData = JSON.parse(event.data) as SseData;
+
+        // lodash를 이용한 데이터 변경 확인 (불필요한 리렌더링 방지)
+        if (!isEqual(lastMessageCache, newData)) {
+          lastMessageCache = newData;
+          listeners.forEach(listener => listener(newData));
         }
+      } catch (e) {
+        console.error("[SSE] Parsing error", e);
+      }
+    });
+  },
 
-        try {
-          const tempEventData = JSON.parse(event.data) as SseData; // Type assertion
+  // Watchdog: 서버가 일정 시간 응답 없으면 죽은 연결로 간주
+  startWatchdog: () => {
+    if (watchdogTimeout) clearTimeout(watchdogTimeout);
+    watchdogTimeout = setTimeout(() => {
+      console.warn("[SSE] No heartbeat for too long. Forcing reconnect...");
+      sseService.connect(currentParams.tenant_id, currentParams.id, currentParams.apiUrl);
+    }, HEARTBEAT_INTERVAL);
+  },
 
-          // Deep comparison to avoid unnecessary updates
-          if (
-            lastAnnounce !== tempEventData.announce ||
-            !isEqual(lastData, tempEventData.data) ||
-            lastKind !== tempEventData.kind ||
-            lastCampaignId !== tempEventData.campaign_id
-          ) {
-            // console.log("SSE Service: New data detected, updating listeners.");
-            // Update cache
-            lastAnnounce = tempEventData.announce;
-            lastData = tempEventData.data;
-            lastKind = tempEventData.kind;
-            lastCampaignId = tempEventData.campaign_id;
+  // 지수 백오프 기반 재연결
+  handleReconnect: () => {
+    sseService.disconnect();
+    if (reconnectTimeout) clearTimeout(reconnectTimeout);
 
-            // Notify all subscribed listeners
-            listeners.forEach(listener => listener(tempEventData));
-          } else {
-            // console.log("SSE Service: Data is the same as last message, skipping update.");
-          }
-        } catch (e) {
-          // console.error("SSE Service: Failed to parse message data:", e, event.data);
-        }
-      });
-
-    } catch (error) {
-      // console.error("SSE Service: Failed to create EventSource:", error);
-      sseService.disconnect(); // Clean up if constructor fails
-    }
+    reconnectTimeout = setTimeout(() => {
+      sseService.connect(currentParams.tenant_id, currentParams.id, currentParams.apiUrl);
+      // 다음 재연결 대기 시간은 두 배로 (최대 30초)
+      reconnectDelay = Math.min(reconnectDelay * 2, MAX_RECONNECT_DELAY);
+    }, reconnectDelay);
   },
 
   disconnect: () => {
     if (eventSourceInstance) {
-      // console.log("SSE Service: Disconnecting...");
       eventSourceInstance.close();
+      eventSourceInstance = null;
     }
-    eventSourceInstance = null;
-    currentTenantId = null;
-    currentUserId = null;
-    currentApiUrl = null;
-    // Don't clear listeners here, they might be needed if reconnecting
-    // listeners.clear(); // Optional: clear if you don't want auto-resubscribe on reconnect
-    // console.log("SSE Service: Disconnected.");
+    if (watchdogTimeout) clearTimeout(watchdogTimeout);
+    if (reconnectTimeout) clearTimeout(reconnectTimeout);
+    lastMessageCache = {};
   },
 
-  // Function for components to subscribe to updates
-  subscribe: (listener: (data: SseData) => void): (() => void) => {
+  subscribe: (listener: (data: SseData) => void) => {
     listeners.add(listener);
-    // console.log("SSE Service: Listener added. Total listeners:", listeners.size);
-    // Return an unsubscribe function
     return () => {
       listeners.delete(listener);
-      // console.log("SSE Service: Listener removed. Total listeners:", listeners.size);
     };
-  },
-
-  // Optional: Get current connection state
-  isConnected: () => {
-    return eventSourceInstance?.readyState === EventSource.OPEN;
   }
 };
-
-// Ensure disconnection on browser tab close (optional but good practice)
-if (typeof window !== 'undefined') {
-  window.addEventListener('beforeunload', () => {
-    sseService.disconnect();
-  });
-}

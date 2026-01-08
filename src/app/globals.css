@@ -324,6 +324,7 @@ input::placeholder {
 }
 .grid-custom{
   height: 100%;
+  background: #fff;
 }
 
 .h-custom-important{
@@ -349,6 +350,7 @@ input::placeholder {
   text-align: center;
   font-size: 13px;
   color: #444;
+  background: #fff;
 }
 .grid-custom.text-align-left .rdg-row .rdg-cell{
   text-align: left;
@@ -358,8 +360,10 @@ input::placeholder {
   text-align: center;
   font-size: 13px;
 }
-.grid-custom .rdg-row:hover{
-  background: #FFFAEE;
+.grid-custom .rdg-row:hover .rdg-cell {
+    background: #FFFAEE !important;
+} .grid-custom .rdg-row[aria-selected=true] .rdg-cell{
+    background-color: #FFFAEE !important;
 }
 .grid-custom .rdg-row .rdg-cell[aria-selected="true"]{
   outline: 2px solid #ebebeb;

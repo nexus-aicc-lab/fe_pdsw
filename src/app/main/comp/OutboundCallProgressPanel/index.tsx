@@ -101,7 +101,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const { campaignSkills, outboundCallProgressCampaignId, setOutboundCallProgressCampaignId } = useCampainManagerStore();
   const [ _campaignData, _setCampaignData ] = useState<CampaignDataMap>({});
   const [ waitingCounselorCnt, setWaitingCounselorCnt ] = useState<number>(0);
-  const { statisticsUpdateCycle, centerId } = useEnvironmentStore();
+  const { statisticsUpdateCycle, centerId, maskInfo } = useEnvironmentStore();
   const intervalOutboundCallProgressRef = React.useRef<NodeJS.Timeout | null>(null);
   const { activeTabId, openedTabs, setActiveTab, secondActiveTabId } = useTabStore();
   const [isPopup, setIsPopup] = useState(false);
@@ -461,7 +461,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       centerId: centerId,
       tenantId: _tenantId,
       campaignId: _campaignId,
-      agentIds: campaignAgents
+      agentIds: campaignAgents,
+      maskInfo : maskInfo
     });
 
     // 주기적 fetch
@@ -471,7 +472,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
           centerId: centerId,
           tenantId: _tenantId,
           campaignId: _campaignId,
-          agentIds: campaignAgents
+          agentIds: campaignAgents,
+          maskInfo : maskInfo
         });
       }, statisticsUpdateCycle * 1000);
     }
@@ -499,10 +501,10 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       const tenantId = campaignInfo?.tenant_id+'' || '1';
       const campaignId = campaignInfo?.campaign_id+'' || '0';
 
-      fetchCallProgressStatus({ centerId, tenantId, campaignId });
+      fetchCallProgressStatus({ centerId, tenantId, campaignId, maskInfo : maskInfo});
       if( statisticsUpdateCycle > 0 ){  
         intervalOutboundCallProgressRef.current = setInterval(() => {
-          fetchCallProgressStatus({ centerId, tenantId, campaignId });
+          fetchCallProgressStatus({ centerId, tenantId, campaignId, maskInfo : maskInfo });
         }, statisticsUpdateCycle * 1000);     
       }
     }else if(!isPopup){
@@ -557,7 +559,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       centerId,
       tenantId,
       campaignId,
-      agentIds: campaignAgents
+      agentIds: campaignAgents,
+      maskInfo : maskInfo
     });
   };
 

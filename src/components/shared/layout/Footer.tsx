@@ -22,6 +22,7 @@ import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampai
 import CustomAlert from "./CustomAlert";
 import { useAgentSkillStatusStore } from "@/store/agenSkillStatusStore";
 import { useQueryClient } from "@tanstack/react-query";
+import { sseService } from "@/lib/sseService";
 
 const errorMessage = {
   isOpen: false,
@@ -824,92 +825,50 @@ export default function Footer({
   // }, [id, tenant_id]);
 
   useEffect(() => {
-    let eventSource: EventSource | null = null;
-    let reconnectTimeout: NodeJS.Timeout | null = null;
+    if (!id || id === '') return;
 
-    const connectSSE = () => {
-      if (typeof window === 'undefined' || !window.EventSource || id === '') return;
-      const isConnected = sessionStorage.getItem("sse_connected");
-      if (isConnected) return;
+    if (typeof window === 'undefined' || !window.EventSource || id === '') return;
 
-      const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-      // console.info(">>>>설정값: ", DOMAIN);
+    const isConnected = sessionStorage.getItem("sse_connected");
+    if (isConnected) {
+      sessionStorage.removeItem("sse_connected");
+      console.log("Legacy SSE connected removed for:", id);
+    }
 
-      let dominUrl = `/notification/${tenant_id}/subscribe/${id}`;
-      if (window.location.hostname === 'localhost') {
-        dominUrl = `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`;
-      }
-      eventSource = new EventSource(dominUrl);
+    let dominUrl = '';
+    if (window.location.hostname === 'localhost') {
+      dominUrl = 'http://localhost:4000';
+    }
 
-      let data: any = {};
-      let announce = "";
-      let command = "";
-      let kind = "";
-      let campaign_id = "";
-      let skill_id = "";
+    // 1. SSE 연결 시작
+    sseService.connect(String(tenant_id), id, dominUrl);
 
-      eventSource.addEventListener('message', (event) => {
-        // console.log("footer sse event = ", event.data);
+    // 2. 메시지 수신 시 동작 정의 (구독)
+    const unsubscribe = sseService.subscribe((tempEventData) => {
+      const { announce, command, data, kind, campaign_id, skill_id } = tempEventData;
 
-        if (event.data !== "Connected!!") {
-          try {
-            const tempEventData = JSON.parse(event.data);
-            if (
-              announce !== tempEventData["announce"] ||
-              !isEqual(data, tempEventData["data"]) ||
-              command !== tempEventData["command"] ||
-              kind !== tempEventData["kind"] ||
-              skill_id !== tempEventData["skill_id"] ||
-              campaign_id !== tempEventData["campaign_id"]
-            ) {
-              announce = tempEventData["announce"];
-              command = tempEventData["command"];
-              data = tempEventData["data"];
-              kind = tempEventData["kind"];
-              campaign_id = tempEventData["campaign_id"];
-              skill_id = tempEventData["skill_id"];
+      // UI 상태 업데이트
+      footerDataSet(
+        announce,
+        command,
+        data,
+        kind,
+        campaign_id,
+        skill_id || "",
+        tempEventData
+      );
+      setSseData(JSON.stringify(tempEventData));
 
-              footerDataSet(
-                announce,
-                command,
-                data,
-                kind,
-                campaign_id,
-                tempEventData["skill_id"] || "",
-                tempEventData
-              );
-              setSseData(event.data);
-
-              sseMessageChannel.postMessage({
-                type: "sseMessage",
-                message: event.data,
-              });
-            }
-          } catch (error) {
-            // console.error("SSE JSON parse error: ", error);
-          }
-        }
+      // 브로드캐스트 채널로 전송 (다른 탭 공유)
+      sseMessageChannel.postMessage({
+        type: "sseMessage",
+        message: JSON.stringify(tempEventData),
       });
-
-      eventSource.onerror = (err) => {
-        // eventSource?.close();
-        sessionStorage.removeItem("sse_connected");
-
-        // 재접속 시도 (3초 후)
-        reconnectTimeout = setTimeout(() => {
-          connectSSE();
-        }, 3000);
-      };
-
-      sessionStorage.setItem("sse_connected", "true");
-    };
-
-    connectSSE();
+    });
 
     return () => {
-      // eventSource?.close();
-      if (reconnectTimeout) clearTimeout(reconnectTimeout);
-      sessionStorage.removeItem("sse_connected");
+      unsubscribe(); // 구독 해제
+      // 전체 앱에서 하나만 유지한다면 disconnect는 호출하지 않아도 됨
     };
   }, [id, tenant_id]);
 

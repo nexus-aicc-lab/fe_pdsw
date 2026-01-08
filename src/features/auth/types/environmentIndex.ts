@@ -25,6 +25,7 @@ export interface EnvironmentListResponse {
     sendingWorkStartHours: string;
     sendingWorkEndHours: string;
     dayOfWeekSetting: string;
+    maskInfo: number;
 }
 
 // 환경설정 수정 RequestData
@@ -40,6 +41,7 @@ export interface EnvironmentSaveRequest {
     sendingWorkStartHours: string;
     sendingWorkEndHours: string;
     dayOfWeekSetting: string;
+    maskInfo: number;
 }
 
 // 환경설정 수정 Response

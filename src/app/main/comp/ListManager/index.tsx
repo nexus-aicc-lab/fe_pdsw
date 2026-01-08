@@ -461,7 +461,15 @@ const ListManager: React.FC = () => {
                   // row.values가 배열인지 확인 후 slice
                   if (Array.isArray(rowValuesRaw)) {
                     const rowValues = rowValuesRaw.slice(1); // 0번째 요소 제거
-                    data.push(rowValues);
+
+
+                    // [추가] 행의 모든 요소가 비어있는지 확인 (null, undefined, "" 체크)
+                    const isRowEmpty = rowValues.every(val => val === null || val === undefined || val === "");
+                    
+                    // 비어있지 않은 행만 데이터 배열에 추가
+                    if (!isRowEmpty) {
+                      data.push(rowValues);
+                    }
                   }
                 });
                 if( data.length > 0 ){

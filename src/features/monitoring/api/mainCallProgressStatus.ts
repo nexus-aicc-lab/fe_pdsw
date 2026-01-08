@@ -8,6 +8,7 @@ export interface CallProgressStatusRequest {
   tenantId: string;
   campaignId: string;
   agentIds?: string[];
+  maskInfo: number;
 }
 
 // 발신진행상태 응답
@@ -43,6 +44,7 @@ export const fetchCallProgressStatus = async (credentials: CallProgressStatusReq
     tenantId: credentials.tenantId,
     campaignId: credentials.campaignId,
     agentIds: credentials.agentIds || [],
+    maskInfo: credentials.maskInfo,
     sessionKey: getCookie('session_key')
   };
 

@@ -19,6 +19,9 @@ export interface EnvironmentState {
   sendingWorkStartHours: string;
   sendingWorkEndHours: string;
   dayOfWeekSetting: string;
+
+  // 2026-01-07 추가 (고객명, 고객번호) 마스킹 처리여부
+  maskInfo:number;
   
   // 메타 상태
   isLoading: boolean;
@@ -46,6 +49,7 @@ interface EnvironmentActions {
   setUnusedWorkHoursCalc: (value: number) => void;
   setWorkHours: (start: string, end: string) => void;
   setDayOfWeekSetting: (value: string) => void;
+  setMaskInfo: (value: number) => void;
   
   // 상태 관리 액션들
   setLoading: (isLoading: boolean) => void;
@@ -76,6 +80,7 @@ const initialState: EnvironmentState = {
   sendingWorkStartHours: "",
   sendingWorkEndHours: "",
   dayOfWeekSetting: "",
+  maskInfo:1,
   
   // 메타 상태 초기값
   isLoading: false,
@@ -109,6 +114,7 @@ export const useEnvironmentStore = create<EnvironmentStore>()(
           sendingWorkStartHours: data.sendingWorkStartHours,
           sendingWorkEndHours: data.sendingWorkEndHours,
           dayOfWeekSetting: data.dayOfWeekSetting,
+          maskInfo: data.maskInfo,
           lastUpdated: new Date(),
           error: null
         }, false, "setEnvironment"),
@@ -269,6 +275,21 @@ export const useEnvironmentStore = create<EnvironmentStore>()(
             "setDayOfWeekSetting"
           );
         },
+
+        setMaskInfo: (value) => {
+          const state = get();
+          const environmentData = state.environmentData ? 
+            { ...state.environmentData, maskInfo: value } : 
+            null;
+          return set(
+            {
+              maskInfo: value,
+              environmentData
+            },
+            false,
+            "setMaskInfo"
+          );
+        },
         
         // 상태 관리 액션들
         setLoading: (isLoading) => set(
@@ -297,7 +318,8 @@ export const useEnvironmentStore = create<EnvironmentStore>()(
             unusedWorkHoursCalc: state.unusedWorkHoursCalc,
             sendingWorkStartHours: state.sendingWorkStartHours,
             sendingWorkEndHours: state.sendingWorkEndHours,
-            dayOfWeekSetting: state.dayOfWeekSetting
+            dayOfWeekSetting: state.dayOfWeekSetting,
+            maskInfo: state.maskInfo
           };
         },
 

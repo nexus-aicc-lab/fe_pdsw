@@ -34,7 +34,8 @@ export const fetchEnvironmentSave = async (credentials: EnvironmentSaveRequest):
         unusedWorkHoursCalc: credentials.unusedWorkHoursCalc,
         sendingWorkStartHours: credentials.sendingWorkStartHours,
         sendingWorkEndHours: credentials.sendingWorkEndHours,
-        dayOfWeekSetting: credentials.dayOfWeekSetting
+        dayOfWeekSetting: credentials.dayOfWeekSetting,
+        maskInfo: credentials.maskInfo
     };
 
     try {
