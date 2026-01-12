@@ -381,21 +381,27 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
   };
 
   // 갱신주기마다 refreshData 실행 useEffect
-  useEffect(() => {    
-    // console.log('activeTabId changed: ', activeTabId, openedTabs);
-    if (activeTabId === 6 || secondActiveTabId === 6) {
+  useEffect(() => {
+    const isPopup = init !== undefined;
+    if (isPopup || activeTabId === 6 || secondActiveTabId === 6) {
       if (statisticsUpdateCycle > 0) {
         intervalChannelMonitorRef.current = setInterval(() => {
           refreshData();
         }, statisticsUpdateCycle * 1000);
-        return () => clearInterval(intervalChannelMonitorRef.current!);
+        return () => {
+          if (intervalChannelMonitorRef.current) {
+            clearInterval(intervalChannelMonitorRef.current);
+          }
+        };
       }
-    }else{
-      clearInterval(intervalChannelMonitorRef.current!);
-      intervalChannelMonitorRef.current = null;
+    } else {
+      if (intervalChannelMonitorRef.current) {
+        clearInterval(intervalChannelMonitorRef.current);
+        intervalChannelMonitorRef.current = null;
+      }
       setIsRefreshing(false);
     }
-  }, [statisticsUpdateCycle, activeTabId, secondActiveTabId]);
+  }, [statisticsUpdateCycle, activeTabId, secondActiveTabId, init]);
 
   return (
     <div className="h-full limit-700">

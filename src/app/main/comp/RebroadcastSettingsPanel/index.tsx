@@ -1156,8 +1156,34 @@ const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
                     handleSelectRebroadcast(rebroadcastList[0].id);
                 }else if( rebroadcastList.length > 0){
                     //첫번째 row 선택.
-                    setSelectedRebroadcastId(rebroadcastList[0].id);
-                    setListRedialQuery(rebroadcastList[0].redialCondition);
+                    const selected = rebroadcastList[0];
+                    setSelectedRebroadcastId(selected.id);
+                    setListRedialQuery(selected.redialCondition);
+
+                    setSelectedRebroadcastDetails(selected);
+                    if (selected.scheduleStartDate) {
+                        setStartDate(new Date(selected.scheduleStartDate));
+                    }
+                    if (selected.scheduleStartTime) {
+                        setStartTime(selected.scheduleStartTime);
+                    }
+                    if (selected.outgoingType) {
+                        setCallType(selected.outgoingType);
+                    }
+                    if (selected.outgoingTime && selected.outgoingTime.type) {
+                        setTimeType(selected.outgoingTime.type);
+                    }
+                    if (selected.outgoingTime && selected.outgoingTime.endDate) {
+                        setEndDate(new Date(selected.outgoingTime.endDate));
+                    }
+                    if( selected.run_flag === 2){
+                        setTextType('Time out');
+                    }else if( selected.run_flag === 1){
+                        setTextType('실행');
+                    }else if( selected.run_flag === 0){
+                        setTextType('미실행');
+                    }
+
                     //발신결과 disabled 설정. 
                     setOutgoingResultChecked(false);
                     setOutgoingTypeChecked(false);

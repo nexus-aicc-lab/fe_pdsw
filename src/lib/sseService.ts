@@ -44,14 +44,14 @@ export const sseService = {
 
     // 1. 연결 성공 시
     eventSourceInstance.onopen = () => {
-      console.log(`[SSE] Connected to ${id}`);
+      // console.log(`[SSE] Connected to ${id}`);
       reconnectDelay = 1000; // 재연결 지연 초기화
       sseService.startWatchdog(); // 감시 타이머 시작
     };
 
     // 2. 에러 발생 시 (자동 재연결 로직)
     eventSourceInstance.onerror = () => {
-      console.error(`[SSE] Connection error. Attempting reconnect in ${reconnectDelay}ms`);
+      // console.error(`[SSE] Connection error. Attempting reconnect in ${reconnectDelay}ms`);
       sseService.handleReconnect();
     };
 

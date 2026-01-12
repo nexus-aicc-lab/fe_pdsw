@@ -27,16 +27,7 @@ export const loginApi = {
         throw new Error('메뉴 권한이 없습니다. 관리자에게 문의하세요.');
       }
 
-      const { data : ipdata } = await axiosRedisInstance.post(`/auth/getIp`);
-      // console.log(" 클라이언트 IP:", ipdata);
 
-      //  쿠키 저장
-      Cookies.set('userHost', ipdata, {
-        expires: 1,
-        secure: false,
-        sameSite: 'Lax',
-        path: '/',
-      });
 
       Cookies.set('id', credentials.user_name, {
         expires: 1,

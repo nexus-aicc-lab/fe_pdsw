@@ -51,7 +51,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
   const router = useRouter();
 
   // 환경설정 스토어에서 데이터 가져오기
-  const { environmentData, setEnvironment } = useEnvironmentStore();
+  const { environmentData, setEnvironment, maskInfo } = useEnvironmentStore();
   // 사용자 인증 정보 가져오기
   const { id: userId, tenant_id } = useAuthStore();
 
@@ -78,7 +78,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
   const [dayOfWeek, setDayOfWeek] = useState<string[]>(['f', 'f', 'f', 'f', 'f', 'f', 'f']);
   const [isSaving, setIsSaving] = useState(false);
 
-  const [maskInfo, setMaskInfo] = useState(1);
+  const [localMaskInfo, setLocalMaskInfo] = useState(1);
 
   const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -144,7 +144,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
           sendingWorkStartHours: unusedWorkHoursCalc ? '0000' : startTime,
           sendingWorkEndHours: unusedWorkHoursCalc ? '0000' : endTime,
           dayOfWeekSetting: unusedWorkHoursCalc ? '0000000' : dayOfWeek.join(','),
-          maskInfo : maskInfo
+          maskInfo : localMaskInfo
         };
         setEnvironment(updatedData);
 
@@ -170,6 +170,9 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
           setDayOfWeek(dayOfWeek);
           setUnusedWorkHoursCalc(false);
         }
+        const channel = new BroadcastChannel('environmentChannel');
+        channel.postMessage({ type: 'ENV_UPDATED', payload: updatedData });
+        // 통합모니터 (팝업) 인 경우를 위해 전송
 
         showAlert('환경설정이 저장되었습니다');
       }
@@ -229,7 +232,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
       setPersonalCampaignAlertOnly(environmentData.personalCampaignAlertOnly === 1);
       setMessageType(environmentData.useAlramPopup === 1 ? "알림만" : "알림과 없음");
       setUnusedWorkHoursCalc(environmentData.unusedWorkHoursCalc === 1);
-      setMaskInfo(environmentData.maskInfo === 1 ? 1 : 0);
+      setLocalMaskInfo(environmentData.maskInfo === 1 ? 1 : 0);
       // setStartTime(environmentData.sendingWorkStartHours || "");
       // setEndTime(environmentData.sendingWorkEndHours || "");
 
@@ -248,7 +251,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
       setStartTime("0000");
       setEndTime("0000");
       setDayOfWeek(['f', 'f', 'f', 'f', 'f', 'f', 'f']);
-      setMaskInfo(1);
+      setLocalMaskInfo(1);
     }
   }, [environmentData]);
 
@@ -362,7 +365,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
       sendingWorkStartHours: startTime || environmentData.sendingWorkStartHours,
       sendingWorkEndHours: endTime || environmentData.sendingWorkEndHours,
       dayOfWeekSetting: dayOfWeek.join(','),
-      maskInfo: maskInfo
+      maskInfo: localMaskInfo
     };
     // #### 여기야
 
@@ -445,7 +448,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   <Label className="w-32">고객정보 마스킹 설정</Label>
                 </TableHeader>
                 <TableCell className="w-[20rem]">
-                  <CommonRadio value={String(maskInfo)} onValueChange={(value) => setMaskInfo(Number(value))} className="flex gap-8">
+                  <CommonRadio value={String(localMaskInfo)} onValueChange={(value) => setLocalMaskInfo(Number(value))} className="flex gap-8">
                     <div className="flex items-center space-x-2">
                       <CommonRadioItem value="1" id="maskInfo-on" />
                       <Label htmlFor="maskInfo-on">설정</Label>

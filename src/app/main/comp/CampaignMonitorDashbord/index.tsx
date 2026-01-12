@@ -214,7 +214,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
   // 컴포넌트 마운트 시 캠페인 정보 로드 및 데이터 조회
   useEffect(() => {
     // console.log("컴포넌트 마운트, 캠페인 ID:", numericCampaignId);
-    console.log('activeTabId changed: ',isPopup, activeTabId, activeTabKey,secondActiveTabId, secondActiveTabKey, openedTabs);
+    // console.log('activeTabId changed: ',isPopup, activeTabId, activeTabKey,secondActiveTabId, secondActiveTabKey, openedTabs);
     
     if (numericCampaignId && ( (activeTabId === 21 && activeTabKey?.split('-')[2] === numericCampaignId+'')
       || ( typeof secondActiveTabKey === 'string' && secondActiveTabKey?.split('-')[2] === numericCampaignId+'' ) || isPopup)

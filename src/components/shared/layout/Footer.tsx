@@ -832,7 +832,7 @@ export default function Footer({
     const isConnected = sessionStorage.getItem("sse_connected");
     if (isConnected) {
       sessionStorage.removeItem("sse_connected");
-      console.log("Legacy SSE connected removed for:", id);
+      // console.log("Legacy SSE connected removed for:", id);
     }
 
     let dominUrl = '';

@@ -19,6 +19,7 @@ import { EnvironmentListResponse } from "@/features/auth/types/environmentIndex"
 import Cookies from 'js-cookie';
 import { useApiForCenterInfo } from '@/features/auth/hooks/useApiForCenterInfo';
 import { Settings } from "lucide-react";
+import { axiosRedisInstance } from '@/lib/axios';
 
 interface LoginFormData {
   user_name: string;
@@ -155,7 +156,7 @@ export default function LoginPage() {
    *  로그인 API
    * ========================= */
   const { mutate: login } = useApiForLogin({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
 
       setAuth(
         formData.user_name,              // id
@@ -173,6 +174,43 @@ export default function LoginPage() {
       } else {
         localStorage.removeItem('remembered_username');
       }
+      
+      try {
+        const { data: ipdata } = await axiosRedisInstance.post('/auth/getIp');
+
+        if (ipdata) {
+          Cookies.set('userHost', ipdata, {
+            expires: 1,
+            secure: false,
+            sameSite: 'Lax',
+            path: '/',
+          });
+        }
+
+      } catch (err) {
+        // console.error('IP 정보 조회 실패:', err);
+        if((err as any).status === 500 || (err as any).response?.status === 500){
+          setAlertState({
+            isOpen: true,
+            message: '서버 연결이 원활하지 않습니다. 관리자에게 문의해주세요.',
+            title: '로그인',
+            type: '2',
+          });
+
+        }else {
+
+          setAlertState({
+            isOpen: true,
+            message: '정보 조회에 실패했습니다. 관리자에게 문의해주세요.',
+            title: '로그인',
+            type: '2',
+          });
+        }
+        setIsPending(false);
+        setLoading(false);
+        return;
+      }
+      // console.log(" 클라이언트 IP:", ipdata);
 
       centerInfo(); // 센터정보 저장하는 api 호출
     },

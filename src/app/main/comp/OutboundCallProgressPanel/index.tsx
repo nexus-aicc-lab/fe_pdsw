@@ -101,12 +101,11 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const { campaignSkills, outboundCallProgressCampaignId, setOutboundCallProgressCampaignId } = useCampainManagerStore();
   const [ _campaignData, _setCampaignData ] = useState<CampaignDataMap>({});
   const [ waitingCounselorCnt, setWaitingCounselorCnt ] = useState<number>(0);
-  const { statisticsUpdateCycle, centerId, maskInfo } = useEnvironmentStore();
+  const { statisticsUpdateCycle, centerId, maskInfo, setEnvironment } = useEnvironmentStore();
   const intervalOutboundCallProgressRef = React.useRef<NodeJS.Timeout | null>(null);
   const { activeTabId, openedTabs, setActiveTab, secondActiveTabId } = useTabStore();
   const [isPopup, setIsPopup] = useState(false);
   const [campaignAgents, setCampaignAgents] = useState<string[]>([]);
-
   // 빈 데이터 정의
   const emptyData: CampaignData = {
     stats: {
@@ -122,6 +121,16 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     ],
     gridData: []
   };
+
+  const currentTenantId = React.useMemo(() => {
+  if (outboundCallProgressCampaignId === 'all' || !outboundCallProgressCampaignId) {
+    return campaigns?.length > 0
+      ? [...new Set(campaigns.map(c => c.tenant_id))].join(',')
+      : '1';
+  }
+  const campaignInfo = campaigns.find(c => c.campaign_id === Number(outboundCallProgressCampaignId));
+  return campaignInfo?.tenant_id?.toString() || '1';
+}, [outboundCallProgressCampaignId, campaigns]);
 
   // allCampaignData를 매번 계산 (렌더링마다)
   const allCampaignData = React.useMemo(() => {
@@ -230,6 +239,29 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       onDataUpdate(currentData);
     }
   }, [currentData, onDataUpdate]);
+
+  useEffect(() => {
+    const channel = new BroadcastChannel('environmentChannel');
+
+    channel.onmessage = (event) => {
+      if (event.data.type === 'ENV_UPDATED') {
+        // 메시지를 받으면 팝업창의 Zustand 스토어를 업데이트함
+        // 스토어가 업데이트되면 이를 구독하는 maskInfo 등이 자동으로 변함
+
+        console.log('BroadCast 이벤트 수신 : ', event);
+        const isPopup = !!window.opener && window.opener !== window;
+
+        if (isPopup) {
+          console.log('환경설정 스토어 업데이트');
+          setEnvironment(event.data.payload);
+        }
+      }
+    };
+
+    return () => {
+      channel.close(); // 컴포넌트 언마운트 시 채널 닫기
+    };
+  }, []);
 
   // 그리드 컬럼 정의
   const columns: Column[] = [
@@ -515,7 +547,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         clearInterval(intervalOutboundCallProgressRef.current);
       }
     };
-  }, [outboundCallProgressCampaignId,statisticsUpdateCycle,campaigns]);
+  }, [outboundCallProgressCampaignId,statisticsUpdateCycle,campaigns, maskInfo]);
   
   useEffect(() => {
     if( externalCampaignId ){
@@ -548,16 +580,18 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const refreshData = () => {
     setIsRefreshing(true);
     // setIsLoading(true);
+    /*
     const tenantId = campaigns?.length
       ? [...new Set(campaigns.map(c => c.tenant_id))].join(',')
       : '1';
+      */
     const campaignId = outboundCallProgressCampaignId === 'all'
       ? campaigns.map(c => c.campaign_id).join(',')
       : outboundCallProgressCampaignId;
 
     fetchCallProgressStatus({
       centerId,
-      tenantId,
+      tenantId : currentTenantId,
       campaignId,
       agentIds: campaignAgents,
       maskInfo : maskInfo
@@ -588,6 +622,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       }
     };
   }, [activeTabId, secondActiveTabId, statisticsUpdateCycle]);
+
+  // console.log("#### outboundCallProgressCampaignId : ", outboundCallProgressCampaignId);
 
 return (
   isLoading ? (

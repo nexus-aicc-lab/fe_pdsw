@@ -13,7 +13,6 @@ import { logoutChannel } from "@/lib/broadcastChannel";
 import CustomAlert from "@/components/shared/layout/CustomAlert";
 import { useApiForCampaignAgentList } from '@/features/preferences/hooks/useApiForCampaignAgent';
 
-
 // 타입 정의
 interface AgentStatus {
   waiting: boolean;
@@ -59,10 +58,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   // 정렬 관련 상태
   const [sortField, setSortField] = useState<SortField>('time');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
-  const { campaigns, tenants } = useMainStore();
-  const [counter, setCounter] = useState(0);
-  const [ searchAgentState, setSearchAgentState ] = useState<boolean>(false);
-
+  const { campaigns } = useMainStore();
   const [agentData, setAgentData] = useState<AgentData[]>([]);
   const [_agentData, _setAgentData] = useState<AgentData[]>([]);
   const [campaignAgents, setCampaignAgents] = useState<string[]>([]);
@@ -168,69 +164,61 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
     isOpen: false,
     message: "",
     title: "",
-    type:"1",
+    type: "1",
   });
 
-  // 캠페인별 상담사 목록 조회
-  const { mutate: fetchCampaignAgentList } = useApiForCampaignAgentList({
-    onSuccess: (response) => {
-      let uniqueAgentIds: string[] = [];
-      setSearchAgentState(true);
-      if (response?.result_data && response.result_data.length > 0) {
-        // 중복 제거된 agent_id 목록 추출
-        uniqueAgentIds = extractUniqueAgentIds(response.result_data);
-        // 상태에 저장 (필요 시 주석 해제)
-      }
-      setCampaignAgents(uniqueAgentIds);
-    },
-    onError: (error) => {
-      ServerErrorCheck('캠페인별 상담사 목록 조회', error.message);
-    }
-  });
   function extractUniqueAgentIds(data: { agent_id: string[] }[]): string[] {
     const agentIdSet = new Set<string>();
-
     data.forEach(item => {
       item.agent_id.forEach(agentId => {
         agentIdSet.add(agentId);
       });
     });
-
     return Array.from(agentIdSet);
   }
 
-  // 할당 상담사 정보 조회 (campaignId를 props로 받아 사용)
+  // 캠페인별 상담사 목록 조회
+  const { mutate: fetchCampaignAgentList } = useApiForCampaignAgentList({
+    onSuccess: (response) => {
+      if (response?.result_data && response.result_data.length > 0) {
+        const uniqueAgentIds = extractUniqueAgentIds(response.result_data);
+        setCampaignAgents(uniqueAgentIds);
+      } else {
+        setCampaignAgents([]);
+      }
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인별 상담사 목록 조회', error.message);
+      setCampaignAgents([]);
+    }
+  });
+
+  // 할당 상담사 정보 조회
   const { mutate: fetchAgentStateMonitoringList } = useApiForAgentStateMonitoringList({
     onSuccess: (data) => {
       if (data.counselorStatusList.length > 0) {
         const tempDataList: AgentData[] = data.counselorStatusList.map((item, index) => ({
           id: index,
-          status: item.statusCode === '204'
-            ? 'waiting'
-            : item.statusCode === '205'
-              ? 'processing'
-              : item.statusCode === '206'
-                ? 'afterprocessing'
-                : 'rest',
+          status: item.statusCode === '204' ? 'waiting' :
+            item.statusCode === '205' ? 'processing' :
+              item.statusCode === '206' ? 'afterprocessing' : 'rest',
           agent: item.counselorId,
           name: item.counselorName,
           time: item.statusTime || '0',
         }));
         _setAgentData(tempDataList);
-        setCounter(counter+1);
-      }else{
+      } else {
         _setAgentData([]);
       }
-      
     },
     onError: (error) => {
-      if(window.opener){
-        if(error.message.split('||')[0] === '5'){
-          logoutChannel.postMessage({
-            type: 'logout',
-            message: error.message,
-          });
-        }else{
+      // 에러 발생 시 반복 조회 중단 (무한 루프 방지)
+      clearAgentInterval();
+
+      if (window.opener) {
+        if (error.message.split('||')[0] === '5') {
+          logoutChannel.postMessage({ type: 'logout', message: error.message });
+        } else {
           setAlertState({
             ...alertState,
             isOpen: true,
@@ -245,24 +233,24 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
     }
   });
 
+  // 시간 카운트 효과
   useEffect(() => {
     if (_agentData.length > 0) {
       let tempCounter = 0;
       const interval = setInterval(() => {
-        const tempData = [];
-        for( let i=0; i<_agentData.length; i++ ) {
-          tempData.push({..._agentData[i]
-            , time: getStatusTime(Number(_agentData[i].time) + tempCounter)
-          });
-        }
+        const tempData = _agentData.map(agent => ({
+          ...agent,
+          time: getStatusTime(Number(agent.time) + tempCounter)
+        }));
         setAgentData(tempData);
         tempCounter++;
       }, 1000);
       return () => clearInterval(interval);
-    }else{
+    } else {
       setAgentData([]);
     }
   }, [_agentData]);
+
 
   // useEffect(() => {
   //   if (campaignAgents.length === 0 && campaignId === 0) return;
@@ -359,6 +347,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   //   }
   // }, [searchAgentState,activeTabId, openedTabs, secondActiveTabId, activeTabKey, secondActiveTabKey]);
 
+
   const clearAgentInterval = () => {
     if (intervalAgentStatusMonitoringRef.current) {
       clearInterval(intervalAgentStatusMonitoringRef.current);
@@ -366,90 +355,83 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
     }
   };
 
+  // 1. MonitorPage로부터 받은 campaignId/tenantId에 따라 어떤 상담사들을 모니터링할지 결정
   useEffect(() => {
-    // if (campaignAgents.length === 0 ) return;
+    const isAgentTabActive = activeTabId === 22 || secondActiveTabId === 22;
+    if (!isAgentTabActive && !isPopup) {
+      setCampaignAgents([]);
+      return;
+    }
 
-    clearAgentInterval(); //  기존 interval 무조건 정리
+    // Case 1: 전체 테넌트
+    if (tenantId === 'A') {
+      fetchCampaignAgentList({
+        campaign_id: campaigns.map(c => c.campaign_id).filter((id): id is number => !!id)
+      });
+    }
+    // Case 2: 특정 테넌트 (특정 캠페인 지정 없음)
+    else if (campaignId === 0 && tenantId && tenantId !== 'undefined') {
+      fetchCampaignAgentList({
+        campaign_id: campaigns
+          .filter(c => c.tenant_id === Number(tenantId))
+          .map(c => c.campaign_id)
+          .filter((id): id is number => !!id)
+      });
+    }
+    // Case 3: 특정 캠페인
+    else if (campaignId && campaignId > 0) {
+      fetchCampaignAgentList({
+        campaign_id: [campaignId]
+      });
+    } else {
+      // 유효한 조건이 아닐 경우, 에이전트 목록을 비웁니다.
+      setCampaignAgents([]);
+    }
+  }, [isPopup, activeTabId, secondActiveTabId, campaignId, tenantId, campaigns, fetchCampaignAgentList]);
+
+  // 2. 결정된 상담사 목록(campaignAgents)의 상태를 주기적으로 조회
+  useEffect(() => {
+    if (campaignAgents.length === 0) {
+      _setAgentData([]);
+      clearAgentInterval();
+      return;
+    }
 
     let resolvedTenantId: string | null = null;
-
-    if (campaignId && campaigns.length > 0) {
-      resolvedTenantId =
-        campaigns.find(c => c.campaign_id === Number(campaignId))?.tenant_id + '';
-    } else if (tenantId !== 'undefined' && tenantId !== 'A') {
-      resolvedTenantId = tenantId + '';
+    if (campaignId && campaignId > 0 && campaigns.length > 0) {
+      const foundTenantId = campaigns.find(c => c.campaign_id === Number(campaignId))?.tenant_id;
+      if (foundTenantId) resolvedTenantId = String(foundTenantId);
+    } else if (tenantId && tenantId !== 'undefined' && tenantId !== 'A') {
+      resolvedTenantId = tenantId;
     } else if (tenantId === 'A' && campaigns.length > 0) {
       resolvedTenantId = [...new Set(campaigns.map(c => c.tenant_id))].join(',');
     }
 
-    if (!resolvedTenantId) return;
+    if (!resolvedTenantId) {
+      clearAgentInterval();
+      return;
+    }
 
-    const fetchFn = () =>
+    const fetchFn = () => {
       fetchAgentStateMonitoringList({
         centerId,
         tenantId: resolvedTenantId!,
         campaignId: campaignId ? Number(campaignId) : 0,
         agentIds: campaignAgents
       });
+    };
 
-    fetchFn(); // 최초 1회
+    fetchFn();
 
     if (statisticsUpdateCycle > 0) {
-      intervalAgentStatusMonitoringRef.current = setInterval(
-        fetchFn,
-        statisticsUpdateCycle * 1000
-      );
+      clearAgentInterval();
+      intervalAgentStatusMonitoringRef.current = setInterval(fetchFn, statisticsUpdateCycle * 1000);
     }
 
     return clearAgentInterval;
-  }, [
-    campaignAgents,
-    campaignId,
-    tenantId,
-    campaigns,
-    statisticsUpdateCycle,
-    centerId
-  ]);
-  
-  useEffect(() => {
-    const isAgentTabActive = activeTabId === 22 || secondActiveTabId === 22;
-    
-    if ((isAgentTabActive || isPopup) && !searchAgentState) {
-      setSearchAgentState(true);
+  }, [campaignAgents, campaigns, centerId, statisticsUpdateCycle, campaignId, tenantId, fetchAgentStateMonitoringList]);
 
-      if (tenantId === 'A' && campaigns.length > 0) {
-        fetchCampaignAgentList({
-          campaign_id: [...new Set(campaigns.map(c => c.campaign_id))].filter(
-            (id): id is number => typeof id === 'number'
-          )
-        });
-      } else if (campaignId === 0 && campaigns.length > 0) {
-        fetchCampaignAgentList({
-          campaign_id: campaigns
-            .filter(c => c.tenant_id === Number(tenantId))
-            .map(c => c.campaign_id)
-        });
-      } else {
-        fetchCampaignAgentList({
-          campaign_id: [Number(campaignId)]
-        });
-      }
-    }
-
-    if (!isAgentTabActive && !isPopup) {
-      clearAgentInterval();
-      setSearchAgentState(false);
-    }
-  }, [
-    isPopup,
-    activeTabId,
-    secondActiveTabId,
-    campaignId,
-    tenantId,
-    campaigns,
-    searchAgentState, activeTabKey, secondActiveTabKey
-  ]);
-
+  // 팝업 여부 확인
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsPopup(!!(window.opener && window.opener !== window));

@@ -477,8 +477,9 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   async (error) => {
+    // console.log("#### error response here :", error);
 
-    if( error.status === 500 ){      
+    if( error.status === 500 || error.response.status === 500){      
       customAlertService.error('PDS 서버 시스템과 연결할 수 없습니다. 서버 동작 상태를 확인하여 주십시오. 프로그램을 종료합니다.', '세션 만료', () => {
         logoutFunction({ portcheck: false });
       });
@@ -950,13 +951,25 @@ axiosRedisInstance.interceptors.response.use(
     return response;
   },
   async (error) => {
+    // console.log("#### error response here 2 :", error);
+    const status = error.response?.status || error.status;
 
     // console.log("axios에서 result code 확인 1111111 : ", error);
-    if( error.status === 500 ){      
-      customAlertService.error('PDS 서버 시스템과 연결할 수 없습니다. 서버 동작 상태를 확인하여 주십시오. 프로그램을 종료합니다.', '세션 만료', () => {
-        logoutFunction({ portcheck: false });
+    if( status === 500 ){
+      
+      if (error.response?.config?.url?.includes('/auth/getIp') || error.config?.url?.includes('/auth/getIp')) {  
+        // 최초 로그인시 수행되는 api 이기때문에 자체 try catch 문 으로 처리
+        return Promise.reject(error);
+      }
+
+      customAlertService.error('PDS 서버 시스템과 연결할 수 없습니다. 서버 동작 상태를 확인하여 주십시오. 프로그램을 종료합니다.', '서버 오류', () => {
+        if(window.location.pathname !== '/login'){
+          logoutFunction({ portcheck: false });
+        }
+        // logoutFunction({ portcheck: false });
       });
-    }    
+      return Promise.reject(error);  
+    }  
 
     // result_code 5 일 경우 axiosInstance 와 동일하게 로그인 페이지로 이동
     if (error.response.data.result_code === 5) {
@@ -972,7 +985,7 @@ axiosRedisInstance.interceptors.response.use(
 
     const url = error.config.url || '';
     const userId = getCookie('id');
-    if( url !== '/log/save' && userId != null && userId != '' ) {
+    if( url !== '/log/save' && userId != null && error.status !== 500 && userId != '' ) {
       let activation = '';
       let eventName = '';
       let queryType = 'R';
