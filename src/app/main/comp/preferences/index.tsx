@@ -517,11 +517,13 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                         if (value === '') {
                           setRetryCount('');
                         } else if (!isNaN(numericValue)) {
-                          setRetryCount(Math.min(numericValue, 60).toString());
+                          const clampedValue = Math.max(1, Math.min(numericValue, 60))
+                          setRetryCount(clampedValue.toString());
                         }
                       }}
                       className="!w-20 flex-shrink-0"
                       max={60}
+                      min={1}
                       isFullWidth={false}
                     />
                     <span className="text-sm whitespace-nowrap">초(sec)</span>
