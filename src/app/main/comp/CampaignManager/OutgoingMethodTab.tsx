@@ -64,8 +64,17 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
   const [limitExitInit, setLimitExitInit] = useState<boolean>(false);
   const [limitInit, setLimitInit] = useState<boolean>(false);
   const [limitRate, setLimitRate] = useState<string>("");
+  const [dncEnabled, setDncEnabled] = useState<boolean>(true);
   const [tempOutgoingMethodTab, setTempOutgoingMethodTab] = useState<OutgoingMethodTabParam>(CampaignOutgoingMethodTab);
   const [tempCampaignId, setTempCampaignId] = useState<number>(0);
+
+  // 사용자 옵션 문자열 생성 헬퍼
+  const getUserOptionString = (limit: string, dnc: boolean, limitEnabled: boolean) => {
+    const parts = [];
+    if (limitEnabled && limit) parts.push(`limit=${limit}`);
+    parts.push(`dnc=${dnc ? 'on' : 'off'}`);
+    return parts.join(',');
+  };
 
   // 숫자만 입력되도록 제어하는 함수
   const handleNumericInput = (
@@ -117,11 +126,12 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
           , power_divert_queue: Number(value)
         });
       } else if (type === 'setLimitRate') {
+        const newUserOption = getUserOptionString(value, dncEnabled, true);
         onCampaignOutgoingMethodChange({
           ...tempOutgoingMethodTab
           , changeYn: true
           , campaignInfoChangeYn: true
-          , user_option: value === '' ? '' : 'limit=' + value
+          , user_option: newUserOption
         });
         setLimitRate(value);
       }
@@ -194,9 +204,28 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
       });
       if (tempCampaignId !== campaignInfo.campaign_id) {
         setTempCampaignId(campaignInfo.campaign_id);
-        setLimitRate(campaignInfo.user_option === '' ? '' : campaignInfo.user_option.split(',')[0].indexOf('limit') > -1 ? campaignInfo.user_option.split(',')[0].split('=')[1] : '');
-        setLimitInit(campaignInfo.user_option === '' ? false : campaignInfo.user_option.split(',')[0].indexOf('limit') > -1 && campaignInfo.user_option.split(',')[1] === '0' ? true : false);
-        setLimitRateEnabled(campaignInfo.user_option === '' ? false : campaignInfo.user_option.split(',')[0].indexOf('limit') > -1 ? true : false);
+        
+        const options = campaignInfo.user_option ? campaignInfo.user_option.split(',') : [];
+        const limitOption = options.find(opt => opt.startsWith('limit='));
+        const dncOption = options.find(opt => opt.startsWith('dnc='));
+
+        // Limit(제한 호수 비율) 파싱
+        if (limitOption) {
+          const limitVal = limitOption.split('=')[1];
+          setLimitRate(limitVal);
+          setLimitRateEnabled(true);
+        } else {
+           setLimitRate("");
+           setLimitRateEnabled(false);
+        }
+
+        // DNC 사용 여부 파싱
+        if (dncOption) {
+             setDncEnabled(dncOption.split('=')[1] === 'on');
+        } else {
+             // 값이 없으면 기본값 '사용(on)'으로 설정
+             setDncEnabled(true);
+        }
       }
     }
   }, [campaignInfo]);
@@ -341,6 +370,32 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
             </Select>
           </div>
 
+
+          {/* DNC 사용 2026.01.28 추가 (기본값 on) - rody */}
+          <div className="flex items-center gap-2 mt-1">
+              <Label className="w-[8.3rem] min-w-[8.3rem]"> {/* 4.3 */}
+                DNC 사용
+              </Label>
+              
+              
+              <CustomCheckbox
+                id="dnc-usage"
+                checked={dncEnabled}
+                onCheckedChange={(checked) => {
+                  setDncEnabled(checked as boolean);
+                  const newUserOption = getUserOptionString(limitRate, checked as boolean, limitRateEnabled);
+                  onCampaignOutgoingMethodChange({
+                    ...tempOutgoingMethodTab
+                    , changeYn: true
+                    , campaignInfoChangeYn: true
+                    , user_option: newUserOption
+                  });
+                }}
+              />
+              
+              
+            </div>
+
         </div>
 
         <div className="w-[50%] flex flex-col gap-y-2">
@@ -453,11 +508,21 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
                 onCheckedChange={(checked) => {
                   setLimitRateEnabled(checked as boolean);
                   setLimitRateRateEnabled(checked as boolean);
+                  
+                  let newLimitRate = limitRate;
                   if (!checked) {
-                    // setLimitRate(""); // 비활성화 시 입력 값 초기화
-                    setLimitInit(checked as boolean);
-                    setLimitExitInit(checked as boolean);
+                    newLimitRate = "";
+                     setLimitInit(checked as boolean);
+                     setLimitExitInit(checked as boolean);
                   }
+                  
+                  const newUserOption = getUserOptionString(newLimitRate, dncEnabled, checked as boolean);
+                  onCampaignOutgoingMethodChange({
+                      ...tempOutgoingMethodTab
+                      , changeYn: true
+                      , campaignInfoChangeYn: true
+                      , user_option: newUserOption
+                  });
                 }}
               />
               <Label htmlFor="limit-rate" className="w-[108px] min-w-[108px]">
@@ -481,11 +546,12 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
                   setLimitRateRateEnabled(!checked as boolean);
                   if (checked) {
                     setLimitRate("0"); // 비활성화 시 입력 값 초기화
+                    const newUserOption = getUserOptionString("0", dncEnabled, limitRateEnabled);
                     onCampaignOutgoingMethodChange({
                       ...tempOutgoingMethodTab
                       , changeYn: true
                       , campaignInfoChangeYn: true
-                      , user_option: 'limit=0'
+                      , user_option: newUserOption
                     });
                     setLimitExitInit(!checked as boolean);
                   }
@@ -505,11 +571,12 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
                   setLimitRateRateEnabled(!checked as boolean);
                   if (checked) {
                     setLimitRate(""); // 비활성화 시 입력 값 초기화
+                    const newUserOption = getUserOptionString("", dncEnabled, false); // limit 비활성화
                     onCampaignOutgoingMethodChange({
                       ...tempOutgoingMethodTab
                       , changeYn: true
                       , campaignInfoChangeYn: true
-                      , user_option: ''
+                      , user_option: newUserOption
                     });
                     setLimitInit(!checked as boolean);
                   }
@@ -520,6 +587,8 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
                 분배 제한 고정 제외 초기화
               </Label>
             </div>
+
+            
           </div>
 
         </div>
