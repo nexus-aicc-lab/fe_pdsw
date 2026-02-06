@@ -66,7 +66,6 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
   const [limitRate, setLimitRate] = useState<string>("");
   const [dncEnabled, setDncEnabled] = useState<boolean>(true);
   const [tempOutgoingMethodTab, setTempOutgoingMethodTab] = useState<OutgoingMethodTabParam>(CampaignOutgoingMethodTab);
-  const [tempCampaignId, setTempCampaignId] = useState<number>(0);
 
   // 사용자 옵션 문자열 생성 헬퍼
   const getUserOptionString = (limit: string, dnc: boolean, limitEnabled: boolean) => {
@@ -202,30 +201,27 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
         , user_option: campaignInfo.user_option
         , channel_group_id: campaignInfo.channel_group_id
       });
-      if (tempCampaignId !== campaignInfo.campaign_id) {
-        setTempCampaignId(campaignInfo.campaign_id);
-        
-        const options = campaignInfo.user_option ? campaignInfo.user_option.split(',') : [];
-        const limitOption = options.find(opt => opt.startsWith('limit='));
-        const dncOption = options.find(opt => opt.startsWith('dnc='));
+      
+      const options = campaignInfo.user_option ? campaignInfo.user_option.split(',') : [];
+      const limitOption = options.find(opt => opt.startsWith('limit='));
+      const dncOption = options.find(opt => opt.startsWith('dnc='));
 
-        // Limit(제한 호수 비율) 파싱
-        if (limitOption) {
-          const limitVal = limitOption.split('=')[1];
-          setLimitRate(limitVal);
-          setLimitRateEnabled(true);
-        } else {
-           setLimitRate("");
-           setLimitRateEnabled(false);
-        }
+      // Limit(제한 호수 비율) 파싱
+      if (limitOption) {
+        const limitVal = limitOption.split('=')[1];
+        setLimitRate(limitVal);
+        setLimitRateEnabled(true);
+      } else {
+          setLimitRate("");
+          setLimitRateEnabled(false);
+      }
 
-        // DNC 사용 여부 파싱
-        if (dncOption) {
-             setDncEnabled(dncOption.split('=')[1] === 'on');
-        } else {
-             // 값이 없으면 기본값 '사용(on)'으로 설정
-             setDncEnabled(true);
-        }
+      // DNC 사용 여부 파싱
+      if (dncOption) {
+            setDncEnabled(dncOption.split('=')[1] === 'on');
+      } else {
+            // 값이 없으면 기본값 '사용(on)'으로 설정
+            setDncEnabled(true);
       }
     }
   }, [campaignInfo]);

@@ -581,6 +581,16 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     // campaignId 추가하여 masterCampaignId 변경 시에도 재설정되도록 함
   }, [campaignId, selectedCampaign, campaignSkills, callingNumbers, schedules]);
 
+  // campaigns 변경 시 selectedCampaign 동기화 - 2026.02.06
+  useEffect(() => {
+    if (campaigns && campaigns.length > 0 && selectedCampaign) {
+      const latest = campaigns.find(c => c.campaign_id === selectedCampaign.campaign_id);
+      if (latest && latest !== selectedCampaign) {
+        setSelectedCampaign(latest);
+      }
+    }
+  }, [campaigns, selectedCampaign, setSelectedCampaign]);
+
   // input 데이터 변경
   const handleInputData = (value: any, col: string) => {
     if (!campaignInfoChangeYn) {
