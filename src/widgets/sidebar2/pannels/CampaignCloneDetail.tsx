@@ -895,6 +895,18 @@ export default function CampaignDetail() {
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
+
+    // # BOSQ-468 태광 요청으로 캠페인ID 자동생성에서 무조건 입력으로 유효성 추가 2026/04/23 - by rody
+    if(!saveErrorCheck && (copyCampaignManagerInfo.campaign_id <= 0 || inputCampaignId === '') ){
+      saveErrorCheck = true;
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: "캠페인 아이디를 입력해 주세요.",
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }
     if( !saveErrorCheck && copyCampaignManagerInfo.campaign_id > 0 ){
       const checkCampaign = campaigns.filter(data => data.campaign_id === copyCampaignManagerInfo.campaign_id);
       if( checkCampaign.length > 0 ){
