@@ -74,7 +74,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
   const [endTime, setEndTime] = useState("");
   const [messageType, setMessageType] = useState("");
   const [personalCampaignAlertOnly, setPersonalCampaignAlertOnly] = useState(false);
-  const [unusedWorkHoursCalc, setUnusedWorkHoursCalc] = useState(false);
+  const [unusedWorkHoursCalc, setUnusedWorkHoursCalc] = useState(true); // 기본값 true 로 변경 BOSQ-464 이슈 수정
   const [dayOfWeek, setDayOfWeek] = useState<string[]>(['f', 'f', 'f', 'f', 'f', 'f', 'f']);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -231,7 +231,10 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
       setCustomTimeout(environmentData.serverConnectionTime?.toString() || "");
       setPersonalCampaignAlertOnly(environmentData.personalCampaignAlertOnly === 1);
       setMessageType(environmentData.useAlramPopup === 1 ? "알림만" : "알림과 없음");
-      setUnusedWorkHoursCalc(environmentData.unusedWorkHoursCalc === 1);
+
+      // BOSQ-464 이슈 수정
+      // setUnusedWorkHoursCalc은 fetchOperatingTime 응답으로만 결정 (시간 관련 state 소스 일원화)
+      // setUnusedWorkHoursCalc(environmentData.unusedWorkHoursCalc === 1);
       setLocalMaskInfo(environmentData.maskInfo === 1 ? 1 : 0);
       // setStartTime(environmentData.sendingWorkStartHours || "");
       // setEndTime(environmentData.sendingWorkEndHours || "");
@@ -247,7 +250,9 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
       setCustomTimeout("100");
       setPersonalCampaignAlertOnly(false);
       setMessageType("알림과 없음");
-      setUnusedWorkHoursCalc(false);
+      // BOSQ-464 이슈 수정
+      // 시간값이 모두 "0000/0000/f..f" 이면 "업무시간 미사용" 상태와 일관되게 true
+      setUnusedWorkHoursCalc(true);
       setStartTime("0000");
       setEndTime("0000");
       setDayOfWeek(['f', 'f', 'f', 'f', 'f', 'f', 'f']);
