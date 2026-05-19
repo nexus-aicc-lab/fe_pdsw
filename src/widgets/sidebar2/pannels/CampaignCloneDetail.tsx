@@ -885,6 +885,18 @@ export default function CampaignDetail() {
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
+
+    if (!saveErrorCheck && new TextEncoder().encode(copyCampaignManagerInfo.campaign_name || '').length > 30) {
+      saveErrorCheck = true;
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: `캠페인 명은 한글로 10자 이내, 영문 및 숫자 30자 이내로 입력해 주세요.`,
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }
+
     if(!saveErrorCheck && copyCampaignManagerInfo.tenant_id < 0 ){
       saveErrorCheck = true;
       setAlertState({
