@@ -174,7 +174,9 @@ export const useDeleteCampaignHelper = () => {
         }
     });
   
-    const commonDeleteCampaign = async (tenantId: number, campaignId: number): Promise<number> => {
+    // clientOrigin: 어떤 화면/동작이 삭제를 일으켰는지 로그에 남기기 위한 식별자.
+    // 로그의 '호출출처' 가 '미지정' 으로 남은 캠페인 삭제는 이 헬퍼를 거치지 않은 삭제다.
+    const commonDeleteCampaign = async (tenantId: number, campaignId: number, clientOrigin: string = '미지정'): Promise<number> => {
 
         // 다음 index 아이디 구하기
         const nextId = findPreviousOrNextCampaignId(tenantId, campaignId);
@@ -248,6 +250,7 @@ export const useDeleteCampaignHelper = () => {
                 ...campaignInfoDelete,
                 campaign_id: campaignId,
                 tenant_id: tenantId,
+                client_origin: clientOrigin,
             });
     
             return nextId;

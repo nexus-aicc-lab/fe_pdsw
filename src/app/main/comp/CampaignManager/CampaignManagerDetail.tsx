@@ -1435,7 +1435,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       // 캠페인 스케줄 삭제를 1번째 순서로 변경
       try{
 
-        const callbackCampaignId = await commonDeleteCampaign(tempCampaignInfo.tenant_id, tempCampaignInfo.campaign_id);
+        const callbackCampaignId = await commonDeleteCampaign(tempCampaignInfo.tenant_id, tempCampaignInfo.campaign_id, 'campaign-detail-delete-button');
         // 삭제로직 이후에 콜백받는 다음 인덱스 캠페인 아이디
         // console.log('Test ######## callbackCampaignId : ', callbackCampaignId);
         setInit(callbackCampaignId);

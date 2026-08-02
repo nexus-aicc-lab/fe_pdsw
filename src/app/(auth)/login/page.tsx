@@ -108,6 +108,22 @@ export default function LoginPage() {
   // 캠페인 운용 가능 시간 조회 API 호출
   const { mutate: fetchOperatingTime } = useApiForOperatingTime({
     onSuccess: (data) => {
+      // 비정상 응답(예: result_code 6 "Access to the API is denied.")은 result_data 가 없다.
+      // 방치하면 아래 구조분해에서 예외가 나 setSessionKey 까지 도달하지 못하고,
+      // 알림도 isPending 해제도 없이 '로그인 중...' 상태로 멈춘 것처럼 보인다.
+      if (data?.result_code !== 0 || !data?.result_data) {
+        setIsPending(false);
+        setAlertState({
+          isOpen: true,
+          message: data?.result_code === 6
+            ? '운용 가능 시간 조회에 접근 할 수 없는 사용자입니다. 관리자에게 문의해주세요.'
+            : '운용 가능 시간 조회에 실패했습니다. 관리자에게 문의해주세요.',
+          title: '로그인',
+          type: '2',
+        });
+        return;
+      }
+
       const { start_time, end_time, days_of_week } = data.result_data;
 
       setEnvironment({
@@ -126,6 +142,16 @@ export default function LoginPage() {
       if( _sessionKey && _sessionKey !== ''){
         setSessionKey(_sessionKey); // authStore에 session_key 저장
       }
+    },
+    onError: () => {
+      // 조회 자체가 실패한 경우에도 '로그인 중...' 으로 멈추지 않도록 상태를 되돌린다.
+      setIsPending(false);
+      setAlertState({
+        isOpen: true,
+        message: '운용 가능 시간 조회에 실패했습니다. 관리자에게 문의해주세요.',
+        title: '로그인',
+        type: '2',
+      });
     },
   });
 

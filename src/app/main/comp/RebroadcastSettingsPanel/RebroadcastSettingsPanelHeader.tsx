@@ -140,12 +140,12 @@ const RebroadcastSettingsPanelHeader = ({
     useEffect(() => {
         if (campaigns && campaigns.length > 0 && campaignId !== '0') {
             setHeaderCampaignId(campaignId + '');
-            const tempCampaign = campaigns.filter(data => Number(campaignId) === data.campaign_id);
-            if (tempCampaign.length > 0) {
-                setListCount(tempCampaign[0].list_count);
-            }
-            if (tempCampaign[0].start_flag === 1) {
-                setRealtime(true);
+            // 삭제된 캠페인은 목록에서 사라지므로 조회 결과가 없을 수 있다.
+            // find + 옵셔널 체이닝으로 인덱스 접근을 없애 목록에 빈 항목이 섞여도 터지지 않게 한다.
+            const tempCampaign = campaigns.find(data => Number(campaignId) === data?.campaign_id);
+            if (tempCampaign) {
+                setListCount(tempCampaign.list_count);
+                setRealtime(tempCampaign.start_flag === 1);
             } else {
                 setRealtime(false);
             }
@@ -180,9 +180,10 @@ const RebroadcastSettingsPanelHeader = ({
                     <CustomInput
                         className="w-[140px]"
                         disabled
-                        value={headerCampaignId === '' ? ''
-                            : campaigns && campaigns.length > 0 ? campaigns.filter(data => Number(headerCampaignId) === data.campaign_id)[0].campaign_name || ''
-                                : ''
+                        value={
+                            // 캠페인 삭제 등으로 목록에서 사라진 뒤에도 headerCampaignId 는 남아 있어
+                            // 일치하는 캠페인이 없을 수 있다. 이 경우 빈 값으로 표시한다.
+                            campaigns?.find(data => Number(headerCampaignId) === data?.campaign_id)?.campaign_name || ''
                         }
                     />
                 </div>

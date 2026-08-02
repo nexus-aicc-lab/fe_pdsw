@@ -72,7 +72,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
     setIsDeleting(true);
 
     try{
-      const callbackCampaignId = await commonDeleteCampaign(Number(tenant_id), Number(campaignId));
+      const callbackCampaignId = await commonDeleteCampaign(Number(tenant_id), Number(campaignId), 'tree-context-menu-delete');
 
       // 내부 알림 상태 설정 (필요하다면)
       setAlertState({

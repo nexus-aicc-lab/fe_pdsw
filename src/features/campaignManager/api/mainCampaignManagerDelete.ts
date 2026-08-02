@@ -16,9 +16,11 @@ export const fetchCampaignManagerDelete = async (credentials: CampaignInfoDelete
       'campaigns/'+credentials.campaign_id,
       {
         headers: {
-          'Content-Type': 'application/json' 
+          'Content-Type': 'application/json'
         },
-        data: campaignManagerDeleteRequestData 
+        data: campaignManagerDeleteRequestData,
+        // 로그에만 남는 값. 어떤 화면/동작이 이 삭제를 일으켰는지 추적용.
+        clientOrigin: credentials.client_origin
       }
     );
     return data;

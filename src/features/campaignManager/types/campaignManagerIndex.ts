@@ -250,6 +250,8 @@ export interface CampaignInfoDeleteRequest {
   campaign_id: number;
   tenant_id: number;
   delete_dial_list: number;
+  /** 로그 추적용 호출 출처. 서버 요청 본문에는 포함되지 않고 로그 description 에만 기록된다. */
+  client_origin?: string;
 }
 
 // 캠페인 분배제한 정보 삭제 요청 데이터 타입

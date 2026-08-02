@@ -4,6 +4,29 @@ import { getCookie } from './cookies';
 import { customAlertService } from '@/components/shared/layout/utils/CustomAlertService';
 import logoutFunction from '@/components/common/logoutFunction';
 
+// 로그 추적용 커스텀 요청 설정.
+// 서버 요청에는 포함되지 않고 /log/save 의 description 에만 기록된다.
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    /** 이 요청을 발생시킨 화면/동작 식별자. 예: 'campaign-detail-delete-button' */
+    clientOrigin?: string;
+  }
+}
+
+// clientOrigin 을 지정한 요청에만 로그 description 에 호출 출처를 덧붙인다.
+// 지정하지 않은 나머지 요청은 기존 description 을 그대로 사용한다.
+const buildLogDescription = (
+  config: { method?: string; clientOrigin?: string } | undefined,
+  description: string
+): string => {
+  const clientOrigin = config?.clientOrigin;
+  if (!clientOrigin) return description;
+
+  const method = (config.method || '').toUpperCase();
+  const originText = (method ? '[' + method + '] ' : '') + '호출출처: ' + clientOrigin;
+  return description ? description + ' ' + originText : originText;
+};
+
 export const axiosInstance = axios.create({
   baseURL: '/pds',
   withCredentials: true
@@ -109,7 +132,11 @@ axiosInstance.interceptors.response.use(
       });
     }
 
-    const url = response.config.url || '';
+    // config.url 은 baseURL 결합 전 값이라 호출부 표기에 따라 선행 슬래시 유무가 제각각이다.
+    // (예: 'campaigns/1/calling-list' vs '/campaigns/1/maxcall-ext')
+    // 아래 분기들이 '/campaigns' 형태를 전제하므로 진입점에서 한 번 정규화한다.
+    const url = '/' + (response.config.url || '').replace(/^\/+/, '');
+    const urlSegments = url.split('/').filter(Boolean);
     const userId = getCookie('id');
     if( url !== '/login' && userId != null && userId != '' ) {
       let activation = '';
@@ -129,7 +156,7 @@ axiosInstance.interceptors.response.use(
         if( response.config.method === 'post' ) {
           activation = '전화번호설명템플릿생성';
           eventName = 'description';
-          queryType = 'C';
+          queryType = 'I'; // 'C' 에서 'I' 로 변경
         }else if( response.config.method === 'put' ) {
           activation = '전화번호설명템플릿수정';
           eventName = 'description';
@@ -182,7 +209,7 @@ axiosInstance.interceptors.response.use(
           eventName = 'channel-assign';
           queryType = 'U';
         }
-      } else if( url === '/collections/skill' || url === 'collections/skill' ) {
+      } else if( url === '/collections/skill' ) {
         activation = '스킬마스터목록조회';
         eventName = 'skills';
       } else if( url.indexOf('skills') > -1 && url.indexOf('/agent-list') == -1 ) {
@@ -218,7 +245,7 @@ axiosInstance.interceptors.response.use(
       } else if( url === '/collections/agent-skill' ) {
         activation = '상담사보유스킬';
         eventName = 'agent-skill';
-      } else if( url === '/collections/campaign-skill' || url === 'collections/campaign-skill' ) {
+      } else if( url === '/collections/campaign-skill' ) {
         activation = '캠페인요구스킬조회';
         eventName = 'skill';
       } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/skill') > -1 ) {
@@ -235,23 +262,41 @@ axiosInstance.interceptors.response.use(
         eventName = 'maxcall-init-time';
         queryType = 'U';
       } else if( url === '/collections/suspended-skill' ) {
-        activation = '일지중지캠페인조회';
+        activation = '일시중지스킬조회';
         eventName = 'suspended-skill';
       } else if( url === '/suspended-skill' ) {
-        activation = '일지중지캠페인삭제';
+        activation = '일시중지스킬삭제';
         eventName = 'suspended-skill';
         queryType = 'D';
-      } else if( url === 'collections/campaign-list' ) {
+      } else if( url === '/collections/campaign-list' ) {
         activation = '캠페인리스트조회';
         eventName = 'campaign-list';
       } else if( url === '/collections/campaign' ) {
         activation = '캠페인마스터목록조회';
         eventName = 'campaigns';
+        
+      // 과거 코드 같음, url 패스가 다름 2026-08-02
+      /*
       } else if( url.indexOf('/collections') > -1 && url.split('/').length === 2 ) {
         if( response.config.method === 'post' ) {
           activation = '캠페인마스터생성';
           eventName = 'campaigns';
           queryType = 'C';
+        }else if( response.config.method === 'put' ) {
+          activation = '캠페인마스터수정';
+          eventName = 'campaigns';
+          queryType = 'U';
+        }else if( response.config.method === 'delete' ) {
+          activation = '캠페인마스터삭제';
+          eventName = 'campaigns';
+          queryType = 'D';
+        }
+      */
+      } else if( urlSegments[0] === 'campaigns' && urlSegments.length === 2 ) {
+        if( response.config.method === 'post' ) {
+          activation = '캠페인마스터생성';
+          eventName = 'campaigns';
+          queryType = 'I'; // 'C' 에서 'I' 로 변경
         }else if( response.config.method === 'put' ) {
           activation = '캠페인마스터수정';
           eventName = 'campaigns';
@@ -316,7 +361,7 @@ axiosInstance.interceptors.response.use(
         if( response.config.method === 'post' ) {
           activation = '캠페인스케줄정보생성';
           eventName = 'campaign-schedule';
-          queryType = 'C';
+          queryType = 'I'; // 'C' 에서 'I' 로 변경
         }else if( response.config.method === 'put' ) {
           activation = '캠페인스케줄정보수정';
           eventName = 'campaign-schedule';
@@ -333,7 +378,7 @@ axiosInstance.interceptors.response.use(
         if( response.config.method === 'post' ) {
           activation = '캠페인발신번호생성';
           eventName = 'campaign-calling-number';
-          queryType = 'C';
+          queryType = 'I'; // 'C' 에서 'I' 로 변경
         } else if( response.config.method === 'put' ) {
           activation = '캠페인발신번호수정';
           eventName = 'campaign-calling-number';
@@ -364,7 +409,7 @@ axiosInstance.interceptors.response.use(
         if( response.config.method === 'post' ) {
           activation = '발신리스트업로드추가';
           eventName = 'campaign-calling-list';
-          queryType = 'C';
+          queryType = 'I'; // 'C' 에서 'I' 로 변경
         } else if( response.config.method === 'delete' ) {
           activation = '발신리스트업로드삭제';
           eventName = 'campaign-calling-list';
@@ -380,6 +425,20 @@ axiosInstance.interceptors.response.use(
           eventName = 'campaign-black-list';
           queryType = 'D';
         }
+      } else if( url === '/collections/callback-daily-init-time' ) {
+        activation = '콜백캠페인리스트초기화시각조회';
+        eventName = 'callback-daily-init-time';
+      } else if( url === '/callback-daily-init-time' ) {
+        activation = '콜백캠페인리스트초기화시각수정';
+        eventName = 'callback-daily-init-time';
+        queryType = 'U';
+      } else if( url === '/collections/operating-time' ) {
+        activation = '캠페인운용가능시간조회';
+        eventName = 'operating-time';
+      } else if( url === '/operating-time' ) {
+        activation = '캠페인운용가능시간수정';
+        eventName = 'operating-time';
+        queryType = 'U';
       } else if( url === '/collections/campaign-blacklist-max' ) {
         activation = '블랙리스트최대수량조회';
         eventName = 'campaign-blacklist-max';
@@ -388,7 +447,7 @@ axiosInstance.interceptors.response.use(
         eventName = 'campaign-blacklist-count';
       } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/dial-speed') > -1 ) {
         activation = '캠페인발신속도수정';
-        eventName = 'campaign-black-list';
+        eventName = 'campaign-dial-speed';
         queryType = 'U';
       } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/callback-list') > -1 ) {
         activation = '캠페인콜백리스트추가';
@@ -413,20 +472,20 @@ axiosInstance.interceptors.response.use(
         activation = '캠페인대기상담사수조회';
         eventName = 'agent-ready-count';
       } else if( url === '/collections/suspended-campaign' ) {
-        activation = '일지중지캠페인조회';
+        activation = '일시중지캠페인조회';
         eventName = 'suspended-campaign';
       } else if( url === '/suspended-campaign' ) {
-        activation = '일지중지캠페인삭제';
+        activation = '일시중지캠페인삭제';
         eventName = 'suspended-campaign';
         queryType = 'D';
-      } else if( url === '/collections/campaign-group' || url === 'collections/campaign-group' ) {
+      } else if( url === '/collections/campaign-group' ) {
         activation = '캠페인그룹정보조회';
         eventName = 'campaignGroups';
-      } else if( url.split('/')[0] === 'campaign-groups' ) {
+      } else if( urlSegments[0] === 'campaign-groups' ) {
         if( response.config.method === 'post' ) {
           activation = '캠페인그룹정보생성';
           eventName = 'campaignGroup';
-          queryType = 'C';
+          queryType = 'I';
         } else if( response.config.method === 'put' ) {
           activation = '캠페인그룹정보수정';
           eventName = 'campaignGroup';
@@ -435,21 +494,21 @@ axiosInstance.interceptors.response.use(
           activation = '캠페인그룹정보삭제';
           eventName = 'campaignGroup';
           queryType = 'D';
-          description = '캠페인 그룹 아이디 : "' + url.split('/')[1] + '"번 삭제';
+          description = '캠페인 그룹 아이디 : "' + urlSegments[1] + '"번 삭제';
         }
-      } else if( url === '/collections/campaign-group-list' || url === 'collections/campaign-group-list' ) {
+      } else if( url === '/collections/campaign-group-list' ) {
         activation = '캠페인그룹소속캠페인조회';
         eventName = 'campaignGroupCampaigns';
-      } else if( url.split('/')[0] === 'campaign-group' && url.indexOf('/list') > -1 ) {
+      } else if( urlSegments[0] === 'campaign-group' && url.indexOf('/list') > -1 ) {
         if( response.config.method === 'post' ) {
           activation = '캠페인그룹소속캠페인생성';
           eventName = 'campaignGroupCampaign';
-          queryType = 'C';
+          queryType = 'I'; // 'C' 에서 'I' 로 변경
         } else if( response.config.method === 'delete' ) {
           activation = '캠페인그룹소속캠페인삭제';
           eventName = 'campaignGroupCampaign';
           queryType = 'D';
-          description = '캠페인 그룹 아이디 : "' + url.split('/')[1] + '"번 소속캠페인 삭제';
+          description = '캠페인 그룹 아이디 : "' + urlSegments[1] + '"번 소속캠페인 삭제';
         }
       }
       const logData = {
@@ -459,7 +518,7 @@ axiosInstance.interceptors.response.use(
           "queryId": response.config.url,
           "queryType": queryType,
           "activation": activation,
-          "description": description,
+          "description": buildLogDescription(response.config, description),
           "successFlag": 1,
           "eventName": eventName,
           "queryRows": typeof response.data.result_data === 'undefined' ? 1 : response.data.result_data.length,
@@ -492,7 +551,9 @@ axiosInstance.interceptors.response.use(
       });
     }
 
-    const url = error.config.url || '';
+    // 성공 인터셉터와 동일하게 선행 슬래시를 정규화한다.
+    const url = '/' + (error.config.url || '').replace(/^\/+/, '');
+    const urlSegments = url.split('/').filter(Boolean);
     const userId = getCookie('id');
     if( url !== '/login' && userId != null && userId != '' ) {
       let activation = '';
@@ -512,7 +573,7 @@ axiosInstance.interceptors.response.use(
         if( error.config.method === 'post' ) {
           activation = '전화번호설명템플릿생성';
           eventName = 'description';
-          queryType = 'C';
+          queryType = 'I'; // 'C' 에서 'I' 로 변경
         }else if( error.config.method === 'put' ) {
           activation = '전화번호설명템플릿수정';
           eventName = 'description';
@@ -565,7 +626,7 @@ axiosInstance.interceptors.response.use(
           eventName = 'channel-assign';
           queryType = 'U';
         }
-      } else if( url === '/collections/skill' || url === 'collections/skill' ) {
+      } else if( url === '/collections/skill' ) {
         activation = '스킬마스터목록조회';
         eventName = 'skills';
       } else if( url.indexOf('skills') > -1 && url.indexOf('/agent-list') == -1 ) {
@@ -601,7 +662,7 @@ axiosInstance.interceptors.response.use(
       } else if( url === '/collections/agent-skill' ) {
         activation = '상담사보유스킬';
         eventName = 'agent-skill';
-      } else if( url === '/collections/campaign-skill' || url === 'collections/campaign-skill' ) {
+      } else if( url === '/collections/campaign-skill' ) {
         activation = '캠페인요구스킬조회';
         eventName = 'skill';
       } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/skill') > -1 ) {
@@ -618,23 +679,42 @@ axiosInstance.interceptors.response.use(
         eventName = 'maxcall-init-time';
         queryType = 'U';
       } else if( url === '/collections/suspended-skill' ) {
-        activation = '일지중지스킬조회';
+        activation = '일시중지스킬조회';
         eventName = 'suspended-skill';
       } else if( url === '/suspended-skill' ) {
-        activation = '일지중지스킬삭제';
+        activation = '일시중지스킬삭제';
         eventName = 'suspended-skill';
         queryType = 'D';
-      } else if( url === 'collections/campaign-list' ) {
+      } else if( url === '/collections/campaign-list' ) {
         activation = '캠페인리스트조회';
         eventName = 'campaign-list';
       } else if( url === '/collections/campaign' ) {
         activation = '캠페인마스터목록조회';
         eventName = 'campaigns';
+
+      // 과거 코드 같음, url 패스가 다름 2026-08-02
+      /*
       } else if( url.indexOf('/collections') > -1 && url.split('/').length === 2 ) {
         if( error.config.method === 'post' ) {
           activation = '캠페인마스터생성';
           eventName = 'campaigns';
-          queryType = 'C';
+          queryType = 'I'; // 'C' 에서 'I' 로 변경
+        }else if( error.config.method === 'put' ) {
+          activation = '캠페인마스터수정';
+          eventName = 'campaigns';
+          queryType = 'U';
+        }else if( error.config.method === 'delete' ) {
+          activation = '캠페인마스터삭제';
+          eventName = 'campaigns';
+          queryType = 'D';
+        }
+      */
+
+      } else if( urlSegments[0] === 'campaigns' && urlSegments.length === 2 ) {
+        if( error.config.method === 'post' ) {
+          activation = '캠페인마스터생성';
+          eventName = 'campaigns';
+          queryType = 'I'; // 'C' 에서 'I' 로 변경
         }else if( error.config.method === 'put' ) {
           activation = '캠페인마스터수정';
           eventName = 'campaigns';
@@ -699,7 +779,7 @@ axiosInstance.interceptors.response.use(
         if( error.config.method === 'post' ) {
           activation = '캠페인스케줄정보생성';
           eventName = 'campaign-schedule';
-          queryType = 'C';
+          queryType = 'I'; // 'C' 에서 'I' 로 변경
         }else if( error.config.method === 'put' ) {
           activation = '캠페인스케줄정보수정';
           eventName = 'campaign-schedule';
@@ -716,7 +796,7 @@ axiosInstance.interceptors.response.use(
         if( error.config.method === 'post' ) {
           activation = '캠페인발신번호생성';
           eventName = 'campaign-calling-number';
-          queryType = 'C';
+          queryType = 'I'; // 'C' 에서 'I' 로 변경
         } else if( error.config.method === 'put' ) {
           activation = '캠페인발신번호수정';
           eventName = 'campaign-calling-number';
@@ -747,7 +827,7 @@ axiosInstance.interceptors.response.use(
         if( error.config.method === 'post' ) {
           activation = '발신리스트업로드추가';
           eventName = 'campaign-calling-list';
-          queryType = 'C';
+          queryType = 'I'; // 'C' 에서 'I' 로 변경
         } else if( error.config.method === 'delete' ) {
           activation = '발신리스트업로드삭제';
           eventName = 'campaign-calling-list';
@@ -763,6 +843,20 @@ axiosInstance.interceptors.response.use(
           eventName = 'campaign-black-list';
           queryType = 'D';
         }
+      } else if( url === '/collections/callback-daily-init-time' ) {
+        activation = '콜백캠페인리스트초기화시각조회';
+        eventName = 'callback-daily-init-time';
+      } else if( url === '/callback-daily-init-time' ) {
+        activation = '콜백캠페인리스트초기화시각수정';
+        eventName = 'callback-daily-init-time';
+        queryType = 'U';
+      } else if( url === '/collections/operating-time' ) {
+        activation = '캠페인운용가능시간조회';
+        eventName = 'operating-time';
+      } else if( url === '/operating-time' ) {
+        activation = '캠페인운용가능시간수정';
+        eventName = 'operating-time';
+        queryType = 'U';
       } else if( url === '/collections/campaign-blacklist-max' ) {
         activation = '블랙리스트최대수량조회';
         eventName = 'campaign-blacklist-max';
@@ -771,7 +865,7 @@ axiosInstance.interceptors.response.use(
         eventName = 'campaign-blacklist-count';
       } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/dial-speed') > -1 ) {
         activation = '캠페인발신속도수정';
-        eventName = 'campaign-black-list';
+        eventName = 'campaign-dial-speed';
         queryType = 'U';
       } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/callback-list') > -1 ) {
         activation = '캠페인콜백리스트추가';
@@ -796,20 +890,20 @@ axiosInstance.interceptors.response.use(
         activation = '캠페인대기상담사수조회';
         eventName = 'agent-ready-count';
       } else if( url === '/collections/suspended-campaign' ) {
-        activation = '일지중지캠페인조회';
+        activation = '일시중지캠페인조회';
         eventName = 'suspended-campaign';
       } else if( url === '/suspended-campaign' ) {
-        activation = '일지중지캠페인삭제';
+        activation = '일시중지캠페인삭제';
         eventName = 'suspended-campaign';
         queryType = 'D';
-      } else if( url === '/collections/campaign-group' || url === 'collections/campaign-group' ) {
+      } else if( url === '/collections/campaign-group' ) {
         activation = '캠페인그룹정보조회';
         eventName = 'campaignGroups';
-      } else if( url.split('/')[0] === 'campaign-groups' ) {
+      } else if( urlSegments[0] === 'campaign-groups' ) {
         if( error.config.method === 'post' ) {
           activation = '캠페인그룹정보생성';
           eventName = 'campaignGroup';
-          queryType = 'C';
+          queryType = 'I'; // 'C' 에서 'I' 로 변경
         } else if( error.config.method === 'put' ) {
           activation = '캠페인그룹정보수정';
           eventName = 'campaignGroup';
@@ -819,14 +913,14 @@ axiosInstance.interceptors.response.use(
           eventName = 'campaignGroup';
           queryType = 'D';
         }
-      } else if( url === '/collections/campaign-group-list' || url === 'collections/campaign-group-list' ) {
+      } else if( url === '/collections/campaign-group-list' ) {
         activation = '캠페인그룹소속캠페인조회';
         eventName = 'campaignGroupCampaigns';
-      } else if( url.split('/')[0] === 'campaign-group' && url.indexOf('/list') > -1 ) {
+      } else if( urlSegments[0] === 'campaign-group' && url.indexOf('/list') > -1 ) {
         if( error.config.method === 'post' ) {
           activation = '캠페인그룹소속캠페인생성';
           eventName = 'campaignGroupCampaign';
-          queryType = 'C';
+          queryType = 'I'; // 'C' 에서 'I' 로 변경
         } else if( error.config.method === 'delete' ) {
           activation = '캠페인그룹소속캠페인삭제';
           eventName = 'campaignGroupCampaign';
@@ -844,7 +938,7 @@ axiosInstance.interceptors.response.use(
             "queryId": error.config.url,
             "queryType": queryType,
             "activation": activation,
-            "description": error.message,
+            "description": buildLogDescription(error.config, error.message),
             "successFlag": 0,
             "eventName": eventName,
             "queryRows": 0,
